@@ -56,6 +56,10 @@ namespace AutoPBW.WPF
 				var engineViewSource = ((CollectionViewSource)(this.FindResource("engineViewSource")));
 				engineViewSource.Source = Config.Instance.Engines;
 				lstEngines.GetBindingExpression(ListView.ItemsSourceProperty).UpdateTarget();
+				ddlEngine.GetBindingExpression(ComboBox.ItemsSourceProperty).UpdateTarget();
+				var modViewSource = ((CollectionViewSource)(this.FindResource("modViewSource")));
+				modViewSource.Source = Config.Instance.Mods;
+				lstMods.GetBindingExpression(ListView.ItemsSourceProperty).UpdateTarget();
 			}
 			catch (Exception ex)
 			{
@@ -94,15 +98,24 @@ namespace AutoPBW.WPF
 			else
 			{
 				var game = (PlayerGame)row.DataContext;
-				if (game.Mod.IsUnknown || game.Mod.Engine.IsUnknown)
+				if (game.Mod.IsUnknown)
 				{
-					MessageBox.Show("Unknown mod " + game.Mod + " for " + game.Mod.Engine + ". Please configure it in the settings.");
-					tabSettings.Focus();
+					MessageBox.Show("Unknown mod " + game.Mod + " for " + game.Engine + ". Please configure it.");
+					lstMods.SelectedItem = game.Mod;
+					tabMods.Focus();
+				}
+				else if (game.Engine.IsUnknown)
+				{
+					MessageBox.Show("Unknown game engine " + game.Engine + ". Please configure it.");
+					lstEngines.SelectedItem = game.Engine;
+					tabEngines.Focus();
 				}
 				else
 				{
+					Cursor = Cursors.Wait;
 					game.DownloadTurn();
 					game.PlayTurn();
+					Cursor = Cursors.Arrow;
 				}
 			}
 			e.Handled = true;
@@ -126,7 +139,7 @@ namespace AutoPBW.WPF
 			var engine = lstEngines.SelectedItem as Engine;
 			if (engine != null)
 			{
-				engine.Code = codeTextBox.Text;
+				engine.Code = engineCodeTextBox.Text;
 				engine.Executable = executableTextBox.Text;
 				engine.HostArguments = hostArgumentsTextBox.Text;
 				engine.HostPath = hostPathTextBox.Text;
@@ -163,6 +176,51 @@ namespace AutoPBW.WPF
 			var engine = Engine.Find("New Engine");
 			RefreshData();
 			lstEngines.SelectedItem = engine;
+		}
+
+		private void btnAddMod_Click(object sender, RoutedEventArgs e)
+		{
+			var mod = Mod.Find("New Mod");
+			RefreshData();
+			lstMods.SelectedItem = mod;
+		}
+
+		private void btnDeleteMod_Click(object sender, RoutedEventArgs e)
+		{
+			var mod = lstMods.SelectedItem as Mod;
+			if (mod != null)
+			{
+				if (MessageBox.Show("Really delete the configuration for " + mod + "?", "Confirm Delete", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+				{
+					Config.Instance.Mods.Remove(mod);
+					Config.Save();
+					RefreshData();
+					lstMods.SelectedItem = null;
+				}
+			}
+		}
+
+		private void btnSaveMod_Click(object sender, RoutedEventArgs e)
+		{
+			var mod = lstMods.SelectedItem as Mod;
+			if (mod != null)
+			{
+				mod.Code = modCodeTextBox.Text;
+				mod.Engine = ddlEngine.SelectedItem as Engine;
+				mod.Path = modPathTextBox.Text;
+				mod.SavePath = savePathTextBox.Text;
+				mod.EmpirePath = empirePathTextBox.Text;
+				mod.IsUnknown = false;
+				Config.Save();
+				RefreshData();
+				lstMods.SelectedItem = null;
+			}
+		}
+
+		private void lstMods_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			var mod = lstMods.SelectedItem as Mod;
+			gridModDetails.DataContext = mod;
 		}
 	}
 }

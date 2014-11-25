@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using SevenZip;
 
 namespace AutoPBW
 {
@@ -17,9 +18,22 @@ namespace AutoPBW
 		static Config()
 		{
 			Instance = new Config();
+
 			JsonSettings = new JsonSerializerSettings();
 			JsonSettings.Formatting = Formatting.Indented;
 			JsonSettings.PreserveReferencesHandling = PreserveReferencesHandling.All;
+
+			if (IntPtr.Size == 8) // 64-bit
+			{
+				SevenZipCompressor.SetLibraryPath("7z64.dll");
+				SevenZipExtractor.SetLibraryPath("7z64.dll");
+
+			}
+			else
+			{
+				SevenZipCompressor.SetLibraryPath("7z.dll");
+				SevenZipExtractor.SetLibraryPath("7z.dll");
+			}
 		}
 
 		private Config()

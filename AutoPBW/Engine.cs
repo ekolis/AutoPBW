@@ -46,50 +46,6 @@ namespace AutoPBW
 		public string Executable { get; set; }
 
 		/// <summary>
-		/// Command line arguments for the host.
-		/// Can use the following replacement strings:
-		/// {ModPath}: the path to the mod
-		/// {SavePath}: the save path of the mod
-		/// {Password}: the host password for the game
-		/// {GameCode}: the unique game code for each game
-		/// {TurnNumber}: the turn number for the game
-		/// </summary>
-		public string HostArguments { get; set; }
-
-		public string GenerateHostArgumentsOrFilter(string basestring, string modpath, string savepath, string password, string gamecode, int turnnumber)
-		{
-			return basestring
-				.Replace("{ModPath}", modpath)
-				.Replace("{SavePath}", savepath)
-				.Replace("{Password}", password)
-				.Replace("{GameCode}", gamecode)
-				.Replace("{TurnNumber}", turnnumber.ToString());
-		}
-
-		/// <summary>
-		/// Command line arguments for the player.
-		/// Can use the following replacement strings:
-		/// {ModPath}: the path to the mod
-		/// {SavePath}: the save path of the mod
-		/// {Password}: the player password for the game
-		/// {GameCode}: the unique game code for each game
-		/// {TurnNumber}: the turn number for the game
-		/// {PlayerNumber}: the player number for our empire
-		/// </summary>
-		public string PlayerArguments { get; set; }
-
-		public string GeneratePlayerArgumentsOrFilter(string basestring, string modpath, string savepath, string password, string gamecode, int turnnumber, int playernumber)
-		{
-			return basestring
-				.Replace("{ModPath}", modpath)
-				.Replace("{SavePath}", savepath)
-				.Replace("{Password}", password)
-				.Replace("{GameCode}", gamecode)
-				.Replace("{TurnNumber}", turnnumber.ToString())
-				.Replace("{PlayerNumber}", playernumber.ToString());
-		}
-
-		/// <summary>
 		/// Comma separated list of filename filters for the host turn upload.
 		/// Can use replacement strings from HostArguments.
 		/// </summary>
@@ -105,6 +61,31 @@ namespace AutoPBW
 		/// Is this an unknown engine?
 		/// </summary>
 		public bool IsUnknown { get; set; }
+
+		/// <summary>
+		/// Command line arguments for the host.
+		/// Can use the following replacement strings:
+		/// {EnginePath}: the path to the game engine
+		/// {ModPath}: the path to the mod (relative to the engine path)
+		/// {SavePath}: the save path of the mod (relative to the engine path)
+		/// {Password}: the host password for the game
+		/// {GameCode}: the unique game code for each game
+		/// {TurnNumber}: the turn number for the game
+		/// </summary>
+		public string HostArguments { get; set; }
+
+		/// <summary>
+		/// Command line arguments for the player.
+		/// Can use the following replacement strings:
+		/// {EnginePath}: the path to the game engine
+		/// {ModPath}: the path to the mod (relative to the engine path)
+		/// {SavePath}: the save path of the mod (relative to the engine path)
+		/// {Password}: the player password for the game
+		/// {GameCode}: the unique game code for each game
+		/// {TurnNumber}: the turn number for the game
+		/// {PlayerNumber}: the player number for our empire
+		/// </summary>
+		public string PlayerArguments { get; set; }
 
 		public static Engine Find(string code)
 		{

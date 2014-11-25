@@ -151,7 +151,7 @@ namespace AutoPBW
 		{
 			// get list of files
 			var path = Path.Combine(Engine.HostPath, Mod.SavePath);
-			var files = GetFiles(path, Engine.GenerateHostArgumentsOrFilter(Engine.HostTurnUploadFilter, Mod.Path, Mod.SavePath, Password, Code, TurnNumber));
+			var files = GetFiles(path, GenerateArgumentsOrFilter(Engine.HostTurnUploadFilter));
 
 			// send to PBW
 			var url = "http://pbw.spaceempires.net/games/{0}/host-turn/upload".F(Code);
@@ -167,6 +167,17 @@ namespace AutoPBW
 		// TODO - upload host PLR
 
 		// TODO - upload GSU
+
+		private string GenerateArgumentsOrFilter(string basestring)
+		{
+			return basestring
+				.Replace("{EnginePath}", Engine.HostPath)
+				.Replace("{ModPath}", Mod.Path)
+				.Replace("{SavePath}", Mod.SavePath)
+				.Replace("{Password}", Password)
+				.Replace("{GameCode}", Code)
+				.Replace("{TurnNumber}", TurnNumber.ToString());
+		}
 	}
 
 	/// <summary>
@@ -247,7 +258,7 @@ namespace AutoPBW
 		{
 			// get list of files
 			var path = Path.Combine(Engine.HostPath, Mod.SavePath);
-			var files = GetFiles(path, Engine.GeneratePlayerArgumentsOrFilter(Engine.PlayerTurnUploadFilter, Mod.Path, Mod.SavePath, Password, Code, TurnNumber, PlayerNumber));
+			var files = GetFiles(path, GenerateArgumentsOrFilter(Engine.PlayerTurnUploadFilter));
 
 			// send to PBW
 			var url = "http://pbw.spaceempires.net/games/{0}/player-turn/upload".F(Code);
@@ -256,9 +267,22 @@ namespace AutoPBW
 
 		public void PlayTurn()
 		{
-			var exe = Path.Combine(Engine.PlayerPath, Engine.Executable);
-			var cmd = Engine.GeneratePlayerArgumentsOrFilter(exe + " " + Engine.PlayerArguments, Mod.Path, Mod.SavePath, Password, Code, TurnNumber, PlayerNumber);
-			Process.Start(cmd);
+			var exe = "\"" + Path.Combine(Engine.PlayerPath, Engine.Executable) + "\"";
+			var cmd = GenerateArgumentsOrFilter(exe);
+			var args = GenerateArgumentsOrFilter(Engine.PlayerArguments);
+			Process.Start(cmd, args);
+		}
+
+		private string GenerateArgumentsOrFilter(string basestring)
+		{
+			return basestring
+				.Replace("{EnginePath}", Engine.PlayerPath)
+				.Replace("{ModPath}", Mod.Path)
+				.Replace("{SavePath}", Mod.SavePath)
+				.Replace("{Password}", Password)
+				.Replace("{GameCode}", Code)
+				.Replace("{TurnNumber}", TurnNumber.ToString())
+				.Replace("{PlayerNumber}", PlayerNumber.ToString());
 		}
 	}
 

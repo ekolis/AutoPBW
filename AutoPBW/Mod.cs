@@ -24,7 +24,7 @@ namespace AutoPBW
 		/// <summary>
 		/// A unique code name for this mod. Used in PBW URLs.
 		/// </summary>
-		public string Code {get; private set; }
+		public string Code { get; set; }
 
 		public override string ToString()
 		{
@@ -54,23 +54,7 @@ namespace AutoPBW
 		/// <summary>
 		/// Is this an unknown mod?
 		/// </summary>
-		public bool IsUnknown { get; private set; }
-
-		/// <summary>
-		/// Populates the mod with data and removes the unknown flag.
-		/// </summary>
-		/// <param name="engine"></param>
-		/// <param name="path"></param>
-		/// <param name="savePath"></param>
-		/// <param name="empirePath"></param>
-		public void Populate(Engine engine, string path, string savePath, string empirePath)
-		{
-			Engine = engine;
-			Path = path;
-			SavePath = savePath;
-			EmpirePath = empirePath;
-			IsUnknown = false;
-		}
+		public bool IsUnknown { get; set; }
 
 		public static Mod Find(string code, string defaultEngineCode = null)
 		{
