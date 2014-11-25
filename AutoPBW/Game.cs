@@ -1,0 +1,346 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using SevenZip;
+
+namespace AutoPBW
+{
+	/// <summary>
+	/// A game that is being played or hosted on PBW.
+	/// </summary>
+	public abstract class Game
+	{
+		/// <summary>
+		/// The unique short name of the game (as used in its URL).
+		/// </summary>
+		public string Code { get; set; }
+
+		public override string ToString()
+		{
+			return Code;
+		}
+
+		/// <summary>
+		/// The player or host password for this game.
+		/// </summary>
+		public string Password { get; set; }
+
+		/// <summary>
+		/// The mod used for this game.
+		/// </summary>
+		public Mod Mod { get; set; }
+
+		/// <summary>
+		/// The engine used for this game.
+		/// </summary>
+		public Engine Engine { get { return Mod.Engine; } }
+
+		/// <summary>
+		/// Turn processing mode for this game.
+		/// </summary>
+		public TurnMode TurnMode { get; set; }
+
+		/// <summary>
+		/// The current turn number.
+		/// </summary>
+		public int TurnNumber { get; set; }
+
+		public static TurnMode ParseTurnMode(string s)
+		{
+			if (s == "manual")
+				return TurnMode.Manual;
+			else if (s == "alpu")
+				return TurnMode.AfterLastPlayerUpload;
+			else if (s == "timed")
+				return TurnMode.Timed;
+			else if (s == "auto")
+				return TurnMode.FullyAutomatic;
+			else
+				throw new ArgumentException("Invalid turn mode: " + s, "s");
+		}
+
+		protected void DownloadExtractAndDelete(string url, string path)
+		{
+			// generate a temp file name
+			var tempfile = MakeTempFile("7z");
+
+			// download the archive
+			PBW.Download(url, tempfile);
+
+			// extract the archive
+			var x = new SevenZipExtractor(tempfile);
+			x.ExtractArchive(path);
+
+			// delete the archive
+			File.Delete(tempfile);
+		}
+
+		protected void ArchiveUploadAndDeleteArchive(IEnumerable<string> files, string path, string url, string uploadFormParam)
+		{
+			// generate a temp file name
+			var tempfile = MakeTempFile("7z");
+
+			// archive the files
+			var c = new SevenZipCompressor();
+			c.CompressFiles(tempfile, files.ToArray());
+
+			// upload the archive
+			PBW.Upload(tempfile, url, uploadFormParam);
+
+			// delete the archive
+			File.Delete(tempfile);
+		}
+
+		protected string MakeTempFile(string extension)
+		{
+			if (!Directory.Exists("temp"))
+				Directory.CreateDirectory("temp");
+			return Path.Combine("temp", DateTime.Now.Ticks + "." + extension);
+		}
+
+		protected IEnumerable<string> GetFiles(string path, string filters)
+		{
+			var files = new HashSet<string>();
+			foreach (var filter in filters.Split(','))
+			{
+				foreach (var file in Directory.EnumerateFiles(path, filter))
+					files.Add(file);
+			}
+			return files;
+		}
+	}
+
+	/// <summary>
+	/// A game that is being hosted on PBW.
+	/// </summary>
+	public class HostGame : Game
+	{
+		/// <summary>
+		/// The game's status for hosting purposes.
+		/// </summary>
+		public HostStatus Status { get; set; }
+
+		/// <summary>
+		/// Downloads empires for this game.
+		/// </summary>
+		public void DownloadEmpires()
+		{
+			var url = "http://pbw.spaceempires.net/games/{0}/host-empire/download".F(Code);
+			var path = Path.Combine(Engine.HostPath, Mod.EmpirePath);
+			DownloadExtractAndDelete(url, path);
+		}
+
+		/// <summary>
+		/// Downloads turns for this game.
+		/// </summary>
+		public void DownloadTurns()
+		{
+			var url = "http://pbw.spaceempires.net/games/{0}/host-turn/download".F(Code);
+			var path = Path.Combine(Engine.HostPath, Mod.EmpirePath);
+			DownloadExtractAndDelete(url, path);
+		}
+
+		/// <summary>
+		/// Uploads the next turn for this game.
+		/// </summary>
+		public void UploadTurn()
+		{
+			// get list of files
+			var path = Path.Combine(Engine.HostPath, Mod.SavePath);
+			var files = GetFiles(path, Engine.GenerateHostArgumentsOrFilter(Engine.HostTurnUploadFilter, Mod.Path, Mod.SavePath, Password, Code, TurnNumber));
+
+			// send to PBW
+			var url = "http://pbw.spaceempires.net/games/{0}/host-turn/upload".F(Code);
+			ArchiveUploadAndDeleteArchive(files, path, url, "turn_file");
+		}
+
+		// TODO - process turn
+
+		// TODO - replace turn
+
+		// TODO - rollback turn
+
+		// TODO - upload host PLR
+
+		// TODO - upload GSU
+	}
+
+	/// <summary>
+	/// A game that is being played on PBW.
+	/// </summary>
+	public class PlayerGame : Game
+	{
+		/// <summary>
+		/// When the next turn is due.
+		/// Or null if the game hasn't started yet.
+		/// </summary>
+		public DateTime? TurnDueDate { get; set; }
+
+		/// <summary>
+		/// Time left to play the turn.
+		/// </summary>
+		public TimeSpan? TimeLeft
+		{
+			get
+			{
+				if (TurnDueDate == null)
+					return TimeSpan.MaxValue;
+				if (TurnDueDate < DateTime.Now)
+					return TimeSpan.Zero;
+				return TurnDueDate - DateTime.Now;
+			}
+		}
+
+		/// <summary>
+		/// The game's status for player purposes.
+		/// </summary>
+		public PlayerStatus Status { get; set; }
+
+		/// <summary>
+		/// Which player are we?
+		/// </summary>
+		public int PlayerNumber { get; set; }
+
+		/// <summary>
+		/// Which shipset are we using?
+		/// </summary>
+		public string ShipsetCode { get; set; }
+
+		public static PlayerStatus ParseStatus(string s)
+		{
+			if (s == "waiting")
+				return PlayerStatus.Waiting;
+			else if (s == "uploaded")
+				return PlayerStatus.Uploaded;
+			else
+				throw new ArgumentException("Invalid player status: " + s, "s");
+		}
+
+		/// <summary>
+		/// Downloads the turn for this game.
+		/// </summary>
+		public void DownloadTurn()
+		{
+			var url = "http://pbw.spaceempires.net/games/{0}/player-turn/download".F(Code);
+			var path = Path.Combine(Engine.PlayerPath, Mod.SavePath);
+			DownloadExtractAndDelete(url, path);
+		}
+
+		/// <summary>
+		/// Uploads empire file for this game.
+		/// </summary>
+		public void UploadEmpire(string empfile)
+		{
+			var url = "http://pbw.spaceempires.net/games/{0}/player-empire/upload".F(Code);
+			var path = Path.Combine(Engine.PlayerPath, Mod.EmpirePath);
+			ArchiveUploadAndDeleteArchive(new string[] { empfile }, path, url, "emp_file");
+		}
+
+		/// <summary>
+		/// Uploads player turn (commands) for this game.
+		/// </summary>
+		public void UploadTurn()
+		{
+			// get list of files
+			var path = Path.Combine(Engine.HostPath, Mod.SavePath);
+			var files = GetFiles(path, Engine.GeneratePlayerArgumentsOrFilter(Engine.PlayerTurnUploadFilter, Mod.Path, Mod.SavePath, Password, Code, TurnNumber, PlayerNumber));
+
+			// send to PBW
+			var url = "http://pbw.spaceempires.net/games/{0}/player-turn/upload".F(Code);
+			ArchiveUploadAndDeleteArchive(files, path, url, "plr_file");
+		}
+
+		public void PlayTurn()
+		{
+			var exe = Path.Combine(Engine.PlayerPath, Engine.Executable);
+			var cmd = Engine.GeneratePlayerArgumentsOrFilter(exe + " " + Engine.PlayerArguments, Mod.Path, Mod.SavePath, Password, Code, TurnNumber, PlayerNumber);
+			Process.Start(cmd);
+		}
+	}
+
+	/// <summary>
+	/// Turn processing modes.
+	/// </summary>
+	[Flags]
+	public enum TurnMode
+	{
+		/// <summary>
+		/// Turn is not processed automatically.
+		/// </summary>
+		Manual = 0,
+
+		/// <summary>
+		/// Turn is processed after all players have uploaded commands.
+		/// </summary>
+		AfterLastPlayerUpload = 1,
+
+		/// <summary>
+		/// Turn is processed after a time limit expires.
+		/// </summary>
+		Timed = 2,
+
+		/// <summary>
+		/// Turn is processed after either all players have uploaded commands, or a time limit expires.
+		/// </summary>
+		FullyAutomatic = AfterLastPlayerUpload | Timed,
+	}
+
+	/// <summary>
+	/// Status of a game for hosting.
+	/// </summary>
+	public enum HostStatus
+	{
+		/// <summary>
+		/// Game is not being hosted by this user.
+		/// Games that are in this status are not currently returned by PBW.
+		/// </summary>
+		None,
+
+		/// <summary>
+		/// Empires have been uploaded; ready for first turn or host setup.
+		/// </summary>
+		EmpiresReady,
+
+		/// <summary>
+		/// Empires and host setup have been uploaded; ready for first turn.
+		/// </summary>
+		HostReady,
+
+		/// <summary>
+		/// Game is in progress and awaiting player commands.
+		/// Games that are in this status are not currently returned by PBW.
+		/// </summary>
+		InProgress,
+
+		/// <summary>
+		/// Game is in progress and turn is ready to process, either due to all commands being uploaded or the turn timer expiring.
+		/// </summary>
+		PlayersReady,
+	}
+
+	/// <summary>
+	/// Status of a game for players.
+	/// </summary>
+	public enum PlayerStatus
+	{
+		/// <summary>
+		/// Game is not being played by this user.
+		/// Games that are in this status are not currently returned by PBW.
+		/// </summary>
+		None,
+
+		/// <summary>
+		/// Waiting for EMP or PLR file from player.
+		/// </summary>
+		Waiting,
+
+		/// <summary>
+		/// EMP or PLR file has been uploaded.
+		/// </summary>
+		Uploaded,
+	}
+}
