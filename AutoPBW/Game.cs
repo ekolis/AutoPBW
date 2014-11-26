@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using SevenZip;
@@ -265,7 +266,11 @@ namespace AutoPBW
 			var url = "http://pbw.spaceempires.net/games/{0}/player-turn/upload".F(Code);
 			if (files.Count() != 1)
 				throw new InvalidOperationException("Can only upload one PLR file at a time. " + files.Count() + " files were submitted.");
-			PBW.Upload(files.Single(), url, "plr_file");
+
+			if (PBW.Upload(files.Single(), url, "plr_file"))
+				Status = PlayerStatus.Uploaded;
+			else
+				throw new WebException("Could not upload " + files.Single() + " to PBW. Try uploading it manually to see if there is an error.");
 		}
 
 		public void PlayTurn()
