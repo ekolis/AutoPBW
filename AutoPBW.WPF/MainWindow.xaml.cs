@@ -256,6 +256,7 @@ namespace AutoPBW.WPF
 				{
 					MessageBox.Show("Could not upload turn: " + ex.Message + ".");
 				}
+				Cursor = Cursors.Arrow;
 			}
 		}
 
