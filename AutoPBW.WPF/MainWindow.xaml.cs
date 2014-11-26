@@ -52,7 +52,7 @@ namespace AutoPBW.WPF
 			{
 				var playerGameViewSource = ((CollectionViewSource)(this.FindResource("playerGameViewSource")));
 				playerGameViewSource.Source = PBW.GetPlayerGames();
-				playerGameDataGrid.GetBindingExpression(DataGrid.ItemsSourceProperty).UpdateTarget();
+				gridPlayerGames.GetBindingExpression(DataGrid.ItemsSourceProperty).UpdateTarget();
 				var engineViewSource = ((CollectionViewSource)(this.FindResource("engineViewSource")));
 				engineViewSource.Source = Config.Instance.Engines;
 				lstEngines.GetBindingExpression(ListView.ItemsSourceProperty).UpdateTarget();
@@ -91,34 +91,7 @@ namespace AutoPBW.WPF
 
 		private void playerGameDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
-			var source = (FrameworkElement)e.OriginalSource;
-			var row = GetAncestor<DataGridRow>(source);
-			if (row == null)
-				return;
-			else
-			{
-				var game = (PlayerGame)row.DataContext;
-				if (game.Mod.IsUnknown)
-				{
-					MessageBox.Show("Unknown mod " + game.Mod + " for " + game.Engine + ". Please configure it.");
-					lstMods.SelectedItem = game.Mod;
-					tabMods.Focus();
-				}
-				else if (game.Engine.IsUnknown)
-				{
-					MessageBox.Show("Unknown game engine " + game.Engine + ". Please configure it.");
-					lstEngines.SelectedItem = game.Engine;
-					tabEngines.Focus();
-				}
-				else
-				{
-					Cursor = Cursors.Wait;
-					game.DownloadTurn();
-					game.PlayTurn();
-					Cursor = Cursors.Arrow;
-				}
-			}
-			e.Handled = true;
+
 		}
 
 		private T GetAncestor<T>(FrameworkElement source) where T : FrameworkElement
@@ -221,5 +194,96 @@ namespace AutoPBW.WPF
 			var mod = lstMods.SelectedItem as Mod;
 			gridModDetails.DataContext = mod;
 		}
+
+		private void btnDownload_Click(object sender, RoutedEventArgs e)
+		{
+			var game = (PlayerGame)gridPlayerGames.SelectedItem;
+			if (CheckModAndEngine(game))
+			{
+				Cursor = Cursors.Wait;
+				try
+				{
+					game.DownloadTurn();
+					Cursor = Cursors.Arrow;
+					if (MessageBox.Show("Turn downloaded. Play it now?", "Turn Ready", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+					{
+						try
+						{
+							game.PlayTurn();
+						}
+						catch (Exception ex)
+						{
+							MessageBox.Show("Could not play turn: " + ex.Message + ".");
+						}
+					}
+				}
+				catch (Exception ex)
+				{
+					MessageBox.Show("Could not download turn: " + ex.Message + ".");
+				}
+				Cursor = Cursors.Arrow;
+			}
+		}
+
+		private void btnPlay_Click(object sender, RoutedEventArgs e)
+		{
+			var game = (PlayerGame)gridPlayerGames.SelectedItem;
+			if (CheckModAndEngine(game))
+			{
+				Cursor = Cursors.Wait;
+				try
+				{
+					game.PlayTurn();
+				}
+				catch (Exception ex)
+				{
+					MessageBox.Show("Could not play turn: " + ex.Message + ".");
+				}
+			}
+		}
+
+		private void btnUpload_Click(object sender, RoutedEventArgs e)
+		{
+			var game = (PlayerGame)gridPlayerGames.SelectedItem;
+			if (CheckModAndEngine(game))
+			{
+				Cursor = Cursors.Wait;
+				try
+				{
+					game.UploadTurn();
+				}
+				catch (Exception ex)
+				{
+					MessageBox.Show("Could not upload turn: " + ex.Message + ".");
+				}
+			}
+		}
+
+		private bool CheckModAndEngine(Game game)
+		{
+			if (game == null)
+			{
+				MessageBox.Show("No game is selected.");
+				return false;
+			}
+			if (game.Mod.IsUnknown)
+			{
+				MessageBox.Show("Unknown mod " + game.Mod + " for " + game.Engine + ". Please configure it.");
+				lstMods.SelectedItem = game.Mod;
+				tabMods.Focus();
+				return false;
+			}
+			else if (game.Engine.IsUnknown)
+			{
+				MessageBox.Show("Unknown game engine " + game.Engine + ". Please configure it.");
+				lstEngines.SelectedItem = game.Engine;
+				tabEngines.Focus();
+				return false;
+			}
+			else
+				return true;
+
+		}
 	}
 }
+
