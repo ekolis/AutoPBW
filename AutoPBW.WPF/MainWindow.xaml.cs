@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -23,9 +24,19 @@ namespace AutoPBW.WPF
 	/// </summary>
 	public partial class MainWindow : Window
 	{
+		private Timer refreshTimer;
+
 		public MainWindow()
 		{
 			InitializeComponent();
+			// TODO - get refresh time from PBW
+			refreshTimer = new Timer(1000 * 60 * 2); // 2 minute refresh by default
+			refreshTimer.Elapsed += refreshTimer_Elapsed;
+		}
+
+		void refreshTimer_Elapsed(object sender, ElapsedEventArgs e)
+		{
+			RefreshData();
 		}
 
 		private void window_Loaded(object sender, RoutedEventArgs e)
@@ -60,6 +71,7 @@ namespace AutoPBW.WPF
 				var modViewSource = ((CollectionViewSource)(this.FindResource("modViewSource")));
 				modViewSource.Source = Config.Instance.Mods;
 				lstMods.GetBindingExpression(ListView.ItemsSourceProperty).UpdateTarget();
+				refreshTimer.Start();
 			}
 			catch (Exception ex)
 			{
