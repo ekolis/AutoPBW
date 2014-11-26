@@ -14,8 +14,6 @@ namespace AutoPBW
 	{
 		public Mod(string code, string engineCode)
 		{
-			if (Config.Instance != null && Config.Instance.Engines.Any(e => e.Code == code))
-				throw new ArgumentException("Mod " + code + " already exists.");
 			Code = code;
 			Engine = Engine.Find(engineCode);
 			IsUnknown = true;
@@ -58,9 +56,28 @@ namespace AutoPBW
 
 		public static Mod Find(string code, string defaultEngineCode = null)
 		{
-			if (!Config.Instance.Mods.Any(m => m.Code == code))
-				Config.Instance.Mods.Add(new Mod(code, defaultEngineCode)); // let the user know what the mod code is so he can find the mod
-			return Config.Instance.Mods.Single(m => m.Code == code);
+			if (code == null)
+				return null;
+			var old = Config.Instance.Mods.SingleOrDefault(x => x.Code == code);
+			Mod nu;
+			if (old == null || old.IsUnknown)
+			{
+				// load from default if present
+				var d = Config.Default.Mods.SingleOrDefault(x => x.Code == code);
+				if (d != null)
+					nu = d;
+				else
+					nu = new Mod(code, defaultEngineCode); // let the user know what the code is so he can find the mod
+			}
+			else
+				nu = old;
+			if (nu != old)
+			{
+				if (old != null)
+					Config.Instance.Mods.Remove(old);
+				Config.Instance.Mods.Add(nu);
+			}
+			return nu;
 		}
 	}
 }

@@ -14,8 +14,6 @@ namespace AutoPBW
 	{
 		public Engine(string code)
 		{
-			if (Config.Instance != null && Config.Instance.Engines.Any(e => e.Code == code))
-				throw new ArgumentException("Engine " + code + " already exists.");
 			Code = code;
 			IsUnknown = true;
 		}
@@ -86,9 +84,26 @@ namespace AutoPBW
 		{
 			if (code == null)
 				return null;
-			if (!Config.Instance.Engines.Any(m => m.Code == code))
-				Config.Instance.Engines.Add(new Engine(code)); // let the user know what the engine code is so he can find the engine
-			return Config.Instance.Engines.Single(e => e.Code == code);
+			var old = Config.Instance.Engines.SingleOrDefault(x => x.Code == code);
+			Engine nu;
+			if (old == null || old.IsUnknown)
+			{
+				// load from default if present
+				var d = Config.Default.Engines.SingleOrDefault(x => x.Code == code);
+				if (d != null)
+					nu = d;
+				else
+					nu = new Engine(code); // let the user know what the code is so he can find the engine
+			}
+			else
+				nu = old;
+			if (nu != old)
+			{
+				if (old != null)
+					Config.Instance.Engines.Remove(old);
+				Config.Instance.Engines.Add(nu);
+			}
+			return nu;
 		}
 	}
 }

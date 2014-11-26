@@ -49,12 +49,27 @@ namespace AutoPBW
 
 		public static Config Instance { get; private set; }
 
+		internal static Config Default { get; private set; }
+
 		private const string filename = "AutoPBW.config.json";
+
+		private const string defaultFilename = "AutoPBW.config.default.json";
 
 		private static JsonSerializerSettings JsonSettings;
 
 		public static void Load()
 		{
+			try
+			{
+				Default = JsonConvert.DeserializeObject<Config>(File.ReadAllText(defaultFilename), JsonSettings);
+			}
+			catch (Exception ex)
+			{
+				PBW.Log.Write("Could not load default config from " + filename + ".");
+				PBW.Log.Write("Error that occurred: " + ex.Message);
+				Default = new Config();
+			}
+
 			try
 			{
 				Instance = JsonConvert.DeserializeObject<Config>(File.ReadAllText(filename), JsonSettings);
@@ -64,6 +79,12 @@ namespace AutoPBW
 				PBW.Log.Write("Could not load config from " + filename + "; reverting to default settings.");
 				PBW.Log.Write("Error that occurred: " + ex.Message);
 				Instance = new Config();
+				Instance.Username = Default.Username;
+				Instance.Password = Default.Password;
+				foreach (var e in Default.Engines)
+					Instance.Engines.Add(e);
+				foreach (var m in Default.Mods)
+					Instance.Mods.Add(m);
 			}
 		}
 

@@ -1,0 +1,67 @@
+{
+    "$id": "1",
+    "Username": "",
+    "Password": "",
+    "Engines": {
+        "$id": "2",
+        "$values": [
+            {
+                "$id": "3",
+                "Code": "SE4",
+                "HostExecutable": "\"C:\\Autohost\\SE4\\se4.exe\"",
+                "PlayerExecutable": "\"C:\\Games\\SE4\\se4.exe\"",
+                "HostTurnUploadFilter": "{GameCode}_*.gam, {GameCode}_*.cmb, {GameCode}_*.trn, {GameCode}_*.txt",
+                "PlayerTurnUploadFilter": "{GameCode}_*.plr",
+                "IsUnknown": true,
+                "HostArguments": "\"{EnginePath}\\{SavePath}\\{GameCode}.gam\" \"{Password}\" \"0\" \"{ModPath}\"",
+                "PlayerArguments": "\"{EnginePath}\\{SavePath}\\{GameCode}.gam\" \"{Password}\" \"{PlayerNumber}\" \"{ModPath}\""
+            },
+            {
+                "$id": "4",
+                "Code": "SE5",
+                "HostExecutable": "\"C:\\Autohost\\SE5\\se5.exe\"",
+                "PlayerExecutable": "\"C:\\Games\\SE5\\se5.exe\"",
+                "HostTurnUploadFilter": "{GameCode}_*.gam, {GameCode}_*.cmb, {GameCode}_*.mvl, {GameCode}_*.hlg, {GameCode}_*.txt",
+                "PlayerTurnUploadFilter": "{GameCode}_*.plr",
+                "IsUnknown": true,
+                "HostArguments": "\"{EnginePath}\\Savegame\\{GameCode}.gam\" \"{Password}\" -moddir \"{ModPath}\"",
+                "PlayerArguments": ""
+            },
+            {
+                "$id": "5",
+                "Code": "THANCS",
+                "HostExecutable": "\"c:\\Autohost\\THANCS\\THANCS.exe\"",
+                "PlayerExecutable": "\"c:\\Games\\THANCS\\THANCS-perlgui.exe\"",
+                "HostTurnUploadFilter": "{GameCode}_{TurnNumber}*.gam",
+                "PlayerTurnUploadFilter": "{GameCode}_{TurnNumber}_*.plr",
+                "IsUnknown": true,
+                "HostArguments": "\"{EnginePath}\\{ModPath}\" \"{EnginePath}\\{SavePath}\\{GameCode}\" \"{TurNumber}\"",
+                "PlayerArguments": "-g={GameCode} -t={TurnNumber} -p={PlayerNumber} -morestats"
+            },
+            {
+                "$id": "6",
+                "Code": "FREEE",
+                "HostExecutable": "\"C:\\Autohost\\FrEee\\FrEee.exe",
+                "PlayerExecutable": "\"C:\\Games\\FrEee\\FrEee.exe",
+                "HostTurnUploadFilter": "{GameCode}_{TurnNumber}*.gam",
+                "PlayerTurnUploadFilter": "{GameCode}_{TurnNumber}_*.plr",
+                "IsUnknown": true,
+                "HostArguments": "--process-turn \"{EnginePath}\\{SavePath}\\{GameCode}_{TurnNumber}.gam\"",
+                "PlayerArguments": "--play-turn \"{EnginePath}\\{SavePath}\\{GameCode}_{TurnNumber}_{PlayerNumber}.gam\""
+            },
+            {
+                "$id": "7",
+                "Code": "EH",
+                "HostExecutable": "\"C:\\Autohost\\EventHorizon\\EventHorizonHost.exe",
+                "PlayerExecutable": "\"C:\\Games\\EventHorizon\\EventHorizon.exe",
+                "HostTurnUploadFilter": "{GameCode}_{TurnNumber}*.gam",
+                "PlayerTurnUploadFilter": "{GameCode}_{TurnNumber}_*.plr",
+                "IsUnknown": true,
+                "HostArguments": "\"{EnginePath}\\{SavePath}\\{GameCode}\" {TurnNumber}",
+                "PlayerArguments": "\"{EnginePath}\\{SavePath}\\{GameCode}_{TurnNumber}.gam\""
+            }
+        ]
+    },
+    "Mods": [
+    ]
+}
