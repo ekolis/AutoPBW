@@ -43,8 +43,8 @@ namespace AutoPBW
 
 			// set up some defaults
 			var se4 = new Engine("SE4");
-			se4.HostPath = @"C:\Autohost\SE4";
-			se4.PlayerPath = @"C:\Games\SE4";
+			se4.HostExecutable = @"C:\Autohost\SE4";
+			se4.PlayerExecutable = @"C:\Games\SE4";
 		}
 
 		public static Config Instance { get; private set; }

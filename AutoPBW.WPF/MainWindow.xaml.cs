@@ -140,13 +140,12 @@ namespace AutoPBW.WPF
 			if (engine != null)
 			{
 				engine.Code = engineCodeTextBox.Text;
-				engine.Executable = executableTextBox.Text;
 				engine.HostArguments = hostArgumentsTextBox.Text;
-				engine.HostPath = hostPathTextBox.Text;
+				engine.HostExecutable = hostExecutableTextBox.Text;
 				engine.HostTurnUploadFilter = hostTurnUploadFilterTextBox.Text;
 				engine.IsUnknown = false;
 				engine.PlayerArguments = playerArgumentsTextBox.Text;
-				engine.PlayerPath = playerPathTextBox.Text;
+				engine.PlayerExecutable = playerExecutableTextBox.Text;
 				engine.PlayerTurnUploadFilter = playerTurnUploadFilterTextBox.Text;
 				Config.Save();
 				RefreshData();

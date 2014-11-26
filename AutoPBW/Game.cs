@@ -130,7 +130,7 @@ namespace AutoPBW
 		public void DownloadEmpires()
 		{
 			var url = "http://pbw.spaceempires.net/games/{0}/host-empire/download".F(Code);
-			var path = Path.Combine(Engine.HostPath, Mod.EmpirePath);
+			var path = Path.Combine(Path.GetDirectoryName(Engine.HostExecutable.Trim('"')), Mod.EmpirePath);
 			DownloadExtractAndDelete(url, path);
 		}
 
@@ -140,7 +140,7 @@ namespace AutoPBW
 		public void DownloadTurns()
 		{
 			var url = "http://pbw.spaceempires.net/games/{0}/host-turn/download".F(Code);
-			var path = Path.Combine(Engine.HostPath, Mod.EmpirePath);
+			var path = Path.Combine(Path.GetDirectoryName(Engine.HostExecutable.Trim('"')), Mod.EmpirePath);
 			DownloadExtractAndDelete(url, path);
 		}
 
@@ -150,7 +150,7 @@ namespace AutoPBW
 		public void UploadTurn()
 		{
 			// get list of files
-			var path = Path.Combine(Engine.HostPath, Mod.SavePath);
+			var path = Path.Combine(Path.GetDirectoryName(Engine.HostExecutable.Trim('"')), Mod.SavePath);
 			var files = GetFiles(path, GenerateArgumentsOrFilter(Engine.HostTurnUploadFilter));
 
 			// send to PBW
@@ -171,7 +171,8 @@ namespace AutoPBW
 		private string GenerateArgumentsOrFilter(string basestring)
 		{
 			return basestring
-				.Replace("{EnginePath}", Engine.HostPath)
+				.Replace("{Executable}", Engine.HostExecutable)
+				.Replace("{EnginePath}", Path.GetDirectoryName(Engine.HostExecutable.Trim('"')))
 				.Replace("{ModPath}", Mod.Path)
 				.Replace("{SavePath}", Mod.SavePath)
 				.Replace("{Password}", Password)
@@ -237,7 +238,7 @@ namespace AutoPBW
 		public void DownloadTurn()
 		{
 			var url = "http://pbw.spaceempires.net/games/{0}/player-turn/download".F(Code);
-			var path = Path.Combine(Engine.PlayerPath, Mod.SavePath);
+			var path = Path.Combine(Path.GetDirectoryName(Engine.PlayerExecutable.Trim('"')), Mod.SavePath);
 			DownloadExtractAndDelete(url, path);
 		}
 
@@ -247,7 +248,7 @@ namespace AutoPBW
 		public void UploadEmpire(string empfile)
 		{
 			var url = "http://pbw.spaceempires.net/games/{0}/player-empire/upload".F(Code);
-			var path = Path.Combine(Engine.PlayerPath, Mod.EmpirePath);
+			var path = Path.Combine(Path.GetDirectoryName(Engine.PlayerExecutable).Trim('"'), Mod.EmpirePath);
 			ArchiveUploadAndDeleteArchive(new string[] { empfile }, path, url, "emp_file");
 		}
 
@@ -257,7 +258,7 @@ namespace AutoPBW
 		public void UploadTurn()
 		{
 			// get list of files
-			var path = Path.Combine(Engine.HostPath, Mod.SavePath);
+			var path = Path.Combine(Path.GetDirectoryName(Engine.PlayerExecutable.Trim('"')), Mod.SavePath);
 			var files = GetFiles(path, GenerateArgumentsOrFilter(Engine.PlayerTurnUploadFilter));
 
 			// send to PBW
@@ -267,8 +268,7 @@ namespace AutoPBW
 
 		public void PlayTurn()
 		{
-			var exe = "\"" + Path.Combine(Engine.PlayerPath, Engine.Executable) + "\"";
-			var cmd = GenerateArgumentsOrFilter(exe);
+			var cmd = GenerateArgumentsOrFilter(Engine.PlayerExecutable);
 			var args = GenerateArgumentsOrFilter(Engine.PlayerArguments);
 			Process.Start(cmd, args);
 		}
@@ -276,7 +276,8 @@ namespace AutoPBW
 		private string GenerateArgumentsOrFilter(string basestring)
 		{
 			return basestring
-				.Replace("{EnginePath}", Engine.PlayerPath)
+				.Replace("{Executable}", Engine.PlayerExecutable)
+				.Replace("{EnginePath}", Path.GetDirectoryName(Engine.PlayerExecutable.Trim('"')))
 				.Replace("{ModPath}", Mod.Path)
 				.Replace("{SavePath}", Mod.SavePath)
 				.Replace("{Password}", Password)

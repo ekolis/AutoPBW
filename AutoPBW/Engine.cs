@@ -31,19 +31,14 @@ namespace AutoPBW
 		}
 
 		/// <summary>
-		/// The path to the host instance of the game engine.
+		/// The full path to the host instance of the game engine executable.
 		/// </summary>
-		public string HostPath { get; set; }
+		public string HostExecutable { get; set; }
 
 		/// <summary>
-		/// The path to the player instance of the game engine.
+		/// The full path to the player instance of the game engine executable.
 		/// </summary>
-		public string PlayerPath { get; set; }
-
-		/// <summary>
-		/// The executable command to run the game, relative to the path.
-		/// </summary>
-		public string Executable { get; set; }
+		public string PlayerExecutable { get; set; }
 
 		/// <summary>
 		/// Comma separated list of filename filters for the host turn upload.
