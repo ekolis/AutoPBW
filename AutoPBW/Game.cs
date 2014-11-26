@@ -263,7 +263,9 @@ namespace AutoPBW
 
 			// send to PBW
 			var url = "http://pbw.spaceempires.net/games/{0}/player-turn/upload".F(Code);
-			ArchiveUploadAndDeleteArchive(files, path, url, "plr_file");
+			if (files.Count() != 1)
+				throw new InvalidOperationException("Can only upload one PLR file at a time. " + files.Count() + " files were submitted.");
+			PBW.Upload(files.Single(), url, "plr_file");
 		}
 
 		public void PlayTurn()
