@@ -85,15 +85,35 @@ namespace AutoPBW.WPF
 			try
 			{
 				var playerGameViewSource = ((CollectionViewSource)(this.FindResource("playerGameViewSource")));
-				playerGameViewSource.Source = PBW.GetPlayerGames();
+				var oldGames = (IEnumerable<PlayerGame>)playerGameViewSource.Source;
+				if (oldGames == null)
+					oldGames = Enumerable.Empty<PlayerGame>();
+				var newGames = PBW.GetPlayerGames();
+				playerGameViewSource.Source = newGames;
+				var newReady = new HashSet<PlayerGame>();
+				foreach (var ng in newGames.Where(g => g.Status == PlayerStatus.Waiting && g.TurnNumber > 0))
+				{
+					var og = oldGames.SingleOrDefault(g => g.Code == ng.Code);
+					if (og == null || og.Status != PlayerStatus.Waiting)
+						newReady.Add(ng);
+				}
+				if (newReady.Count > 1)
+					taskbarIcon.ShowBalloonTip("Turn ready", newReady.Count + " games are ready to play.", BalloonIcon.None);
+				else if (newReady.Count == 1)
+					taskbarIcon.ShowBalloonTip("Turn ready", newReady.Single() + " is ready to play.", BalloonIcon.None);
 				gridPlayerGames.GetBindingExpression(DataGrid.ItemsSourceProperty).UpdateTarget();
+
+				// TODO - host games
+
 				var engineViewSource = ((CollectionViewSource)(this.FindResource("engineViewSource")));
 				engineViewSource.Source = Config.Instance.Engines;
 				lstEngines.GetBindingExpression(ListView.ItemsSourceProperty).UpdateTarget();
 				ddlEngine.GetBindingExpression(ComboBox.ItemsSourceProperty).UpdateTarget();
+
 				var modViewSource = ((CollectionViewSource)(this.FindResource("modViewSource")));
 				modViewSource.Source = Config.Instance.Mods;
 				lstMods.GetBindingExpression(ListView.ItemsSourceProperty).UpdateTarget();
+
 				refreshTimer.Start();
 			}
 			catch (Exception ex)
