@@ -16,6 +16,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using AutoPBW;
 using AutoPBW.WPF.Properties;
+using Hardcodet.Wpf.TaskbarNotification;
 
 namespace AutoPBW.WPF
 {
@@ -25,13 +26,35 @@ namespace AutoPBW.WPF
 	public partial class MainWindow : Window
 	{
 		private Timer refreshTimer;
+		private TaskbarIcon taskbarIcon;
 
 		public MainWindow()
 		{
 			InitializeComponent();
+
 			// TODO - get refresh time from PBW
 			refreshTimer = new Timer(1000 * 60 * 2); // 2 minute refresh by default
 			refreshTimer.Elapsed += refreshTimer_Elapsed;
+
+			taskbarIcon = new TaskbarIcon();
+			taskbarIcon.IconSource = Icon;
+			taskbarIcon.TrayMouseDoubleClick += taskbarIcon_TrayMouseDoubleClick;
+			taskbarIcon.ContextMenu = new ContextMenu();
+			var miExit = new MenuItem();
+			miExit.Header = "Exit AutoPBW";
+			miExit.Click += miExit_Click;
+			taskbarIcon.ContextMenu.Items.Add(miExit);
+		}
+
+		void miExit_Click(object sender, RoutedEventArgs e)
+		{
+			exiting = true;
+			Close();
+		}
+
+		void taskbarIcon_TrayMouseDoubleClick(object sender, RoutedEventArgs e)
+		{
+			Show();
 		}
 
 		void refreshTimer_Elapsed(object sender, ElapsedEventArgs e)
@@ -298,6 +321,18 @@ namespace AutoPBW.WPF
 				return true;
 
 		}
+
+		private void window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+		{
+			if (!exiting)
+			{
+				// just hide the window, we have a taskbar icon
+				e.Cancel = true;
+				Hide();
+			}
+		}
+
+		private bool exiting;
 	}
 }
 

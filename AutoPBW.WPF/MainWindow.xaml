@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:AutoPBW="clr-namespace:AutoPBW;assembly=AutoPBW" mc:Ignorable="d" x:Name="window" x:Class="AutoPBW.WPF.MainWindow"
 		xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
-        Title="AutoPBW" Height="397" Width="547" Loaded="window_Loaded">
+        Title="AutoPBW" Height="397" Width="547" Loaded="window_Loaded" Closing="window_Closing" Icon="AutoPBW.ico">
 	<Window.Resources>
 		<CollectionViewSource x:Key="playerGameViewSource" d:DesignSource="{d:DesignInstance {x:Type AutoPBW:PlayerGame}, CreateList=True}"/>
 		<CollectionViewSource x:Key="engineViewSource" d:DesignSource="{d:DesignInstance {x:Type AutoPBW:Engine}, CreateList=True}">
