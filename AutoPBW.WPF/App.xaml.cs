@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using AutoPBW;
+using WpfSingleInstanceByEventWaitHandle;
 
 namespace AutoPBW.WPF
 {
@@ -19,6 +20,7 @@ namespace AutoPBW.WPF
 		protected override void OnStartup(StartupEventArgs e)
 		{
 			base.OnStartup(e);
+			WpfSingleInstance.Make();
 			Config.Load();
 		}
 
