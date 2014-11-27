@@ -36,7 +36,7 @@ namespace AutoPBW.WPF
 
 		void refreshTimer_Elapsed(object sender, ElapsedEventArgs e)
 		{
-			RefreshData();
+			Dispatcher.Invoke(() => RefreshData());
 		}
 
 		private void window_Loaded(object sender, RoutedEventArgs e)
