@@ -80,7 +80,7 @@ namespace AutoPBW
 			File.Delete(tempfile);
 		}
 
-		protected void ArchiveUploadAndDeleteArchive(IEnumerable<string> files, string path, string url, string uploadFormParam)
+		protected void ArchiveUploadAndDeleteArchive(IEnumerable<string> files, string path, string url, string uploadFormParam, HttpStatusCode expectedStatus = HttpStatusCode.OK)
 		{
 			// generate a temp file name
 			var tempfile = MakeTempFile("7z");
@@ -90,7 +90,7 @@ namespace AutoPBW
 			c.CompressFiles(tempfile, files.ToArray());
 
 			// upload the archive
-			PBW.Upload(tempfile, url, uploadFormParam);
+			PBW.Upload(tempfile, url, uploadFormParam, expectedStatus);
 
 			// delete the archive
 			File.Delete(tempfile);
@@ -156,7 +156,7 @@ namespace AutoPBW
 
 			// send to PBW
 			var url = "http://pbw.spaceempires.net/games/{0}/host-turn/upload".F(Code);
-			ArchiveUploadAndDeleteArchive(files, path, url, "turn_file");
+			ArchiveUploadAndDeleteArchive(files, path, url, "turn_file", HttpStatusCode.Redirect); // for some reason PBW gives a 302 on host turn upload
 		}
 
 		// TODO - process turn

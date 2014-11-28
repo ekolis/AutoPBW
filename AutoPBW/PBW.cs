@@ -278,7 +278,7 @@ namespace AutoPBW
 		}
 
 
-		public static bool Upload(string file, string uploadurl, string uploadFormParam)
+		public static bool Upload(string file, string uploadurl, string uploadFormParam, HttpStatusCode expectedStatus = HttpStatusCode.OK)
 		{
 			//adapted from and many thanks to: http://www.briangrinstead.com/blog/multipart-form-post-in-c
 			Log.Write("Attempting to upload {0} to {1} as form field {2}.".F(file, uploadurl, uploadFormParam));
@@ -310,11 +310,8 @@ namespace AutoPBW
 
 				// Process response
 				StreamReader responseReader = new StreamReader(webResponse.GetResponseStream());
-				if (webResponse.StatusCode == HttpStatusCode.Redirect)
-				{
-					// PBW returns a 302 Redirect on success, and a 200 OK on failure, oddly...
+				if (webResponse.StatusCode == expectedStatus)
 					success = true;
-				}
 				webResponse.Close();
 			}
 
