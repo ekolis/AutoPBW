@@ -84,6 +84,10 @@ namespace AutoPBW.WPF
 		{
 			try
 			{
+				// remember selection
+				var selGame = gridPlayerGames.SelectedItem as PlayerGame;
+				var selCode = selGame == null ? null : selGame.Code;
+
 				var playerGameViewSource = ((CollectionViewSource)(this.FindResource("playerGameViewSource")));
 				var oldGames = (IEnumerable<PlayerGame>)playerGameViewSource.Source;
 				if (oldGames == null)
@@ -113,6 +117,9 @@ namespace AutoPBW.WPF
 				var modViewSource = ((CollectionViewSource)(this.FindResource("modViewSource")));
 				modViewSource.Source = Config.Instance.Mods;
 				lstMods.GetBindingExpression(ListView.ItemsSourceProperty).UpdateTarget();
+
+				// remember selection
+				gridPlayerGames.SelectedItem = newGames.SingleOrDefault(g => g.Code == selCode);
 
 				refreshTimer.Start();
 			}
