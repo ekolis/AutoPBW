@@ -93,7 +93,7 @@ namespace AutoPBW.WPF
 				var oldGames = (IEnumerable<PlayerGame>)playerGameViewSource.Source;
 				if (oldGames == null)
 					oldGames = Enumerable.Empty<PlayerGame>();
-				var newGames = PBW.GetPlayerGames();
+				var newGames = PBW.GetPlayerGames().ToArray();
 				playerGameViewSource.Source = newGames;
 				var newReady = new HashSet<PlayerGame>();
 				var waiting = newGames.Where(g => g.Status == PlayerStatus.Waiting);
