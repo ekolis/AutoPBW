@@ -161,13 +161,13 @@ namespace AutoPBW.WPF
 
 					// newly ready games, show a popup
 					if (waitingPLR.Intersect(newReady).Count() > 1)
-						taskbarIcon.ShowBalloonTip("New turns ready", waitingPLR.Union(newReady).Count() + " new games are ready to play.", BalloonIcon.None);
+						taskbarIcon.ShowBalloonTip("New turns ready", waitingPLR.Intersect(newReady).Count() + " new games are ready to play.", BalloonIcon.None);
 					else if (waitingPLR.Intersect(newReady).Count() == 1)
-						taskbarIcon.ShowBalloonTip("New turn ready", waitingPLR.Union(newReady).Single() + " is ready to play.", BalloonIcon.None);
+						taskbarIcon.ShowBalloonTip("New turn ready", waitingPLR.Intersect(newReady).Single() + " is ready to play.", BalloonIcon.None);
 					else if (waitingEMP.Intersect(newReady).Count() > 1)
-						taskbarIcon.ShowBalloonTip("Awaiting empires", waitingEMP.Union(newReady).Count() + " games are awaiting empire setup files.", BalloonIcon.None);
+						taskbarIcon.ShowBalloonTip("Awaiting empires", waitingEMP.Intersect(newReady).Count() + " games are awaiting empire setup files.", BalloonIcon.None);
 					else if (waitingEMP.Intersect(newReady).Count() == 1)
-						taskbarIcon.ShowBalloonTip("Awaiting empire", waitingEMP.Union(newReady).Single() + " is awaiting an empire setup file.", BalloonIcon.None);
+						taskbarIcon.ShowBalloonTip("Awaiting empire", waitingEMP.Intersect(newReady).Single() + " is awaiting an empire setup file.", BalloonIcon.None);
 
 					// all ready games, set a tooltip
 					if (waitingPLR.Count() > 1)
