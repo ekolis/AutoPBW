@@ -397,18 +397,18 @@ namespace AutoPBW.WPF
 				MessageBox.Show("No game is selected.");
 				return false;
 			}
-			if (game.Mod.IsUnknown)
-			{
-				MessageBox.Show("Unknown mod " + game.Mod + " for " + game.Engine + ". Please configure it.");
-				lstMods.SelectedItem = game.Mod;
-				tabMods.Focus();
-				return false;
-			}
 			else if (game.Engine.IsUnknown)
 			{
 				MessageBox.Show("Unknown game engine " + game.Engine + ". Please configure it.");
 				lstEngines.SelectedItem = game.Engine;
 				tabEngines.Focus();
+				return false;
+			}
+			else if (game.Mod.IsUnknown)
+			{
+				MessageBox.Show("Unknown mod " + game.Mod + " for " + game.Engine + ". Please configure it.");
+				lstMods.SelectedItem = game.Mod;
+				tabMods.Focus();
 				return false;
 			}
 			else
