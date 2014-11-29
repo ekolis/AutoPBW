@@ -95,17 +95,36 @@ namespace AutoPBW.WPF
 				var newGames = PBW.GetPlayerGames();
 				playerGameViewSource.Source = newGames;
 				var newReady = new HashSet<PlayerGame>();
-				foreach (var ng in newGames.Where(g => g.Status == PlayerStatus.Waiting && g.TurnNumber > 0))
+				var waitingPLR = newGames.Where(g => g.Status == PlayerStatus.Waiting && g.TurnNumber > 0);
+				var waitingEMP = newGames.Where(g => g.Status == PlayerStatus.Waiting && g.TurnNumber == 0);
+				foreach (var ng in waitingPLR)
 				{
 					var og = oldGames.SingleOrDefault(g => g.Code == ng.Code);
 					if (og == null || og.Status != PlayerStatus.Waiting)
 						newReady.Add(ng);
 				}
-				if (newReady.Count > 1)
-					taskbarIcon.ShowBalloonTip("Turn ready", newReady.Count + " games are ready to play.", BalloonIcon.None);
-				else if (newReady.Count == 1)
-					taskbarIcon.ShowBalloonTip("Turn ready", newReady.Single() + " is ready to play.", BalloonIcon.None);
-				gridPlayerGames.GetBindingExpression(DataGrid.ItemsSourceProperty).UpdateTarget();
+
+				// newly ready games, show a popup
+				if (waitingPLR.Union(newReady).Count() > 1)
+					taskbarIcon.ShowBalloonTip("New turns ready", waitingPLR.Union(newReady).Count() + " new games are ready to play.", BalloonIcon.None);
+				else if (waitingPLR.Union(newReady).Count() == 1)
+					taskbarIcon.ShowBalloonTip("New turn ready", waitingPLR.Union(newReady).Single() + " is ready to play.", BalloonIcon.None);
+				else if (waitingEMP.Union(newReady).Count() > 1)
+					taskbarIcon.ShowBalloonTip("Awaiting empires", waitingEMP.Union(newReady).Count() + " games are awaiting empire setup files.", BalloonIcon.None);
+				else if (waitingEMP.Union(newReady).Count() == 1)
+					taskbarIcon.ShowBalloonTip("Awaiting empire", waitingEMP.Union(newReady).Single() + " is awaiting an empire setup file.", BalloonIcon.None);
+				
+				// all ready games, set a tooltip
+				if (waitingPLR.Count() > 1)
+					taskbarIcon.ToolTipText = waitingPLR.Count() + " games are ready to play.";
+				else if (waitingPLR.Count() == 1)
+					taskbarIcon.ToolTipText = waitingPLR.Single() + " is ready to play.";
+				else if (waitingEMP.Count() > 1)
+					taskbarIcon.ToolTipText = waitingEMP.Count() + " games are awaiting empire setup files.";
+				else if (waitingEMP.Count() == 1)
+					taskbarIcon.ToolTipText = waitingEMP.Single() + " is awaiting an empire setup file.";
+				else
+					taskbarIcon.ToolTipText = "All caught up!";
 
 				// TODO - host games
 
