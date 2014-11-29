@@ -119,7 +119,8 @@ namespace AutoPBW.WPF
 				lstMods.GetBindingExpression(ListView.ItemsSourceProperty).UpdateTarget();
 
 				// remember selection
-				gridPlayerGames.SelectedItem = newGames.SingleOrDefault(g => g.Code == selCode);
+				var newGame =  gridPlayerGames.Items.Cast<PlayerGame>().SingleOrDefault(g => g.Code == selCode);
+				gridPlayerGames.SelectedItem = newGame;
 
 				refreshTimer.Start();
 			}
