@@ -93,13 +93,15 @@ namespace AutoPBW.WPF
 
 		private void RefreshData()
 		{
+			// set cursor
 			Cursor = Cursors.Wait;
+
+			// remember selection
+			var selGame = gridPlayerGames.SelectedItem as PlayerGame;
+			var selCode = selGame == null ? null : selGame.Code;
+
 			try
 			{
-				// remember selection
-				var selGame = gridPlayerGames.SelectedItem as PlayerGame;
-				var selCode = selGame == null ? null : selGame.Code;
-
 				// load host games
 				{
 					var hostGameViewSource = ((CollectionViewSource)(this.FindResource("hostGameViewSource")));
@@ -118,8 +120,11 @@ namespace AutoPBW.WPF
 								{
 									game.DownloadTurns();
 									currentTurnGame = game;
-									currentTurnProcess = game.ProcessTurn();
+									currentTurnProcess = new Process();
+									currentTurnProcess.StartInfo = game.ProcessTurnPrepare();
+									currentTurnProcess.EnableRaisingEvents = true;
 									currentTurnProcess.Exited += process_Exited;
+									currentTurnProcess.Start();
 									break; // wait till we finish this one
 								}
 								catch (Exception ex)
@@ -181,6 +186,13 @@ namespace AutoPBW.WPF
 					else
 						taskbarIcon.ToolTipText = "All caught up!";
 				}
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show("Unable to refresh games lists: " + ex.Message);
+			}
+			try
+			{
 
 				// load engines
 				var engineViewSource = ((CollectionViewSource)(this.FindResource("engineViewSource")));
@@ -192,18 +204,20 @@ namespace AutoPBW.WPF
 				var modViewSource = ((CollectionViewSource)(this.FindResource("modViewSource")));
 				modViewSource.Source = Config.Instance.Mods;
 				lstMods.GetBindingExpression(ListView.ItemsSourceProperty).UpdateTarget();
-
-				// remember selection
-				var newGame = gridPlayerGames.Items.Cast<PlayerGame>().SingleOrDefault(g => g.Code == selCode);
-				gridPlayerGames.SelectedItem = newGame;
-
-				// start a timer so we can refresh in a few minutes
-				refreshTimer.Start();
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show("Unable to refresh games/engines/mods lists: " + ex.Message);
+				MessageBox.Show("Unable to refresh engines/mods lists: " + ex.Message);
 			}
+
+			// remember selection
+			var newGame = gridPlayerGames.Items.Cast<PlayerGame>().SingleOrDefault(g => g.Code == selCode);
+			gridPlayerGames.SelectedItem = newGame;
+
+			// start a timer so we can refresh in a few minutes
+			refreshTimer.Start();
+
+			// reset cursor
 			Cursor = Cursors.Arrow;
 		}
 
@@ -218,7 +232,7 @@ namespace AutoPBW.WPF
 			else
 			{
 				g.UploadTurn();
-				RefreshData();
+				Dispatcher.Invoke(() => { RefreshData(); });
 			}
 		}
 

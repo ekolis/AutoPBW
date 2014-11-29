@@ -167,13 +167,15 @@ namespace AutoPBW
 		}
 
 		/// <summary>
-		/// Processes the turn for this game.
+		/// Prepares to process the turn for this game.
+		/// You will need to actually start the process yourself.
+		/// This is so you can attach an event handler to the process exit event.
 		/// </summary>
-		public Process ProcessTurn()
+		public ProcessStartInfo ProcessTurnPrepare()
 		{
-			var cmd = GenerateArgumentsOrFilter(Engine.HostExecutable);
-			var args = GenerateArgumentsOrFilter(Engine.HostArguments);
-			return Process.Start(cmd, args);
+			var cmd = GenerateArgumentsOrFilter(Engine.HostExecutable, false);
+			var args = GenerateArgumentsOrFilter(Engine.HostArguments, false);
+			return new ProcessStartInfo(cmd, args);
 		}
 
 		/// <summary>
@@ -183,7 +185,7 @@ namespace AutoPBW
 		{
 			// get list of files
 			var path = Path.Combine(Path.GetDirectoryName(Engine.HostExecutable.Trim('"')), Mod.SavePath);
-			var files = GetFiles(path, GenerateArgumentsOrFilter(Engine.HostTurnUploadFilter));
+			var files = GetFiles(path, GenerateArgumentsOrFilter(Engine.HostTurnUploadFilter, true));
 
 			// send to PBW
 			var url = "http://pbw.spaceempires.net/games/{0}/host-turn/upload".F(Code);
@@ -217,7 +219,7 @@ namespace AutoPBW
 			PBW.SubmitForm(url, fields, "clearing hold on " + Code);
 		}
 
-		private string GenerateArgumentsOrFilter(string basestring)
+		private string GenerateArgumentsOrFilter(string basestring, bool nextTurn)
 		{
 			return basestring
 				.Replace("{Executable}", Engine.HostExecutable)
@@ -226,7 +228,7 @@ namespace AutoPBW
 				.Replace("{SavePath}", Mod.SavePath)
 				.Replace("{Password}", Password)
 				.Replace("{GameCode}", Code)
-				.Replace("{TurnNumber}", TurnNumber.ToString());
+				.Replace("{TurnNumber}", (nextTurn ? TurnNumber + 1 : TurnNumber).ToString());
 		}
 	}
 
@@ -324,7 +326,10 @@ namespace AutoPBW
 				.Replace("{Password}", Password)
 				.Replace("{GameCode}", Code)
 				.Replace("{TurnNumber}", TurnNumber.ToString())
-				.Replace("{PlayerNumber}", PlayerNumber.ToString());
+				.Replace("{PlayerNumber}", PlayerNumber.ToString())
+				.Replace("{PlayerNumber2}", PlayerNumber.ToString("00"))
+				.Replace("{PlayerNumber3}", PlayerNumber.ToString("000"))
+				.Replace("{PlayerNumber4}", PlayerNumber.ToString("0000"));
 		}
 	}
 
