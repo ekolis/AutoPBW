@@ -96,9 +96,10 @@ namespace AutoPBW.WPF
 				var newGames = PBW.GetPlayerGames();
 				playerGameViewSource.Source = newGames;
 				var newReady = new HashSet<PlayerGame>();
-				var waitingPLR = newGames.Where(g => g.Status == PlayerStatus.Waiting && g.TurnNumber > 0);
-				var waitingEMP = newGames.Where(g => g.Status == PlayerStatus.Waiting && g.TurnNumber == 0);
-				foreach (var ng in waitingPLR)
+				var waiting = newGames.Where(g => g.Status == PlayerStatus.Waiting);
+				var waitingPLR = waiting.Where(g => g.TurnNumber > 0);
+				var waitingEMP = waiting.Where(g => g.TurnNumber == 0);
+				foreach (var ng in waiting)
 				{
 					var og = oldGames.SingleOrDefault(g => g.Code == ng.Code);
 					if (og == null || og.Status != PlayerStatus.Waiting)
@@ -106,13 +107,13 @@ namespace AutoPBW.WPF
 				}
 
 				// newly ready games, show a popup
-				if (waitingPLR.Union(newReady).Count() > 1)
+				if (waitingPLR.Intersect(newReady).Count() > 1)
 					taskbarIcon.ShowBalloonTip("New turns ready", waitingPLR.Union(newReady).Count() + " new games are ready to play.", BalloonIcon.None);
-				else if (waitingPLR.Union(newReady).Count() == 1)
+				else if (waitingPLR.Intersect(newReady).Count() == 1)
 					taskbarIcon.ShowBalloonTip("New turn ready", waitingPLR.Union(newReady).Single() + " is ready to play.", BalloonIcon.None);
-				else if (waitingEMP.Union(newReady).Count() > 1)
+				else if (waitingEMP.Intersect(newReady).Count() > 1)
 					taskbarIcon.ShowBalloonTip("Awaiting empires", waitingEMP.Union(newReady).Count() + " games are awaiting empire setup files.", BalloonIcon.None);
-				else if (waitingEMP.Union(newReady).Count() == 1)
+				else if (waitingEMP.Intersect(newReady).Count() == 1)
 					taskbarIcon.ShowBalloonTip("Awaiting empire", waitingEMP.Union(newReady).Single() + " is awaiting an empire setup file.", BalloonIcon.None);
 				
 				// all ready games, set a tooltip
