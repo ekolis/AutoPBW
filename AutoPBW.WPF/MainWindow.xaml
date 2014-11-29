@@ -18,7 +18,7 @@
 		</CollectionViewSource>
 	</Window.Resources>
 	<Grid>
-		<TabControl x:Name="tabber">
+		<TabControl x:Name="tabber" Margin="0,33,0,0">
 			<TabItem x:Name="tabPlayerGames" Header="Games I Play">
 				<Grid Background="#FFE5E5E5" Margin="0">
 					<Grid.ColumnDefinitions>
@@ -158,5 +158,10 @@
 				</Grid>
 			</TabItem>
 		</TabControl>
+		<Menu IsMainMenu="True" Margin="0,0,0,338">
+			<Button Content="Refresh" x:Name="btnRefresh" Click="btnRefresh_Click"/>
+			<Button Content="PBW Website" x:Name="btnWebsite" Click="btnWebsite_Click"/>
+			<Button Content="Exit AutoPBW" x:Name="btnExit" Click="btnExit_Click"/>
+		</Menu>
 	</Grid>
 </Window>

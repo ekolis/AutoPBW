@@ -83,6 +83,7 @@ namespace AutoPBW.WPF
 
 		private void RefreshData()
 		{
+			Cursor = Cursors.Wait;
 			try
 			{
 				// remember selection
@@ -149,6 +150,7 @@ namespace AutoPBW.WPF
 			{
 				MessageBox.Show("Unable to refresh games/engines/mods lists: " + ex.Message);
 			}
+			Cursor = Cursors.Arrow;
 		}
 
 		private void Login()
@@ -425,9 +427,27 @@ namespace AutoPBW.WPF
 				e.Cancel = true;
 				Hide();
 			}
+			else
+				taskbarIcon.Dispose(); // get rid of the icon
 		}
 
 		private bool exiting;
+
+		private void btnRefresh_Click(object sender, RoutedEventArgs e)
+		{
+			RefreshData();
+		}
+
+		private void btnWebsite_Click(object sender, RoutedEventArgs e)
+		{
+			Process.Start("http://pbw.spaceempires.net/dashboard");
+		}
+
+		private void btnExit_Click(object sender, RoutedEventArgs e)
+		{
+			exiting = true;
+			Close();
+		}
 	}
 }
 
