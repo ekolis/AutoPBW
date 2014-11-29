@@ -6,6 +6,7 @@
         Title="AutoPBW" Height="397" Width="547" Loaded="window_Loaded" Closing="window_Closing" Icon="AutoPBW.ico">
 	<Window.Resources>
 		<CollectionViewSource x:Key="playerGameViewSource" d:DesignSource="{d:DesignInstance {x:Type AutoPBW:PlayerGame}, CreateList=True}"/>
+		<CollectionViewSource x:Key="hostGameViewSource" d:DesignSource="{d:DesignInstance {x:Type AutoPBW:HostGame}, CreateList=True}"/>
 		<CollectionViewSource x:Key="engineViewSource" d:DesignSource="{d:DesignInstance {x:Type AutoPBW:Engine}, CreateList=True}">
 			<CollectionViewSource.SortDescriptions>
 				<scm:SortDescription PropertyName="Code"/>
@@ -31,9 +32,9 @@
 					</Grid.RowDefinitions>
 					<DataGrid x:Name="gridPlayerGames" AutoGenerateColumns="False" EnableRowVirtualization="True" DataContext="{StaticResource playerGameViewSource}" ItemsSource="{Binding}" RowDetailsVisibilityMode="VisibleWhenSelected" RenderTransformOrigin="0.5,0.5" IsReadOnly="True" MouseDoubleClick="playerGameDataGrid_MouseDoubleClick" Margin="0,0,0,38" Grid.ColumnSpan="2">
 						<DataGrid.Columns>
-							<DataGridTextColumn x:Name="codeColumn" Binding="{Binding Code}" Header="Game" Width="100"/>
-							<DataGridTextColumn x:Name="statusColumn" Binding="{Binding Status}" Header="Status" Width="100"/>
-							<DataGridTextColumn x:Name="turnModeColumn" Binding="{Binding TurnMode}" Header="Turn Mode" Width="150"/>
+							<DataGridTextColumn Binding="{Binding Code}" Header="Game" Width="100"/>
+							<DataGridTextColumn Binding="{Binding Status}" Header="Status" Width="100"/>
+							<DataGridTextColumn Binding="{Binding TurnMode}" Header="Turn Mode" Width="150"/>
 							<DataGridTextColumn Binding="{Binding TimeLeft,StringFormat='dd\\d\\ hh\\h\\ mm\\m'}" ClipboardContentBinding="{x:Null}" Header="Time Left" Width="150"/>
 						</DataGrid.Columns>
 					</DataGrid>
@@ -43,7 +44,15 @@
 				</Grid>
 			</TabItem>
 			<TabItem Header="Games I Host">
-				<DataGrid x:Name="gridHostGames" Margin="0"/>
+				<!-- TODO - buttons to upload/download files manually, including GSU and EMPs --> 
+				<DataGrid x:Name="gridHostGames" AutoGenerateColumns="False" EnableRowVirtualization="True" DataContext="{StaticResource hostGameViewSource}" ItemsSource="{Binding}" RowDetailsVisibilityMode="VisibleWhenSelected" RenderTransformOrigin="0.5,0.5" IsReadOnly="True" MouseDoubleClick="playerGameDataGrid_MouseDoubleClick" Margin="0,0,0,38" Grid.ColumnSpan="2">
+					<DataGrid.Columns>
+						<DataGridTextColumn Binding="{Binding Code}" Header="Game" Width="100"/>
+						<DataGridTextColumn Binding="{Binding Status}" Header="Status" Width="100"/>
+						<DataGridTextColumn Binding="{Binding TurnMode}" Header="Turn Mode" Width="150"/>
+						<DataGridTextColumn Binding="{Binding TimeLeft,StringFormat='dd\\d\\ hh\\h\\ mm\\m'}" ClipboardContentBinding="{x:Null}" Header="Time Left" Width="150"/>
+					</DataGrid.Columns>
+				</DataGrid>
 			</TabItem>
 			<TabItem Header="Settings" x:Name="tabSettings" HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="55">
 				<Grid Background="#FFE5E5E5" Margin="0">

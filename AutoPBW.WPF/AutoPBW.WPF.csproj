@@ -97,6 +97,7 @@
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\DataSources\AutoPBW.Engine.datasource" />
+    <None Include="Properties\DataSources\AutoPBW.HostGame.datasource" />
     <None Include="Properties\DataSources\AutoPBW.Mod.datasource" />
     <None Include="Properties\DataSources\AutoPBW.PlayerGame.datasource" />
     <None Include="Properties\Settings.settings">

@@ -50,6 +50,27 @@ namespace AutoPBW
 		/// </summary>
 		public int TurnNumber { get; set; }
 
+		/// <summary>
+		/// When the next turn is due.
+		/// Or null if the game hasn't started yet.
+		/// </summary>
+		public DateTime? TurnDueDate { get; set; }
+
+		/// <summary>
+		/// Time left to play the turn.
+		/// </summary>
+		public TimeSpan? TimeLeft
+		{
+			get
+			{
+				if (TurnDueDate == null)
+					return TimeSpan.MaxValue;
+				if (TurnDueDate < DateTime.Now)
+					return TimeSpan.Zero;
+				return TurnDueDate - DateTime.Now;
+			}
+		}
+
 		public static TurnMode ParseTurnMode(string s)
 		{
 			if (s == "manual")
@@ -146,6 +167,16 @@ namespace AutoPBW
 		}
 
 		/// <summary>
+		/// Processes the turn for this game.
+		/// </summary>
+		public Process ProcessTurn()
+		{
+			var cmd = GenerateArgumentsOrFilter(Engine.HostExecutable);
+			var args = GenerateArgumentsOrFilter(Engine.HostArguments);
+			return Process.Start(cmd, args);
+		}
+
+		/// <summary>
 		/// Uploads the next turn for this game.
 		/// </summary>
 		public void UploadTurn()
@@ -159,8 +190,6 @@ namespace AutoPBW
 			ArchiveUploadAndDeleteArchive(files, path, url, "turn_file", HttpStatusCode.Redirect); // for some reason PBW gives a 302 on host turn upload
 		}
 
-		// TODO - process turn
-
 		// TODO - replace turn
 
 		// TODO - rollback turn
@@ -168,6 +197,25 @@ namespace AutoPBW
 		// TODO - upload host PLR
 
 		// TODO - upload GSU
+
+		public void PlaceHold(string reason)
+		{
+			var url = "http://pbw.spaceempires.net/games/{0}/hold-turn".F(Code);
+			PBW.Log.Write("Attempting to place hold on auto processing for {0}.".F(Code));
+			var fields = new Dictionary<string, string>
+			{
+				{"hold_message", reason},
+			};
+			PBW.SubmitForm(url, fields, "placing hold on " + Code);
+		}
+
+		public void ClearHold(string reason)
+		{
+			var url = "http://pbw.spaceempires.net/games/{0}/clear-hold".F(Code);
+			PBW.Log.Write("Attempting to clear hold on auto processing for {0}.".F(Code));
+			var fields = new Dictionary<string, string>();
+			PBW.SubmitForm(url, fields, "clearing hold on " + Code);
+		}
 
 		private string GenerateArgumentsOrFilter(string basestring)
 		{
@@ -187,27 +235,6 @@ namespace AutoPBW
 	/// </summary>
 	public class PlayerGame : Game
 	{
-		/// <summary>
-		/// When the next turn is due.
-		/// Or null if the game hasn't started yet.
-		/// </summary>
-		public DateTime? TurnDueDate { get; set; }
-
-		/// <summary>
-		/// Time left to play the turn.
-		/// </summary>
-		public TimeSpan? TimeLeft
-		{
-			get
-			{
-				if (TurnDueDate == null)
-					return TimeSpan.MaxValue;
-				if (TurnDueDate < DateTime.Now)
-					return TimeSpan.Zero;
-				return TurnDueDate - DateTime.Now;
-			}
-		}
-
 		/// <summary>
 		/// The game's status for player purposes.
 		/// </summary>

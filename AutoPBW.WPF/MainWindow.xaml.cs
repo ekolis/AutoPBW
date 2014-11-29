@@ -29,6 +29,16 @@ namespace AutoPBW.WPF
 		private Timer refreshTimer;
 		private TaskbarIcon taskbarIcon;
 
+		/// <summary>
+		/// System process for current turn processing.
+		/// </summary>
+		private Process currentTurnProcess = null;
+
+		/// <summary>
+		/// Current game being processed.
+		/// </summary>
+		private HostGame currentTurnGame = null;
+
 		public MainWindow()
 		{
 			InitializeComponent();
@@ -90,60 +100,104 @@ namespace AutoPBW.WPF
 				var selGame = gridPlayerGames.SelectedItem as PlayerGame;
 				var selCode = selGame == null ? null : selGame.Code;
 
-				var playerGameViewSource = ((CollectionViewSource)(this.FindResource("playerGameViewSource")));
-				var oldGames = (IEnumerable<PlayerGame>)playerGameViewSource.Source;
-				if (oldGames == null)
-					oldGames = Enumerable.Empty<PlayerGame>();
-				var newGames = PBW.GetPlayerGames().ToArray();
-				playerGameViewSource.Source = newGames;
-				var newReady = new HashSet<PlayerGame>();
-				var waiting = newGames.Where(g => g.Status == PlayerStatus.Waiting);
-				var waitingPLR = waiting.Where(g => g.TurnNumber > 0);
-				var waitingEMP = waiting.Where(g => g.TurnNumber == 0);
-				foreach (var ng in waiting)
+				// load host games
 				{
-					var og = oldGames.SingleOrDefault(g => g.Code == ng.Code);
-					if (og == null || og.Status != PlayerStatus.Waiting)
-						newReady.Add(ng);
+					var hostGameViewSource = ((CollectionViewSource)(this.FindResource("hostGameViewSource")));
+					var games = PBW.GetHostGames().ToArray();
+					hostGameViewSource.Source = games;
+					var gamesToProcess = games.Where(g => g.Status == HostStatus.PlayersReady).ToList();
+					if (currentTurnProcess == null)
+					{
+						while (gamesToProcess.Any())
+						{
+							var game = gamesToProcess.First();
+							if (CheckModAndEngine(game))
+							{
+								taskbarIcon.ShowBalloonTip("Processing turn", "Processing turn for " + game + ".", BalloonIcon.None);
+								try
+								{
+									game.DownloadTurns();
+									currentTurnGame = game;
+									currentTurnProcess = game.ProcessTurn();
+									currentTurnProcess.Exited += process_Exited;
+									break; // wait till we finish this one
+								}
+								catch (Exception ex)
+								{
+									taskbarIcon.ShowBalloonTip("Turn processing failed", "Turn processing for " + game + " failed:\n" + ex.Message, BalloonIcon.None);
+									game.PlaceHold(ex.Message);
+									if (currentTurnProcess != null)
+									{
+										currentTurnProcess.Close();
+										currentTurnProcess = null;
+										currentTurnGame = null;
+									}
+								}
+							}
+							else
+								gamesToProcess.Remove(game); // can't process this game now
+						}
+					}
 				}
 
-				// newly ready games, show a popup
-				if (waitingPLR.Intersect(newReady).Count() > 1)
-					taskbarIcon.ShowBalloonTip("New turns ready", waitingPLR.Union(newReady).Count() + " new games are ready to play.", BalloonIcon.None);
-				else if (waitingPLR.Intersect(newReady).Count() == 1)
-					taskbarIcon.ShowBalloonTip("New turn ready", waitingPLR.Union(newReady).Single() + " is ready to play.", BalloonIcon.None);
-				else if (waitingEMP.Intersect(newReady).Count() > 1)
-					taskbarIcon.ShowBalloonTip("Awaiting empires", waitingEMP.Union(newReady).Count() + " games are awaiting empire setup files.", BalloonIcon.None);
-				else if (waitingEMP.Intersect(newReady).Count() == 1)
-					taskbarIcon.ShowBalloonTip("Awaiting empire", waitingEMP.Union(newReady).Single() + " is awaiting an empire setup file.", BalloonIcon.None);
-				
-				// all ready games, set a tooltip
-				if (waitingPLR.Count() > 1)
-					taskbarIcon.ToolTipText = waitingPLR.Count() + " games are ready to play.";
-				else if (waitingPLR.Count() == 1)
-					taskbarIcon.ToolTipText = waitingPLR.Single() + " is ready to play.";
-				else if (waitingEMP.Count() > 1)
-					taskbarIcon.ToolTipText = waitingEMP.Count() + " games are awaiting empire setup files.";
-				else if (waitingEMP.Count() == 1)
-					taskbarIcon.ToolTipText = waitingEMP.Single() + " is awaiting an empire setup file.";
-				else
-					taskbarIcon.ToolTipText = "All caught up!";
+				// load player games
+				{
+					var playerGameViewSource = ((CollectionViewSource)(this.FindResource("playerGameViewSource")));
+					var oldGames = (IEnumerable<PlayerGame>)playerGameViewSource.Source;
+					if (oldGames == null)
+						oldGames = Enumerable.Empty<PlayerGame>();
+					var newGames = PBW.GetPlayerGames().ToArray();
+					playerGameViewSource.Source = newGames;
+					var newReady = new HashSet<PlayerGame>();
+					var waiting = newGames.Where(g => g.Status == PlayerStatus.Waiting);
+					var waitingPLR = waiting.Where(g => g.TurnNumber > 0);
+					var waitingEMP = waiting.Where(g => g.TurnNumber == 0);
+					foreach (var ng in waiting)
+					{
+						var og = oldGames.SingleOrDefault(g => g.Code == ng.Code);
+						if (og == null || og.Status != PlayerStatus.Waiting)
+							newReady.Add(ng);
+					}
 
-				// TODO - host games
+					// newly ready games, show a popup
+					if (waitingPLR.Intersect(newReady).Count() > 1)
+						taskbarIcon.ShowBalloonTip("New turns ready", waitingPLR.Union(newReady).Count() + " new games are ready to play.", BalloonIcon.None);
+					else if (waitingPLR.Intersect(newReady).Count() == 1)
+						taskbarIcon.ShowBalloonTip("New turn ready", waitingPLR.Union(newReady).Single() + " is ready to play.", BalloonIcon.None);
+					else if (waitingEMP.Intersect(newReady).Count() > 1)
+						taskbarIcon.ShowBalloonTip("Awaiting empires", waitingEMP.Union(newReady).Count() + " games are awaiting empire setup files.", BalloonIcon.None);
+					else if (waitingEMP.Intersect(newReady).Count() == 1)
+						taskbarIcon.ShowBalloonTip("Awaiting empire", waitingEMP.Union(newReady).Single() + " is awaiting an empire setup file.", BalloonIcon.None);
 
+					// all ready games, set a tooltip
+					if (waitingPLR.Count() > 1)
+						taskbarIcon.ToolTipText = waitingPLR.Count() + " games are ready to play.";
+					else if (waitingPLR.Count() == 1)
+						taskbarIcon.ToolTipText = waitingPLR.Single() + " is ready to play.";
+					else if (waitingEMP.Count() > 1)
+						taskbarIcon.ToolTipText = waitingEMP.Count() + " games are awaiting empire setup files.";
+					else if (waitingEMP.Count() == 1)
+						taskbarIcon.ToolTipText = waitingEMP.Single() + " is awaiting an empire setup file.";
+					else
+						taskbarIcon.ToolTipText = "All caught up!";
+				}
+
+				// load engines
 				var engineViewSource = ((CollectionViewSource)(this.FindResource("engineViewSource")));
 				engineViewSource.Source = Config.Instance.Engines;
 				lstEngines.GetBindingExpression(ListView.ItemsSourceProperty).UpdateTarget();
 				ddlEngine.GetBindingExpression(ComboBox.ItemsSourceProperty).UpdateTarget();
 
+				// load mods
 				var modViewSource = ((CollectionViewSource)(this.FindResource("modViewSource")));
 				modViewSource.Source = Config.Instance.Mods;
 				lstMods.GetBindingExpression(ListView.ItemsSourceProperty).UpdateTarget();
 
 				// remember selection
-				var newGame =  gridPlayerGames.Items.Cast<PlayerGame>().SingleOrDefault(g => g.Code == selCode);
+				var newGame = gridPlayerGames.Items.Cast<PlayerGame>().SingleOrDefault(g => g.Code == selCode);
 				gridPlayerGames.SelectedItem = newGame;
 
+				// start a timer so we can refresh in a few minutes
 				refreshTimer.Start();
 			}
 			catch (Exception ex)
@@ -151,6 +205,21 @@ namespace AutoPBW.WPF
 				MessageBox.Show("Unable to refresh games/engines/mods lists: " + ex.Message);
 			}
 			Cursor = Cursors.Arrow;
+		}
+
+		void process_Exited(object sender, EventArgs e)
+		{
+			var p = currentTurnProcess;
+			var g = currentTurnGame;
+			currentTurnProcess = null;
+			currentTurnGame = null;
+			if (p.ExitCode != 0)
+				throw new Exception("Turn processing failed with exit code " + p.ExitCode + ". Please check the game documentation for the meaning of this code.");
+			else
+			{
+				g.UploadTurn();
+				RefreshData();
+			}
 		}
 
 		private void Login()
@@ -393,7 +462,7 @@ namespace AutoPBW.WPF
 			}
 		}
 
-		private bool CheckModAndEngine(Game game)
+		private bool CheckModAndEngine(PlayerGame game)
 		{
 			if (game == null)
 			{
@@ -412,6 +481,24 @@ namespace AutoPBW.WPF
 				MessageBox.Show("Unknown mod " + game.Mod + " for " + game.Engine + ". Please configure it.");
 				lstMods.SelectedItem = lstMods.Items.Cast<Mod>().SingleOrDefault(m => m.Code == game.Mod.Code);
 				tabMods.Focus();
+				return false;
+			}
+			else
+				return true;
+		}
+
+		private bool CheckModAndEngine(HostGame game)
+		{
+			if (game == null)
+				return true;
+			else if (game.Engine.IsUnknown)
+			{
+				taskbarIcon.ShowBalloonTip("Configuration required", "Unknown game engine " + game.Engine + " required by hosted game " + game + ". Please configure it.", BalloonIcon.None);
+				return false;
+			}
+			else if (game.Mod.IsUnknown)
+			{
+				taskbarIcon.ShowBalloonTip("Configuration required", "Unknown mod " + game.Mod + " required by hosted game " + game + ". Please configure it.", BalloonIcon.None);
 				return false;
 			}
 			else

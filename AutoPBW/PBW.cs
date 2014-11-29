@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Web;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -31,6 +32,14 @@ namespace AutoPBW
 			return Epoch.AddSeconds(seconds).ToLocalTime();
 		}
 
+		private static string ToQueryString(this IDictionary<string, string> q)
+		{
+			var array = (from key in q.Keys
+						 select string.Format("{0}={1}", HttpUtility.UrlEncode(key), HttpUtility.UrlEncode(q[key])))
+				.ToArray();
+			return string.Join("&", array);
+		}
+
 		/// <summary>
 		/// Shortcut for string.Format
 		/// </summary>
@@ -55,25 +64,36 @@ namespace AutoPBW
 		/// </remarks>
 		public static void Login(string username, string password)
 		{
-			HttpWebRequest request;
-			HttpWebResponse response;
 			var login_address = "https://pbw.spaceempires.net/login/process";
 			Log.Write("Attempting to connect to PBW at {0} using username={1} and password={2}.".F(login_address, username, new string('*', password.Length)));
+			var fields = new Dictionary<string, string>
+			{
+				{"username", username},
+				{"password", password},
+			};
+			SubmitForm(login_address, fields, "logging in");
+		}
+
+		public static void SubmitForm(string url, IDictionary<string, string> fields, string action = "submitting form")
+		{
+			HttpWebRequest request;
+			HttpWebResponse response;
+			
 			try
 			{
-
-				request = (HttpWebRequest)WebRequest.Create(login_address);
+				request = (HttpWebRequest)WebRequest.Create(url);
 				request.Method = "POST";
 				request.ContentType = "application/x-www-form-urlencoded";
 				using (StreamWriter writer = new StreamWriter(request.GetRequestStream(), Encoding.ASCII))
 				{
-					writer.Write("username=" + username + "&password=" + password);
+					writer.Write(fields.ToQueryString());
 				}
 				request.CookieContainer = new CookieContainer();
 				response = (HttpWebResponse)request.GetResponse();
+				
 
 				ConnectionStatus = response.StatusCode;
-				
+
 				Log.Write("Connection status to {0} is {1} {2}".F(response.Server, response.StatusCode, response.StatusDescription));
 				if (response.Cookies != null)
 					Log.Write("Cookies exist.");
@@ -88,7 +108,7 @@ namespace AutoPBW
 			}
 			catch (WebException ex)
 			{
-				Log.Write("Error while logging in:");
+				Log.Write("Error while {0}:".F(action));
 				Log.Write(ex.ToString());
 				throw;
 			}
@@ -209,10 +229,12 @@ namespace AutoPBW
 		{
 			var g = new HostGame();
 			g.Code = gx.Element("game_code").Value;
-			g.Password = gx.Element("password").Value;
+			g.Password = gx.Element("game_password").Value;
 			g.Mod = Mod.Find(gx.Element("mod_code").Value, gx.Element("game_type").Value);
 			g.TurnMode = Game.ParseTurnMode(gx.Element("turn_mode").Value);
 			g.TurnNumber = int.Parse(gx.Element("turn").Value);
+			if (gx.Element("next_turn_date") != null)
+				g.TurnDueDate = UnixTimeToDateTime(gx.Element("next_turn_date").Value);
 			return g;
 		}
 
