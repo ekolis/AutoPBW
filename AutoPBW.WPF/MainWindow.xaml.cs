@@ -17,6 +17,7 @@ using System.Windows.Shapes;
 using AutoPBW;
 using AutoPBW.WPF.Properties;
 using Hardcodet.Wpf.TaskbarNotification;
+using Microsoft.Win32;
 
 namespace AutoPBW.WPF
 {
@@ -283,25 +284,33 @@ namespace AutoPBW.WPF
 			if (CheckModAndEngine(game))
 			{
 				Cursor = Cursors.Wait;
-				try
+				if (game.TurnNumber == 0)
 				{
-					game.DownloadTurn();
-					Cursor = Cursors.Arrow;
-					if (MessageBox.Show("Turn downloaded. Play it now?", "Turn Ready", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+					// TODO - download GSU?
+					MessageBox.Show("Nothing to download on turn zero.");
+				}
+				else
+				{
+					try
 					{
-						try
+						game.DownloadTurn();
+						Cursor = Cursors.Arrow;
+						if (MessageBox.Show("Turn downloaded. Play it now?", "Turn Ready", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
 						{
-							game.PlayTurn();
-						}
-						catch (Exception ex)
-						{
-							MessageBox.Show("Could not play turn: " + ex.Message + ".");
+							try
+							{
+								game.PlayTurn();
+							}
+							catch (Exception ex)
+							{
+								MessageBox.Show("Could not play turn: " + ex.Message + ".");
+							}
 						}
 					}
-				}
-				catch (Exception ex)
-				{
-					MessageBox.Show("Could not download turn: " + ex.Message + ".");
+					catch (Exception ex)
+					{
+						MessageBox.Show("Could not download turn: " + ex.Message + ".");
+					}
 				}
 				Cursor = Cursors.Arrow;
 			}
@@ -313,14 +322,31 @@ namespace AutoPBW.WPF
 			if (CheckModAndEngine(game))
 			{
 				Cursor = Cursors.Wait;
-				try
+				if (game.TurnNumber == 0)
 				{
-					game.PlayTurn();
+					// create EMP
+					try
+					{
+						game.CreateEmpire();
+					}
+					catch (Exception ex)
+					{
+						MessageBox.Show("Could not create empire setup: " + ex.Message + ".");
+					}
 				}
-				catch (Exception ex)
+				else
 				{
-					MessageBox.Show("Could not play turn: " + ex.Message + ".");
+					// play turn
+					try
+					{
+						game.PlayTurn();
+					}
+					catch (Exception ex)
+					{
+						MessageBox.Show("Could not play turn: " + ex.Message + ".");
+					}
 				}
+				Cursor = Cursors.Arrow;
 			}
 		}
 
@@ -330,16 +356,37 @@ namespace AutoPBW.WPF
 			if (CheckModAndEngine(game))
 			{
 				Cursor = Cursors.Wait;
-				try
+				if (game.TurnNumber == 0)
 				{
-					game.UploadTurn();
+					// upload EMP
+					try
+					{
+						var dlg = new OpenFileDialog();
+						dlg.InitialDirectory = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(game.Engine.PlayerExecutable.Trim('"')), game.Mod.EmpirePath);
+						var result = dlg.ShowDialog();
+						if (result.HasValue && result.Value)
+							game.UploadEmpire(dlg.FileName);
+					}
+					catch (Exception ex)
+					{
+						MessageBox.Show("Could not upload turn: " + ex.Message + ".");
+					}
 				}
-				catch (Exception ex)
+				else
 				{
-					MessageBox.Show("Could not upload turn: " + ex.Message + ".");
+					// upload PLR
+					try
+					{
+						game.UploadTurn();
+					}
+					catch (Exception ex)
+					{
+						MessageBox.Show("Could not upload turn: " + ex.Message + ".");
+					}
 				}
-				Cursor = Cursors.Arrow;
 				RefreshData();
+				Cursor = Cursors.Arrow;
+
 			}
 		}
 

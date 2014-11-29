@@ -233,6 +233,13 @@ namespace AutoPBW
 				throw new ArgumentException("Invalid player status: " + s, "s");
 		}
 
+		public void CreateEmpire()
+		{
+			// just run the game so the player can create it in-game
+			var cmd = GenerateArgumentsOrFilter(Engine.PlayerExecutable);
+			Process.Start(cmd);
+		}
+
 		/// <summary>
 		/// Downloads the turn for this game.
 		/// </summary>
