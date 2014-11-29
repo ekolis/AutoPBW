@@ -400,14 +400,14 @@ namespace AutoPBW.WPF
 			else if (game.Engine.IsUnknown)
 			{
 				MessageBox.Show("Unknown game engine " + game.Engine + ". Please configure it.");
-				lstEngines.SelectedItem = game.Engine;
+				lstEngines.SelectedItem = lstEngines.Items.Cast<Engine>().SingleOrDefault(e => e.Code == game.Engine.Code);
 				tabEngines.Focus();
 				return false;
 			}
 			else if (game.Mod.IsUnknown)
 			{
 				MessageBox.Show("Unknown mod " + game.Mod + " for " + game.Engine + ". Please configure it.");
-				lstMods.SelectedItem = game.Mod;
+				lstMods.SelectedItem = lstMods.Items.Cast<Mod>().SingleOrDefault(m => m.Code == game.Mod.Code);
 				tabMods.Focus();
 				return false;
 			}
