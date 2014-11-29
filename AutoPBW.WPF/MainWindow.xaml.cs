@@ -39,6 +39,11 @@ namespace AutoPBW.WPF
 		/// </summary>
 		private HostGame currentTurnGame = null;
 
+		/// <summary>
+		/// Current turn processing exit code.
+		/// </summary>
+		private int? currentTurnExitCode = null;
+
 		public MainWindow()
 		{
 			InitializeComponent();
@@ -136,7 +141,9 @@ namespace AutoPBW.WPF
 										currentTurnProcess.Close();
 										currentTurnProcess = null;
 										currentTurnGame = null;
+										currentTurnExitCode = null;
 									}
+									gamesToProcess.Remove(game);
 								}
 							}
 							else
@@ -227,12 +234,16 @@ namespace AutoPBW.WPF
 			var g = currentTurnGame;
 			currentTurnProcess = null;
 			currentTurnGame = null;
-			if (p.ExitCode != 0)
-				throw new Exception("Turn processing failed with exit code " + p.ExitCode + ". Please check the game documentation for the meaning of this code.");
-			else
+			currentTurnExitCode = p.ExitCode;
+			if (currentTurnExitCode.Value == 0)
 			{
 				g.UploadTurn();
 				Dispatcher.Invoke(() => { RefreshData(); });
+				currentTurnExitCode = null;
+			}
+			else
+			{
+				Dispatcher.Invoke(() => taskbarIcon.ShowBalloonTip("Turn processing failed", "Turn processing for {0} failed with exit code {1}.".F(g, currentTurnExitCode), BalloonIcon.Error));
 			}
 		}
 

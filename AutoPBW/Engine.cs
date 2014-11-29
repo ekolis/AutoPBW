@@ -59,7 +59,7 @@ namespace AutoPBW
 		/// Command line arguments for the host.
 		/// Can use the following replacement strings:
 		/// {EnginePath}: the path to the game engine
-		/// {ModPath}: the path to the mod (relative to the engine path)
+		/// {ModPath}: the path to the mod (relative to the engine's standard mods folder)
 		/// {SavePath}: the save path of the mod (relative to the engine path)
 		/// {Password}: the host password for the game
 		/// {GameCode}: the unique game code for each game
@@ -71,7 +71,7 @@ namespace AutoPBW
 		/// Command line arguments for the player.
 		/// Can use the following replacement strings:
 		/// {EnginePath}: the path to the game engine
-		/// {ModPath}: the path to the mod (relative to the engine path)
+		/// {ModPath}: the path to the mod (relative to the engine's standard mods folder)
 		/// {SavePath}: the save path of the mod (relative to the engine path)
 		/// {Password}: the player password for the game
 		/// {GameCode}: the unique game code for each game

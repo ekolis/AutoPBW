@@ -129,7 +129,7 @@ namespace AutoPBW
 			var files = new HashSet<string>();
 			foreach (var filter in filters.Split(','))
 			{
-				foreach (var file in Directory.EnumerateFiles(path, filter))
+				foreach (var file in Directory.EnumerateFiles(path, filter.Trim()))
 					files.Add(file);
 			}
 			return files;
@@ -162,7 +162,7 @@ namespace AutoPBW
 		public void DownloadTurns()
 		{
 			var url = "http://pbw.spaceempires.net/games/{0}/host-turn/download".F(Code);
-			var path = Path.Combine(Path.GetDirectoryName(Engine.HostExecutable.Trim('"')), Mod.EmpirePath);
+			var path = Path.Combine(Path.GetDirectoryName(Engine.HostExecutable.Trim('"')), Mod.SavePath);
 			DownloadExtractAndDelete(url, path);
 		}
 
