@@ -94,21 +94,32 @@ namespace AutoPBW
 			PBW.Download(url, tempfile);
 
 			// extract the archive
+			PBW.Log.Write("Extracting {0} into {1}".F(tempfile, path));
 			var x = new SevenZipExtractor(tempfile);
 			x.ExtractArchive(path);
 
+			// log file list
+			PBW.Log.Write("List of files extracted:");
+			foreach (var f in x.ArchiveFileNames)
+				PBW.Log.Write("\t" + f);
+
 			// delete the archive
+			PBW.Log.Write("Deleting {0}".F(tempfile));
 			File.Delete(tempfile);
 		}
 
-		protected void ArchiveUploadAndDeleteArchive(IEnumerable<string> files, string path, string url, string uploadFormParam, HttpStatusCode expectedStatus = HttpStatusCode.OK)
+		protected void ArchiveUploadAndDeleteArchive(IEnumerable<string> files, string url, string uploadFormParam, HttpStatusCode expectedStatus = HttpStatusCode.OK)
 		{
 			// generate a temp file name
 			var tempfile = MakeTempFile("7z");
+			PBW.Log.Write("Archiving files into {0}:".F(tempfile));
 
 			// archive the files
 			var c = new SevenZipCompressor();
-			c.CompressFiles(tempfile, files.ToArray());
+			var files2 = files.ToArray();
+			foreach (var f in files2)
+				PBW.Log.Write("\t" + f);
+			c.CompressFiles(tempfile, files2);
 
 			// upload the archive
 			PBW.Upload(tempfile, url, uploadFormParam, expectedStatus);
@@ -189,7 +200,7 @@ namespace AutoPBW
 
 			// send to PBW
 			var url = "http://pbw.spaceempires.net/games/{0}/host-turn/upload".F(Code);
-			ArchiveUploadAndDeleteArchive(files, path, url, "turn_file", HttpStatusCode.Redirect); // for some reason PBW gives a 302 on host turn upload
+			ArchiveUploadAndDeleteArchive(files, url, "turn_file", HttpStatusCode.Redirect); // for some reason PBW gives a 302 on host turn upload
 		}
 
 		// TODO - replace turn
@@ -286,7 +297,7 @@ namespace AutoPBW
 		{
 			var url = "http://pbw.spaceempires.net/games/{0}/player-empire/upload".F(Code);
 			var path = Path.Combine(Path.GetDirectoryName(Engine.PlayerExecutable).Trim('"'), Mod.EmpirePath);
-			ArchiveUploadAndDeleteArchive(new string[] { empfile }, path, url, "emp_file");
+			ArchiveUploadAndDeleteArchive(new string[] { empfile }, url, "emp_file");
 		}
 
 		/// <summary>

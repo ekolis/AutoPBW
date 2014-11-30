@@ -94,7 +94,7 @@ namespace AutoPBW
 
 				ConnectionStatus = response.StatusCode;
 
-				Log.Write("Connection status to {0} is {1} {2}".F(response.Server, response.StatusCode, response.StatusDescription));
+				Log.Write("Connection status to {0} is {1} {2}: {3}".F(response.ResponseUri, (int)response.StatusCode, response.StatusCode, response.StatusDescription));
 				if (response.Cookies != null)
 					Log.Write("Cookies exist.");
 				else
@@ -273,8 +273,7 @@ namespace AutoPBW
 				HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 				Stream responseStream = response.GetResponseStream();
 
-				Log.Write("response StatusCode is " + response.StatusCode + "\r\n");
-				Log.Write("response StatusDescription is " + response.StatusDescription + "\r\n");
+				Log.Write("Connection status to {0} is {1} {2}: {3}".F(response.ResponseUri, (int)response.StatusCode, response.StatusCode, response.StatusDescription));
 
 				int buffersize = 1024;
 				byte[] buffer = new byte[buffersize];
@@ -328,18 +327,20 @@ namespace AutoPBW
 				// Create request and receive response
 				string postURL = uploadurl;
 				string userAgent = "AutoPBW/" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-				HttpWebResponse webResponse = FormUpload.MultipartFormDataPost(cookies, postURL, userAgent, postParameters);
+				HttpWebResponse response = FormUpload.MultipartFormDataPost(cookies, postURL, userAgent, postParameters);
+
+				Log.Write("Connection status to {0} is {1} {2}: {3}".F(response.ResponseUri, (int)response.StatusCode, response.StatusCode, response.StatusDescription));
 
 				// Process response
-				StreamReader responseReader = new StreamReader(webResponse.GetResponseStream());
-				if (webResponse.StatusCode == expectedStatus)
+				StreamReader responseReader = new StreamReader(response.GetResponseStream());
+				if (response.StatusCode == expectedStatus)
 					success = true;
-				webResponse.Close();
+				response.Close();
 			}
 
 			catch (Exception ex)
 			{
-				Log.Write("Error while uploading file:");
+				Log.Write("Error while uploading file:\n");
 				Log.Write(ex.ToString());
 				throw;
 			}
