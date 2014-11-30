@@ -360,11 +360,9 @@ namespace AutoPBW
 			/// </summary>
 			/// <param name="text"></param>
 			/// <param name="newline"></param>
-			public static void Write(string text, bool newline = true)
+			public static void Write(string text)
 			{
-				if (newline) { text += "\r\n"; }
 				log.Add(text);
-
 			}
 
 			/// <summary>
