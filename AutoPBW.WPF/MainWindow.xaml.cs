@@ -217,6 +217,9 @@ namespace AutoPBW.WPF
 				MessageBox.Show("Unable to refresh engines/mods lists: " + ex.Message);
 			}
 
+			// load log
+			lstLog.DataContext = PBW.Log.ReadAll();
+
 			// remember selection
 			var newGame = gridPlayerGames.Items.Cast<PlayerGame>().SingleOrDefault(g => g.Code == selCode);
 			gridPlayerGames.SelectedItem = newGame;
