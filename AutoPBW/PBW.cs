@@ -8,6 +8,7 @@ using System.Web;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using System.Collections.ObjectModel;
 
 namespace AutoPBW
 {
@@ -353,7 +354,7 @@ namespace AutoPBW
 		/// </summary>
 		public static class Log
 		{
-			private static List<string> log = new List<string>();
+			private static ObservableCollection<string> log = new ObservableCollection<string>();
 			private static int readCount = 0;
 
 			/// <summary>
