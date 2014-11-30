@@ -240,13 +240,28 @@ namespace AutoPBW.WPF
 			currentTurnExitCode = p.ExitCode;
 			if (currentTurnExitCode.Value == 0)
 			{
-				g.UploadTurn();
+				try
+				{
+					g.UploadTurn();
+				}
+				catch (Exception ex)
+				{
+					Dispatcher.Invoke(() => { taskbarIcon.ShowBalloonTip("Error uploading turn", "Unable to upload new turn for hosted game {0}: {1}".F(g, ex.Message), BalloonIcon.Error); });
+				}
 				Dispatcher.Invoke(() => { RefreshData(); });
 				currentTurnExitCode = null;
 			}
 			else
 			{
 				Dispatcher.Invoke(() => taskbarIcon.ShowBalloonTip("Turn processing failed", "Turn processing for {0} failed with exit code {1}.".F(g, currentTurnExitCode), BalloonIcon.Error));
+				try
+				{
+					g.PlaceHold("{0} exited with error code {1}".F(System.IO.Path.GetFileName(p.StartInfo.FileName), currentTurnExitCode));
+				}
+				catch (Exception ex)
+				{
+					Dispatcher.Invoke(() => { taskbarIcon.ShowBalloonTip("Error placing hold", "Unable to place processing hold on {0}: {1}".F(g, ex.Message), BalloonIcon.Error); });
+				}
 			}
 		}
 
