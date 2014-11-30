@@ -44,7 +44,7 @@
 				</Grid>
 			</TabItem>
 			<TabItem Header="Games I Host">
-				<!-- TODO - buttons to upload/download files manually, including GSU and EMPs --> 
+				<!-- TODO - buttons to upload/download files manually, including GSU and EMPs -->
 				<DataGrid x:Name="gridHostGames" AutoGenerateColumns="False" EnableRowVirtualization="True" DataContext="{StaticResource hostGameViewSource}" ItemsSource="{Binding}" RowDetailsVisibilityMode="VisibleWhenSelected" RenderTransformOrigin="0.5,0.5" IsReadOnly="True" MouseDoubleClick="playerGameDataGrid_MouseDoubleClick" Margin="0,0,0,38" Grid.ColumnSpan="2">
 					<DataGrid.Columns>
 						<DataGridTextColumn Binding="{Binding Code}" Header="Game" Width="100"/>
@@ -69,8 +69,8 @@
 					<Label Content="Username"/>
 					<Label Content="Password" Grid.Row ="1" RenderTransformOrigin="0.5,0.5">
 					</Label>
-					<TextBox x:Name="txtUsername" Grid.Column="1" TextWrapping="Wrap" RenderTransformOrigin="-0.008,0"  Height="24"/>
-					<PasswordBox x:Name="txtPassword" Grid.Column="1" Grid.Row="1" Height="21"/>
+					<TextBox x:Name="txtUsername" Grid.Column="1" TextWrapping="Wrap" RenderTransformOrigin="-0.008,0"  Height="24" ToolTip="Your PBW username."/>
+					<PasswordBox x:Name="txtPassword" Grid.Column="1" Grid.Row="1" Height="21" ToolTip="Your PBW password."/>
 					<Button x:Name="btnSaveSettings" Content="Save" Grid.Column="1" HorizontalAlignment="Left" Margin="336,0,0,0" Grid.Row="2" VerticalAlignment="Top" Width="75" Height="24" Click="btnSaveSettings_Click"/>
 				</Grid>
 			</TabItem>
@@ -103,19 +103,19 @@
 							<RowDefinition Height="Auto"/>
 						</Grid.RowDefinitions>
 						<Label Content="Code:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="0" VerticalAlignment="Center" Height="26" Width="40" />
-						<TextBox x:Name="engineCodeTextBox" Grid.Column="1" Height="24" Margin="10,4,-210,4" Grid.Row="0" Text="{Binding Code, Mode=OneWay}" Width="200" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+						<TextBox x:Name="engineCodeTextBox" Grid.Column="1" Height="24" Margin="10,4,-210,4" Grid.Row="0" Text="{Binding Code, Mode=OneWay}" Width="200" VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="Unique alphanumeric code used to represent this game engine. Must match what's used on PBW."/>
 						<Label Content="Host Executable:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="2" VerticalAlignment="Center" Height="26" Width="97" />
-						<TextBox x:Name="hostExecutableTextBox" Grid.Column="1" Height="24" Margin="10,4,-210,4" Grid.Row="2" Text="{Binding HostExecutable, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+						<TextBox x:Name="hostExecutableTextBox" Grid.Column="1" Height="24" Margin="10,4,-210,4" Grid.Row="2" Text="{Binding HostExecutable, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="Full path to the executable to run when hosting this game. If there are spaces in the path, it needs to be enclosed in double quotes."/>
 						<Label Content="Host Arguments:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="3" VerticalAlignment="Center" Height="26" Width="99" />
-						<TextBox x:Name="hostArgumentsTextBox" Grid.Column="1" Height="24" Margin="10,4,-210,4" Grid.Row="3" Text="{Binding HostArguments, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+						<TextBox x:Name="hostArgumentsTextBox" Grid.Column="1" Height="24" Margin="10,4,-210,4" Grid.Row="3" Text="{Binding HostArguments, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="Arguments which should be passed to the host executable. Click the &quot;Help&quot; button for more information."/>
 						<Label Content="Host Turn Upload Filter:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="4" VerticalAlignment="Center" Height="26" Width="136" />
-						<TextBox x:Name="hostTurnUploadFilterTextBox" Grid.Column="1" Height="24" Margin="10,4,-210,4" Grid.Row="4" Text="{Binding HostTurnUploadFilter, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+						<TextBox x:Name="hostTurnUploadFilterTextBox" Grid.Column="1" Height="24" Margin="10,4,-210,4" Grid.Row="4" Text="{Binding HostTurnUploadFilter, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="Comma-separated list of filename filters to apply to the savegame folder when uploading turns as a host."/>
 						<Label Content="Player Executable:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="5" VerticalAlignment="Center" Height="26" Width="104" />
-						<TextBox x:Name="playerExecutableTextBox" Grid.Column="1" Height="24" Margin="10,4,-210,4" Grid.Row="5" Text="{Binding PlayerExecutable, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+						<TextBox x:Name="playerExecutableTextBox" Grid.Column="1" Height="24" Margin="10,4,-210,4" Grid.Row="5" Text="{Binding PlayerExecutable, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="Full path to the executable to run when playing a turn. If there are spaces in the path, it needs to be enclosed in double quotes."/>
 						<Label Content="Player Arguments:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="6" VerticalAlignment="Center" Height="26" Width="106" />
-						<TextBox x:Name="playerArgumentsTextBox" Grid.Column="1" Height="24" Margin="10,4,-210,4" Grid.Row="6" Text="{Binding PlayerArguments, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+						<TextBox x:Name="playerArgumentsTextBox" Grid.Column="1" Height="24" Margin="10,4,-210,4" Grid.Row="6" Text="{Binding PlayerArguments, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="Arguments which should be passed to the player executable. Click the &quot;Help&quot; button for more information."/>
 						<Label Content="Player Turn Upload Filter:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="7" VerticalAlignment="Center" Height="26" Width="143" />
-						<TextBox x:Name="playerTurnUploadFilterTextBox" Grid.Column="1" Height="24" Margin="10,4,-210,4" Grid.Row="7" Text="{Binding PlayerTurnUploadFilter, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+						<TextBox x:Name="playerTurnUploadFilterTextBox" Grid.Column="1" Height="24" Margin="10,4,-210,4" Grid.Row="7" Text="{Binding PlayerTurnUploadFilter, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="Comma-separated list of filename filters to apply to the savegame folder when uploading turns as a player."/>
 					</Grid>
 					<Button x:Name="btnAddEngine" Grid.Column="1" Content="Add" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" Height="24" Click="btnAddEngine_Click" RenderTransformOrigin="2.04,4.458" Margin="0,0,170,10"/>
 					<Button x:Name="btnDeleteEngine" Grid.Column="1" Content="Delete" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" Height="24" Click="btnDeleteEngine_Click" RenderTransformOrigin="2.04,4.458" Margin="0,0,90,10"/>
@@ -151,15 +151,15 @@
 							<RowDefinition Height="Auto"/>
 						</Grid.RowDefinitions>
 						<Label Content="Code:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="0" VerticalAlignment="Center" />
-						<TextBox x:Name="modCodeTextBox" Grid.Column="1" Height="24" Margin="4,3,0,5" Grid.Row="0" Text="{Binding Code, Mode=OneWay}" Width="200" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+						<TextBox x:Name="modCodeTextBox" Grid.Column="1" Height="24" Margin="4,3,0,5" Grid.Row="0" Text="{Binding Code, Mode=OneWay}" Width="200" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Unique alphanumeric code used to represent this mod. Must match what's used on PBW."/>
 						<Label Content="Engine:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="1" VerticalAlignment="Center"  />
-						<ComboBox x:Name="ddlEngine" Grid.Column="1" Grid.Row="1" Height="32" ItemsSource="{Binding Mode=OneWay, Source={StaticResource engineViewSource}}" SelectedItem="{Binding Engine}" Margin="4,0,0,0" Width="200" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+						<ComboBox x:Name="ddlEngine" Grid.Column="1" Grid.Row="1" Height="32" ItemsSource="{Binding Mode=OneWay, Source={StaticResource engineViewSource}}" SelectedItem="{Binding Engine}" Margin="4,0,0,0" Width="200" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Game engine used by this mod."/>
 						<Label Content="Path:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="2" VerticalAlignment="Center" />
-						<TextBox x:Name="modPathTextBox" Grid.Column="1" Height="24" Margin="4,3,0,5" Grid.Row="2" Text="{Binding Path, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+						<TextBox x:Name="modPathTextBox" Grid.Column="1" Height="24" Margin="4,3,0,5" Grid.Row="2" Text="{Binding Path, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Path to this mod, relative to the game engine's standard mods path."/>
 						<Label Content="Save Path:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="3" VerticalAlignment="Center" />
-						<TextBox x:Name="savePathTextBox" Grid.Column="1" Height="24" Margin="4,3,0,5" Grid.Row="3" Text="{Binding SavePath, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+						<TextBox x:Name="savePathTextBox" Grid.Column="1" Height="24" Margin="4,3,0,5" Grid.Row="3" Text="{Binding SavePath, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Path to this mod's savegame folder, relative to the location of the game's executable."/>
 						<Label Content="Empire Path:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="4" VerticalAlignment="Center" />
-						<TextBox x:Name="empirePathTextBox" Grid.Column="1" Height="24" Margin="4,3,0,5" Grid.Row="4" Text="{Binding EmpirePath, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+						<TextBox x:Name="empirePathTextBox" Grid.Column="1" Height="24" Margin="4,3,0,5" Grid.Row="4" Text="{Binding EmpirePath, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Path to this mod's empire folder, relative to the location of the game's executable."/>
 					</Grid>
 					<Button x:Name="btnAddMod" Grid.Column="1" Content="Add" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" Height="24" Click="btnAddMod_Click" RenderTransformOrigin="2.04,4.458" Margin="0,0,170,10"/>
 					<Button x:Name="btnDeleteMod" Grid.Column="1" Content="Delete" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" Height="24" Click="btnDeleteMod_Click" RenderTransformOrigin="2.04,4.458" Margin="0,0,90,10"/>
@@ -177,9 +177,10 @@
 			</TabItem>
 		</TabControl>
 		<Menu IsMainMenu="True" Margin="0,0,0,338">
-			<Button Content="Refresh" x:Name="btnRefresh" Click="btnRefresh_Click"/>
-			<Button Content="PBW Website" x:Name="btnWebsite" Click="btnWebsite_Click"/>
-			<Button Content="Exit AutoPBW" x:Name="btnExit" Click="btnExit_Click"/>
+			<Button Content="Refresh" x:Name="btnRefresh" Click="btnRefresh_Click" ToolTip="Refreshes the list of games from PBW."/>
+			<Button Content="PBW Website" x:Name="btnWebsite" Click="btnWebsite_Click" ToolTip="Opens PBW in your web browser."/>
+			<Button Content="Help" x:Name="btnHelp" Click="btnHelp_Click" ToolTip="Opens the AutoPBW user manual in your web browser."/>
+			<Button Content="Exit AutoPBW" x:Name="btnExit" Click="btnExit_Click" ToolTip="Exits AutoPBW."/>
 		</Menu>
 	</Grid>
 </Window>

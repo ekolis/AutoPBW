@@ -563,6 +563,11 @@ namespace AutoPBW.WPF
 			exiting = true;
 			Close();
 		}
+
+		private void btnHelp_Click(object sender, RoutedEventArgs e)
+		{
+			Process.Start("AutoPBW-Manual.html");
+		}
 	}
 }
 

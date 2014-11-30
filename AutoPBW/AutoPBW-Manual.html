@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>AutoPBW Manual</title>
+	<style>
+		body {
+			color: #44aaff;
+			background-color: black;
+		}
+
+		h1, h2, h3, h4, h5, h6 {
+			padding-left: 1em;
+			padding-top: 0.25em;
+			padding-bottom: 0.25em;
+			font-family: sans-serif;
+			color: #0088ff;
+			border: 5px solid #888888;
+			border-radius: 5px;
+			border-style: inset;
+			width: 500px;
+		}
+
+		h2 {
+			margin-left: 1em;
+		}
+
+		h3 {
+			margin-left: 2em;
+		}
+
+		div div {
+			margin-left: 1em;
+		}
+
+		div p, div ul {
+			margin-left: 3em;
+		}
+
+		a:link {
+			color: #0088ff;
+		}
+
+		a:visited {
+			color: #8888ff;
+		}
+
+		em {
+			color: #88ffff;
+		}
+
+		li.added:before {
+			content: "Added: ";
+			color: #00ffaa;
+		}
+
+		li.changed:before {
+			content: "Changed: ";
+			color: #aaaaaa;
+		}
+
+		li.fixed:before {
+			content: "Fixed: ";
+			color: #aaaa00;
+		}
+
+		li.removed:before {
+			content: "Removed: ";
+			color: #aa8888;
+		}
+	</style>
+</head>
+<body>
+	<h1>AutoPBW Manual</h1>
+	<div>
+		<h2>What is AutoPBW?</h2>
+		<p>
+			AutoPBW is desktop client application for the <a href="http://pbw.spaceempires.net">PBW website</a>, which allows for automation of PBEM-style play in turn-based strategy games such as Space Empires IV.
+		</p>
+		<p>
+			The current version of AutoPBW is 1.1. You can download the <a href="https://bitbucket.org/ekolis/autopbw/downloads">latest version</a> or <a href="https://bitbucket.org/ekolis/autopbw/src">source code</a>, or file a <a href="https://bitbucket.org/ekolis/autopbw/issues?status=new&status=open">bug report or feature request</a> at Bitbucket. Also feel free to fork this project and submit pull requests!
+		</p>
+		<p>
+			AutoPBW was created by <a href="mailto:edkolis@gmail.com">Ed Kolis</a> and is based on Jon Sorensen's <a href="https://github.com/se5a/PBWAutoClient">PBW AutoClient</a>.
+		</p>
+		<p>
+			AutoPBW runs in the background when you close the window; you can bring it up again by double-clicking the tray icon, and close it for good by right-clicking the tray icon and selecting "Exit AutoPBW" from the menu, or by clicking the "Exit AutoPBW" button in the GUI.
+		</p>
+	</div>
+	<div>
+		<h2>Configuration</h2>
+		<p>
+			There are three things you will need to configure in AutoPBW:
+			<ul>
+				<li>Login information</li>
+				<li>Game engines</li>
+				<li>Mods</li>
+			</ul>
+		</p>
+		<div>
+			<h3>Configuring login information</h3>
+			<p>
+				This is fairly self-explanatory; just enter your PBW username and password on the "Settings" tab and click "Save".
+			</p>
+			<h3>Configuring game engines</h3>
+			<p>
+				AutoPBW comes with preconfigured settings for all game engines supported by PBW, but you will need to set the paths to the game executables. Note that for SE4 and SE5, you will want to use separate instances of the game for playing and hosting, as the games create temporary files which will overwrite each other if you run more than one instance of the game at once. (AutoPBW never attempts to run more than one hosted game at a time for this reason.)
+			</p>
+			<p>
+				If you do need to customize these settings (e.g. PBW adds support for new game engines, or I made a mistake in the configuration files), be aware that the configuration fields (except the "Code" field) support support a variety of replacement strings:
+			</p>
+
+			<ul>
+				<li><em>{Executable}</em>: The game engine executable, as specified in the Host Executable or Player Executable field as appropriate.</li>
+				<li><em>{EnginePath}</em>: The folder containing the executable.</li>
+				<li><em>{ModPath}</em>: The path to the mod being played (relative to the engine's mods path, see "Configuring Mods" below)</li>
+				<li><em>{SavePath}</em>: The path to the mod's savegame folder (relative to the engine path).</li>
+				<li><em>{Password}</em>: The password used to log in as the host or player, as appropriate.</li>
+				<li><em>{GameCode}</em>: The unique alphanumeric code used to refer to the game being played on PBW.</li>
+				<li><em>{TurnNumber}</em>: The current turn number.</li>
+			</ul>
+
+			<p>
+				Additionally, the following replacement strings are supported only by the player fields:
+			</p>
+			<ul>
+				<li><em>{PlayerNumber}</em>: The player's number in the game, e.g. if he is the first player it will be 1.</li>
+				<li><em>{PlayerNumber2}</em>: The player's number in the game, padded with zeroes to two digits, e.g. if he is the first player it will be 01.</li>
+				<li><em>{PlayerNumber3}</em>: The player's number in the game, padded with zeroes to three digits, e.g. if he is the first player it will be 001.</li>
+				<li><em>{PlayerNumber4}</em>: The player's number in the game, padded with zeroes to four digits, e.g. if he is the first player it will be 0001.</li>
+			</ul>
+			<h3>Configuring mods</h3>
+			<p>
+				When AutoPBW encounters a mod being used on PBW for the first time, it automatically creates a blank configuration entry for that mod. You will, however, need to fill in a few fields:
+			</p>
+			<ul>
+				<li><em>Path</em>: The path to the mod, relative to the game engine's mods folder. This varies depending on the game engine - for SE5, that is the GameTypes folder, and for FrEee and THANCS, that is the Mods folder, but for SE4 it's the root SE4 folder, and for EH, it's irrelevant as EH doesn't actually have mods.</li>
+				<li><em>Save Path</em>: The path to the mod's savegame folder, relative to the game engine's root folder. For SE4, this is typically set to a Savegame folder under the mod's folder, and for other games it is typically set to a Savegame folder under the engine's root folder (though you can do this for SE4 as well if you like).</li>
+				<li><em>Empire Path</em>: The path to the mod's empire folder, relative to the game engine's root folder. For SE4 and FrEee, this is typically set to an Empires folder under the mod's folder (or just use "Empires" to place it under the engine root), for SE5 it is SavedEmpires, for THANCS you would use a dot (".") since THANCS "empires" (ship designs) are stored in the engine root folder, and for EH this is irrelevant as EH doesn't use empire files.</li>
+			</ul>
+		</div>
+	</div>
+	<div>
+		<h2>Playing Games</h2>
+		<p>
+			The "Games I Play" tab will list all of the games that you are currently playing. It has four columns:
+		</p>
+		<ul>
+			<li><em>Game</em>: The unique code of the game.</li>
+			<li><em>Status</em>: The status of the game - either "uploaded" or "waiting".</li>
+			<li><em>Turn Mode</em>: The turn processing mode of the game - either "manual", "after last player upload", "timed only", or "fully automatic".</li>
+			<li><em>Time Left</em>: The amount of time remaining until the turn deadline expires. Will not show negative numbers; instead, zero will be displayed. If the game hasn't started yet, a very long time will be displayed.</li>
+		</ul>
+		<p>
+			After selecting a game that has started, you can click the "Download" button to download the turn. You will be prompted to play the turn. After you have played the turn, you can click "Upload" to upload to PBW. If you have already downloaded a turn, but haven't had a chance to play it yet, you can click "Play" to play it without redownloading it. If the game's mod or engine isn't configured yet, you will be prompted to do so, and once you have done so, you can try to play the turn again.
+		</p>
+	</div>
+	<div>
+		<h2>Hosting Games</h2>
+		<p>
+			If you are hosting any games (or have volunteered to autohost someone else's games), they will show up in the "Games I Host" tab, but only if they are currently awaiting action from you; PBW doesn't currently report on hosted games that are not awaiting action. The "Games I Host" list has the same columns as the "Games I Play" list.
+		</p>
+		<p>
+			When a game is ready for turn processing, AutoPBW will automatically attempt to download, process, and upload the turn files for the game. If the game's engine or mod isn't configured yet, an error will be displayed in the tray icon. You will need to open AutoPBW by double-clicking the tray icon, find the mod or engine in question, and configure it; then the game will attempt to process again the next time AutoPBW refreshes. (The standard refresh rate is once every two minutes, but it also refreshes after uploading any files, and you can refresh manually by clicking the "Refresh" button.)
+		</p>
+		<p>
+			AutoPBW will never attempt to process more than one game at a time; if more than one game is awaiting processing, AutoPBW will process them sequentially. You can, however, download, play, and upload turns while a game is processing (though you will have to wait for any downloads or uploads in progress to complete in order to download or upload files).
+		</p>
+	</div>
+	<div>
+		<h2>Version History</h2>
+
+		<div>
+			<h3>1.1</h3>
+			<ul>
+				<li class="added">Log tab in GUI</li>
+				<li class="added">Tooltips for configuration fields</li>
+				<li class="added">HTML documentation</li>
+			</ul>
+
+			<h3>1.0</h3>
+			<ul>
+				<li>Initial release</li>
+			</ul>
+		</div>
+	</div>
+</body>
+</html>
