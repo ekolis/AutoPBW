@@ -104,52 +104,15 @@ namespace AutoPBW.WPF
 			// remember selection
 			var selGame = gridPlayerGames.SelectedItem as PlayerGame;
 			var selCode = selGame == null ? null : selGame.Code;
+			IEnumerable<HostGame> hostGames = null;
 
 			try
 			{
 				// load host games
 				{
 					var hostGameViewSource = ((CollectionViewSource)(this.FindResource("hostGameViewSource")));
-					var games = PBW.GetHostGames().ToArray();
-					hostGameViewSource.Source = games;
-					var gamesToProcess = games.Where(g => g.Status == HostStatus.PlayersReady).ToList();
-					if (currentTurnProcess == null)
-					{
-						while (gamesToProcess.Any())
-						{
-							var game = gamesToProcess.First();
-							if (CheckModAndEngine(game))
-							{
-								taskbarIcon.ShowBalloonTip("Processing turn", "Processing turn for " + game + ".", BalloonIcon.None);
-								try
-								{
-									game.DownloadTurns();
-									currentTurnGame = game;
-									currentTurnProcess = new Process();
-									currentTurnProcess.StartInfo = game.ProcessTurnPrepare();
-									currentTurnProcess.EnableRaisingEvents = true;
-									currentTurnProcess.Exited += process_Exited;
-									currentTurnProcess.Start();
-									break; // wait till we finish this one
-								}
-								catch (Exception ex)
-								{
-									taskbarIcon.ShowBalloonTip("Turn processing failed", "Turn processing for " + game + " failed:\n" + ex.Message, BalloonIcon.None);
-									game.PlaceHold(ex.Message);
-									if (currentTurnProcess != null)
-									{
-										currentTurnProcess.Close();
-										currentTurnProcess = null;
-										currentTurnGame = null;
-										currentTurnExitCode = null;
-									}
-									gamesToProcess.Remove(game);
-								}
-							}
-							else
-								gamesToProcess.Remove(game); // can't process this game now
-						}
-					}
+					hostGames = PBW.GetHostGames().ToArray();
+					hostGameViewSource.Source = hostGames;
 				}
 
 				// load player games
@@ -200,7 +163,6 @@ namespace AutoPBW.WPF
 			}
 			try
 			{
-
 				// load engines
 				var engineViewSource = ((CollectionViewSource)(this.FindResource("engineViewSource")));
 				engineViewSource.Source = Config.Instance.Engines;
@@ -219,6 +181,49 @@ namespace AutoPBW.WPF
 
 			// load log
 			lstLog.DataContext = PBW.Log.ReadAll();
+
+			// process turn if needed
+			if (hostGames != null)
+			{
+				var gamesToProcess = hostGames.Where(g => g.Status == HostStatus.PlayersReady).ToList();
+				if (currentTurnProcess == null)
+				{
+					while (gamesToProcess.Any())
+					{
+						var game = gamesToProcess.First();
+						if (CheckModAndEngine(game))
+						{
+							taskbarIcon.ShowBalloonTip("Processing turn", "Processing turn for " + game + ".", BalloonIcon.None);
+							try
+							{
+								game.DownloadTurns();
+								currentTurnGame = game;
+								currentTurnProcess = new Process();
+								currentTurnProcess.StartInfo = game.ProcessTurnPrepare();
+								currentTurnProcess.EnableRaisingEvents = true;
+								currentTurnProcess.Exited += process_Exited;
+								currentTurnProcess.Start();
+								break; // wait till we finish this one
+							}
+							catch (Exception ex)
+							{
+								taskbarIcon.ShowBalloonTip("Turn processing failed", "Turn processing for " + game + " failed:\n" + ex.Message, BalloonIcon.None);
+								game.PlaceHold(ex.Message);
+								if (currentTurnProcess != null)
+								{
+									currentTurnProcess.Close();
+									currentTurnProcess = null;
+									currentTurnGame = null;
+									currentTurnExitCode = null;
+								}
+								gamesToProcess.Remove(game);
+							}
+						}
+						else
+							gamesToProcess.Remove(game); // can't process this game now
+					}
+				}
+			}
 
 			// remember selection
 			var newGame = gridPlayerGames.Items.Cast<PlayerGame>().SingleOrDefault(g => g.Code == selCode);
@@ -512,6 +517,13 @@ namespace AutoPBW.WPF
 				MessageBox.Show("No game is selected.");
 				return false;
 			}
+			else if (game.Engine == null)
+			{
+				MessageBox.Show("Mod " + game.Mod + " does not have an engine assigned to it. Please configure it.");
+				lstMods.SelectedItem = lstMods.Items.Cast<Mod>().SingleOrDefault(m => m.Code == game.Mod.Code);
+				tabMods.Focus();
+				return false;
+			}
 			else if (game.Engine.IsUnknown)
 			{
 				MessageBox.Show("Unknown game engine " + game.Engine + ". Please configure it.");
@@ -534,6 +546,11 @@ namespace AutoPBW.WPF
 		{
 			if (game == null)
 				return true;
+			else if (game.Engine == null)
+			{
+				taskbarIcon.ShowBalloonTip("Configuration required", "Mod " + game.Mod + " required by hosted game " + game + " has no engine assigned. Please configure it.", BalloonIcon.None);
+				return false;
+			}
 			else if (game.Engine.IsUnknown)
 			{
 				taskbarIcon.ShowBalloonTip("Configuration required", "Unknown game engine " + game.Engine + " required by hosted game " + game + ". Please configure it.", BalloonIcon.None);
