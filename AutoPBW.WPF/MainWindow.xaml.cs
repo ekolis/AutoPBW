@@ -247,7 +247,7 @@ namespace AutoPBW.WPF
 			{
 				try
 				{
-					g.UploadTurn();
+					Dispatcher.Invoke(() => { g.UploadTurn(); });
 				}
 				catch (Exception ex)
 				{
