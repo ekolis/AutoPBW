@@ -29,7 +29,7 @@ namespace WpfSingleInstanceByEventWaitHandle
 			var appName = Application.Current.GetType().Assembly.ManifestModule.ScopeName;
 
 			var windowsIdentity = System.Security.Principal.WindowsIdentity.GetCurrent();
-			var keyUserName = windowsIdentity!=null?windowsIdentity.User.ToString():String.Empty;
+			var keyUserName = windowsIdentity != null ? windowsIdentity.User.ToString() : String.Empty;
 
 			// Be careful! Max 260 chars!
 			var eventWaitHandleName = string.Format(
@@ -67,7 +67,18 @@ namespace WpfSingleInstanceByEventWaitHandle
 		private static void OtherInstanceAttemptedToStart(Object state, Boolean timedOut)
 		{
 			RemoveApplicationsStartupDeadlockForStartupCrushedWindows();
-			Application.Current.Dispatcher.BeginInvoke(new Action(() => { try { Application.Current.MainWindow.Activate(); } catch { } }));
+			Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+			{
+				try
+				{
+					Application.Current.MainWindow.Activate();
+					Application.Current.MainWindow.Show();
+				}
+				catch
+				{
+					
+				}
+			}));
 		}
 
 		internal static DispatcherTimer AutoExitAplicationIfStartupDeadlock;
