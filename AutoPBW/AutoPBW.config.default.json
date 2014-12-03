@@ -124,7 +124,7 @@
 				"$id": "14",
 				"Code": "adamant_0161",
 				"Engine": {
-					"$ref": "3"
+					"$ref": "4"
 				},
 				"Path": "GameTypes\\Adamant 0.16.00",
 				"SavePath": "GameTypes\\Adamant 0.16.00\\Savegame",
