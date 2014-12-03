@@ -70,7 +70,10 @@ namespace AutoPBW.WPF
 
 		void taskbarIcon_TrayMouseDoubleClick(object sender, RoutedEventArgs e)
 		{
+			if (WindowState == WindowState.Minimized)
+				WindowState = WindowState.Normal;
 			Show();
+			Activate();
 		}
 
 		void refreshTimer_Elapsed(object sender, ElapsedEventArgs e)
