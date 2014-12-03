@@ -30,7 +30,7 @@
 						<RowDefinition Height="*"/>
 						<RowDefinition Height="32"/>
 					</Grid.RowDefinitions>
-					<DataGrid x:Name="gridPlayerGames" AutoGenerateColumns="False" EnableRowVirtualization="True" DataContext="{StaticResource playerGameViewSource}" ItemsSource="{Binding}" RowDetailsVisibilityMode="VisibleWhenSelected" RenderTransformOrigin="0.5,0.5" IsReadOnly="True" MouseDoubleClick="playerGameDataGrid_MouseDoubleClick" Margin="0,0,0,38" Grid.ColumnSpan="2">
+					<DataGrid x:Name="gridPlayerGames" AutoGenerateColumns="False" EnableRowVirtualization="True" DataContext="{StaticResource playerGameViewSource}" ItemsSource="{Binding}" RowDetailsVisibilityMode="VisibleWhenSelected" RenderTransformOrigin="0.5,0.5" IsReadOnly="True" MouseDoubleClick="playerGameDataGrid_MouseDoubleClick" Margin="0,0,0,38" Grid.ColumnSpan="2" SelectionMode="Single">
 						<DataGrid.Columns>
 							<DataGridTextColumn Binding="{Binding Code}" Header="Game" Width="100"/>
 							<DataGridTextColumn Binding="{Binding Status}" Header="Status" Width="100"/>
@@ -45,7 +45,7 @@
 			</TabItem>
 			<TabItem Header="Games I Host">
 				<!-- TODO - buttons to upload/download files manually, including GSU and EMPs -->
-				<DataGrid x:Name="gridHostGames" AutoGenerateColumns="False" EnableRowVirtualization="True" DataContext="{StaticResource hostGameViewSource}" ItemsSource="{Binding}" RowDetailsVisibilityMode="VisibleWhenSelected" RenderTransformOrigin="0.5,0.5" IsReadOnly="True" MouseDoubleClick="playerGameDataGrid_MouseDoubleClick" Margin="0,0,0,38" Grid.ColumnSpan="2">
+				<DataGrid x:Name="gridHostGames" AutoGenerateColumns="False" EnableRowVirtualization="True" DataContext="{StaticResource hostGameViewSource}" ItemsSource="{Binding}" RowDetailsVisibilityMode="VisibleWhenSelected" RenderTransformOrigin="0.5,0.5" IsReadOnly="True" MouseDoubleClick="playerGameDataGrid_MouseDoubleClick" Margin="0,0,0,38" Grid.ColumnSpan="2" SelectionMode="Single">
 					<DataGrid.Columns>
 						<DataGridTextColumn Binding="{Binding Code}" Header="Game" Width="100"/>
 						<DataGridTextColumn Binding="{Binding Status}" Header="Status" Width="100"/>
