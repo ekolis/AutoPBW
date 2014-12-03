@@ -43,7 +43,7 @@
 					<Button x:Name="btnUpload" Content="Upload" HorizontalAlignment="Right" Margin="0,0,0,0" VerticalAlignment="Bottom" Width="75" Click="btnUpload_Click" Grid.Row="1" Grid.Column="1"/>
 				</Grid>
 			</TabItem>
-			<TabItem Header="Games I Host">
+			<TabItem x:Name="tabHostGames" Header="Games I Host">
 				<!-- TODO - buttons to upload/download files manually, including GSU and EMPs -->
 				<DataGrid x:Name="gridHostGames" AutoGenerateColumns="False" EnableRowVirtualization="True" DataContext="{StaticResource hostGameViewSource}" ItemsSource="{Binding}" RowDetailsVisibilityMode="VisibleWhenSelected" RenderTransformOrigin="0.5,0.5" IsReadOnly="True" MouseDoubleClick="playerGameDataGrid_MouseDoubleClick" Margin="0,0,0,38" Grid.ColumnSpan="2" SelectionMode="Single">
 					<DataGrid.Columns>

@@ -44,6 +44,11 @@ namespace AutoPBW.WPF
 		/// </summary>
 		private int? currentTurnExitCode = null;
 
+		/// <summary>
+		/// Context item for balloon tip.
+		/// </summary>
+		private object balloonTipContext = null;
+
 		public MainWindow()
 		{
 			InitializeComponent();
@@ -55,11 +60,50 @@ namespace AutoPBW.WPF
 			taskbarIcon = new TaskbarIcon();
 			taskbarIcon.IconSource = Icon;
 			taskbarIcon.TrayMouseDoubleClick += taskbarIcon_TrayMouseDoubleClick;
+			taskbarIcon.TrayBalloonTipClicked += taskbarIcon_TrayBalloonTipClicked;
 			taskbarIcon.ContextMenu = new ContextMenu();
 			var miExit = new MenuItem();
 			miExit.Header = "Exit AutoPBW";
 			miExit.Click += miExit_Click;
 			taskbarIcon.ContextMenu.Items.Add(miExit);
+		}
+
+		void taskbarIcon_TrayBalloonTipClicked(object sender, RoutedEventArgs e)
+		{
+			if (balloonTipContext is PlayerGame)
+			{
+				// select game
+				tabPlayerGames.Focus();
+				gridPlayerGames.SelectedItem = balloonTipContext;
+			}
+			else if (balloonTipContext is HostGame)
+			{
+				// select game
+				tabHostGames.Focus();
+				gridHostGames.SelectedItem = balloonTipContext;
+			}
+			else if (balloonTipContext is IEnumerable<PlayerGame>)
+			{
+				// focus player game tab
+				tabPlayerGames.Focus();
+			}
+			else if (balloonTipContext is IEnumerable<HostGame>)
+			{
+				// focus host game tab
+				tabHostGames.Focus();
+			}
+			else if (balloonTipContext is Engine)
+			{
+				// select engine
+				tabEngines.Focus();
+				lstEngines.SelectedItem = balloonTipContext;
+			}
+			else if (balloonTipContext is Mod)
+			{
+				// select mod
+				tabMods.Focus();
+				lstMods.SelectedItem = balloonTipContext;
+			}
 		}
 
 		void miExit_Click(object sender, RoutedEventArgs e)
@@ -139,13 +183,13 @@ namespace AutoPBW.WPF
 
 					// newly ready games, show a popup
 					if (waitingPLR.Intersect(newReady).Count() > 1)
-						taskbarIcon.ShowBalloonTip("New turns ready", waitingPLR.Intersect(newReady).Count() + " new games are ready to play.", BalloonIcon.None);
+						ShowBalloonTip("New turns ready", waitingPLR.Intersect(newReady).Count() + " new games are ready to play.", waitingPLR.Intersect(newReady));
 					else if (waitingPLR.Intersect(newReady).Count() == 1)
-						taskbarIcon.ShowBalloonTip("New turn ready", waitingPLR.Intersect(newReady).Single() + " is ready to play.", BalloonIcon.None);
+						ShowBalloonTip("New turn ready", waitingPLR.Intersect(newReady).Single() + " is ready to play.", waitingPLR.Intersect(newReady).Single());
 					else if (waitingEMP.Intersect(newReady).Count() > 1)
-						taskbarIcon.ShowBalloonTip("Awaiting empires", waitingEMP.Intersect(newReady).Count() + " games are awaiting empire setup files.", BalloonIcon.None);
+						ShowBalloonTip("Awaiting empires", waitingEMP.Intersect(newReady).Count() + " games are awaiting empire setup files.", waitingEMP.Intersect(newReady));
 					else if (waitingEMP.Intersect(newReady).Count() == 1)
-						taskbarIcon.ShowBalloonTip("Awaiting empire", waitingEMP.Intersect(newReady).Single() + " is awaiting an empire setup file.", BalloonIcon.None);
+						ShowBalloonTip("Awaiting empire", waitingEMP.Intersect(newReady).Single() + " is awaiting an empire setup file.", waitingEMP.Intersect(newReady).Single());
 
 					// all ready games, set a tooltip
 					if (waitingPLR.Count() > 1)
@@ -196,7 +240,7 @@ namespace AutoPBW.WPF
 						var game = gamesToProcess.First();
 						if (CheckModAndEngine(game))
 						{
-							taskbarIcon.ShowBalloonTip("Processing turn", "Processing turn for " + game + ".", BalloonIcon.None);
+							ShowBalloonTip("Processing turn", "Processing turn for " + game + ".", game);
 							try
 							{
 								game.DownloadTurns();
@@ -210,7 +254,7 @@ namespace AutoPBW.WPF
 							}
 							catch (Exception ex)
 							{
-								taskbarIcon.ShowBalloonTip("Turn processing failed", "Turn processing for " + game + " failed:\n" + ex.Message, BalloonIcon.None);
+								ShowBalloonTip("Turn processing failed", "Turn processing for " + game + " failed:\n" + ex.Message, game);
 								game.PlaceHold(ex.Message);
 								if (currentTurnProcess != null)
 								{
@@ -254,21 +298,21 @@ namespace AutoPBW.WPF
 				}
 				catch (Exception ex)
 				{
-					Dispatcher.Invoke(() => { taskbarIcon.ShowBalloonTip("Error uploading turn", "Unable to upload new turn for hosted game {0}: {1}".F(g, ex.Message), BalloonIcon.Error); });
+					Dispatcher.Invoke(() => { ShowBalloonTip("Error uploading turn", "Unable to upload new turn for hosted game {0}: {1}".F(g, ex.Message), g, BalloonIcon.Error); });
 				}
 				Dispatcher.Invoke(() => { RefreshData(); });
 				currentTurnExitCode = null;
 			}
 			else
 			{
-				Dispatcher.Invoke(() => taskbarIcon.ShowBalloonTip("Turn processing failed", "Turn processing for {0} failed with exit code {1}.".F(g, currentTurnExitCode), BalloonIcon.Error));
+				Dispatcher.Invoke(() => ShowBalloonTip("Turn processing failed", "Turn processing for {0} failed with exit code {1}.".F(g, currentTurnExitCode), g, BalloonIcon.Error));
 				try
 				{
 					g.PlaceHold("{0} exited with error code {1}".F(System.IO.Path.GetFileName(p.StartInfo.FileName), currentTurnExitCode));
 				}
 				catch (Exception ex)
 				{
-					Dispatcher.Invoke(() => { taskbarIcon.ShowBalloonTip("Error placing hold", "Unable to place processing hold on {0}: {1}".F(g, ex.Message), BalloonIcon.Error); });
+					Dispatcher.Invoke(() => { ShowBalloonTip("Error placing hold", "Unable to place processing hold on {0}: {1}".F(g, ex.Message), g, BalloonIcon.Error); });
 				}
 			}
 		}
@@ -551,17 +595,17 @@ namespace AutoPBW.WPF
 				return true;
 			else if (game.Engine == null)
 			{
-				taskbarIcon.ShowBalloonTip("Configuration required", "Mod " + game.Mod + " required by hosted game " + game + " has no engine assigned. Please configure it.", BalloonIcon.None);
+				ShowBalloonTip("Configuration required", "Mod " + game.Mod + " required by hosted game " + game + " has no engine assigned. Please configure it.", game.Mod);
 				return false;
 			}
 			else if (game.Engine.IsUnknown)
 			{
-				taskbarIcon.ShowBalloonTip("Configuration required", "Unknown game engine " + game.Engine + " required by hosted game " + game + ". Please configure it.", BalloonIcon.None);
+				ShowBalloonTip("Configuration required", "Unknown game engine " + game.Engine + " required by hosted game " + game + ". Please configure it.", game.Engine);
 				return false;
 			}
 			else if (game.Mod.IsUnknown)
 			{
-				taskbarIcon.ShowBalloonTip("Configuration required", "Unknown mod " + game.Mod + " required by hosted game " + game + ". Please configure it.", BalloonIcon.None);
+				ShowBalloonTip("Configuration required", "Unknown mod " + game.Mod + " required by hosted game " + game + ". Please configure it.", game.Mod);
 				return false;
 			}
 			else
@@ -602,6 +646,12 @@ namespace AutoPBW.WPF
 		private void btnHelp_Click(object sender, RoutedEventArgs e)
 		{
 			Process.Start("AutoPBW-Manual.html");
+		}
+
+		private void ShowBalloonTip(string title, string text, object context = null, BalloonIcon icon = BalloonIcon.None)
+		{
+			balloonTipContext = context;
+			taskbarIcon.ShowBalloonTip(title, text, icon);
 		}
 	}
 }
