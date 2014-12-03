@@ -1,67 +1,257 @@
 {
-    "$id": "1",
-    "Username": "",
-    "Password": "",
-    "Engines": {
-        "$id": "2",
-        "$values": [
-            {
-                "$id": "3",
-                "Code": "SE4",
-                "HostExecutable": "\"C:\\Autohost\\SE4\\se4.exe\"",
-                "PlayerExecutable": "\"C:\\Games\\SE4\\se4.exe\"",
-                "HostTurnUploadFilter": "{GameCode}_*.gam, {GameCode}_*.cmb, {GameCode}_*.trn, {GameCode}_*.txt",
-                "PlayerTurnUploadFilter": "{GameCode}_*.plr",
-                "IsUnknown": true,
-                "HostArguments": "\"{EnginePath}\\{SavePath}\\{GameCode}.gam\" \"{Password}\" \"0\" \"{ModPath}\"",
-                "PlayerArguments": "\"{EnginePath}\\{SavePath}\\{GameCode}.gam\" \"{Password}\" \"{PlayerNumber}\" \"{ModPath}\""
-            },
-            {
-                "$id": "4",
-                "Code": "SE5",
-                "HostExecutable": "\"C:\\Autohost\\SE5\\se5.exe\"",
-                "PlayerExecutable": "\"C:\\Games\\SE5\\se5.exe\"",
-                "HostTurnUploadFilter": "{GameCode}_*.gam, {GameCode}_*.cmb, {GameCode}_*.mvl, {GameCode}_*.hlg, {GameCode}_*.txt",
-                "PlayerTurnUploadFilter": "{GameCode}_*.plr",
-                "IsUnknown": true,
-                "HostArguments": "\"{EnginePath}\\Savegame\\{GameCode}.gam\" \"{Password}\" -moddir \"{ModPath}\"",
-                "PlayerArguments": ""
-            },
-            {
-                "$id": "5",
-                "Code": "THANCS",
-                "HostExecutable": "\"c:\\Autohost\\THANCS\\THANCS.exe\"",
-                "PlayerExecutable": "\"c:\\Games\\THANCS\\THANCS-perlgui.exe\"",
-                "HostTurnUploadFilter": "{GameCode}_{TurnNumber}*.gam",
-                "PlayerTurnUploadFilter": "{GameCode}_{TurnNumber}_*.plr",
-                "IsUnknown": true,
-                "HostArguments": "\"{EnginePath}\\{ModPath}\" \"{EnginePath}\\{SavePath}\\{GameCode}\" \"{TurNumber}\"",
-                "PlayerArguments": "-g={GameCode} -t={TurnNumber} -p={PlayerNumber} -morestats"
-            },
-            {
-                "$id": "6",
-                "Code": "FREEE",
-                "HostExecutable": "\"C:\\Autohost\\FrEee\\FrEee.exe",
-                "PlayerExecutable": "\"C:\\Games\\FrEee\\FrEee.exe",
-                "HostTurnUploadFilter": "{GameCode}_{TurnNumber}*.gam",
-                "PlayerTurnUploadFilter": "{GameCode}_{TurnNumber}_*.plr",
-                "IsUnknown": true,
-                "HostArguments": "--process-turn \"{EnginePath}\\{SavePath}\\{GameCode}_{TurnNumber}.gam\"",
-                "PlayerArguments": "--play-turn \"{EnginePath}\\{SavePath}\\{GameCode}_{TurnNumber}_{PlayerNumber}.gam\""
-            },
-            {
-                "$id": "7",
-                "Code": "EH",
-                "HostExecutable": "\"C:\\Autohost\\EventHorizon\\EventHorizonHost.exe",
-                "PlayerExecutable": "\"C:\\Games\\EventHorizon\\EventHorizon.exe",
-                "HostTurnUploadFilter": "{GameCode}_{TurnNumber}*.gam",
-                "PlayerTurnUploadFilter": "{GameCode}_{TurnNumber}_*.plr",
-                "IsUnknown": true,
-                "HostArguments": "\"{EnginePath}\\{SavePath}\\{GameCode}\" {TurnNumber}",
-                "PlayerArguments": "\"{EnginePath}\\{SavePath}\\{GameCode}_{TurnNumber}.gam\""
-            }
-        ]
-    },
-    "Mods": [
-    ]
+	"$id": "1",
+	"Username": "",
+	"Password": "",
+	"Engines": {
+		"$id": "2",
+		"$values": [
+			{
+				"$id": "4",
+				"Code": "SE4",
+				"HostExecutable": "\"C:\\Autohost\\SE4\\se4.exe\"",
+				"PlayerExecutable": "\"C:\\Games\\SE4\\se4.exe\"",
+				"HostTurnUploadFilter": "{GameCode}_*.gam, {GameCode}_*.cmb, {GameCode}_*.trn, {GameCode}_*.txt",
+				"PlayerTurnUploadFilter": "{GameCode}_*.plr",
+				"IsUnknown": true,
+				"HostArguments": "\"{EnginePath}\\{SavePath}\\{GameCode}.gam\" \"{Password}\" \"0\" \"{ModPath}\"",
+				"PlayerArguments": "\"{EnginePath}\\{SavePath}\\{GameCode}.gam\" \"{Password}\" \"{PlayerNumber}\" \"{ModPath}\""
+			},
+			{
+				"$id": "3",
+				"Code": "SE5",
+				"HostExecutable": "\"C:\\Autohost\\SE5\\se5.exe\"",
+				"PlayerExecutable": "\"C:\\Games\\SE5\\se5.exe\"",
+				"HostTurnUploadFilter": "{GameCode}_*.gam, {GameCode}_*.cmb, {GameCode}_*.mvl, {GameCode}_*.hlg, {GameCode}_*.txt",
+				"PlayerTurnUploadFilter": "{GameCode}_*.plr",
+				"IsUnknown": true,
+				"HostArguments": "\"{EnginePath}\\Savegame\\{GameCode}.gam\" \"{Password}\" -moddir \"{ModPath}\"",
+				"PlayerArguments": ""
+			},
+			{
+				"$id": "5",
+				"Code": "THANCS",
+				"HostExecutable": "\"c:\\Autohost\\THANCS\\THANCS.exe\"",
+				"PlayerExecutable": "\"c:\\Games\\THANCS\\THANCS-perlgui.exe\"",
+				"HostTurnUploadFilter": "{GameCode}_{TurnNumber}*.gam",
+				"PlayerTurnUploadFilter": "{GameCode}_{TurnNumber}_*.plr",
+				"IsUnknown": true,
+				"HostArguments": "\"{EnginePath}\\{ModPath}\" \"{EnginePath}\\{SavePath}\\{GameCode}\" \"{TurNumber}\"",
+				"PlayerArguments": "-g={GameCode} -t={TurnNumber} -p={PlayerNumber} -morestats"
+			},
+			{
+				"$id": "6",
+				"Code": "FREEE",
+				"HostExecutable": "\"C:\\Autohost\\FrEee\\FrEee.exe",
+				"PlayerExecutable": "\"C:\\Games\\FrEee\\FrEee.exe",
+				"HostTurnUploadFilter": "{GameCode}_{TurnNumber}*.gam",
+				"PlayerTurnUploadFilter": "{GameCode}_{TurnNumber}_*.plr",
+				"IsUnknown": true,
+				"HostArguments": "--process-turn \"{EnginePath}\\{SavePath}\\{GameCode}_{TurnNumber}.gam\"",
+				"PlayerArguments": "--play-turn \"{EnginePath}\\{SavePath}\\{GameCode}_{TurnNumber}_{PlayerNumber}.gam\""
+			},
+			{
+				"$id": "7",
+				"Code": "EH",
+				"HostExecutable": "\"C:\\Autohost\\EventHorizon\\EventHorizonHost.exe",
+				"PlayerExecutable": "\"C:\\Games\\EventHorizon\\EventHorizon.exe",
+				"HostTurnUploadFilter": "{GameCode}_{TurnNumber}*.gam",
+				"PlayerTurnUploadFilter": "{GameCode}_{TurnNumber}_*.plr",
+				"IsUnknown": true,
+				"HostArguments": "\"{EnginePath}\\{SavePath}\\{GameCode}\" {TurnNumber}",
+				"PlayerArguments": "\"{EnginePath}\\{SavePath}\\{GameCode}_{TurnNumber}.gam\""
+			}
+		]
+	},
+	"Mods": {
+		"$id": "8",
+		"$values": [
+			{
+				"$id": "9",
+				"Code": "ccmod9",
+				"Engine": {
+					"$ref": "3"
+				},
+				"Path": "CCmod 9.0",
+				"SavePath": "Savegame",
+				"EmpirePath": "SavedEmpires",
+				"IsUnknown": false
+			},
+			{
+				"$id": "10",
+				"Code": "warp10231",
+				"Engine": {
+					"$ref": "3"
+				},
+				"Path": "WarpTen2.3.1",
+				"SavePath": "Savegame",
+				"EmpirePath": "SavedEmpires",
+				"IsUnknown": false
+			},
+			{
+				"$id": "11",
+				"Code": "swbeta8",
+				"Engine": {
+					"$ref": "3"
+				},
+				"Path": "Stellar Warfare Beta 8",
+				"SavePath": "Savegame",
+				"EmpirePath": "SavedEmpires",
+				"IsUnknown": false
+			},
+			{
+				"$id": "12",
+				"Code": "invasion060",
+				"Engine": {
+					"$ref": "4"
+				},
+				"Path": "GameTypes\\Invasion",
+				"SavePath": "GameTypes\\Invasion\\Savegame",
+				"EmpirePath": "GameTypes\\Invasion\\Empires",
+				"IsUnknown": true
+			},
+			{
+				"$id": "13",
+				"Code": "dvn180",
+				"Engine": {
+					"$ref": "4"
+				},
+				"Path": "GameTypes\\DevnullMod Gold 1.80",
+				"SavePath": "GameTypes\\DevnullMod Gold 1.80\\Savegame",
+				"EmpirePath": "GameTypes\\DevnullMod Gold 1.80\\Empires",
+				"IsUnknown": true
+			},
+			{
+				"$id": "14",
+				"Code": "adamant_0161",
+				"Engine": {
+					"$ref": "3"
+				},
+				"Path": "GameTypes\\Adamant 0.16.00",
+				"SavePath": "GameTypes\\Adamant 0.16.00\\Savegame",
+				"EmpirePath": "GameTypes\\Adamant 0.16.00\\Empires",
+				"IsUnknown": true
+			},
+			{
+				"$id": "15",
+				"Code": "djasv75",
+				"Engine": {
+					"$ref": "3"
+				},
+				"Path": "antarans",
+				"SavePath": "Savegame",
+				"EmpirePath": "SavedEmpires",
+				"IsUnknown": false
+			},
+			{
+				"$id": "16",
+				"Code": "swbeta9",
+				"Engine": {
+					"$ref": "3"
+				},
+				"Path": "Stellar Warfare Beta 9",
+				"SavePath": "Savegame",
+				"EmpirePath": "SavedEmpires",
+				"IsUnknown": false
+			},
+			{
+				"$id": "17",
+				"Code": "stockeventhorizon",
+				"Engine": {
+					"$ref": "7"
+				},
+				"Path": "",
+				"SavePath": "Savegames",
+				"EmpirePath": "Empires",
+				"IsUnknown": false
+			},
+			{
+				"$id": "18",
+				"Code": "darknova_429",
+				"Engine": {
+					"$ref": "4"
+				},
+				"Path": "GameTypes\\DN4",
+				"SavePath": "GameTypes\\DN4\\Savegame",
+				"EmpirePath": "GameTypes\\DN4\\Empires",
+				"IsUnknown": true
+			},
+			{
+				"$id": "19",
+				"Code": "freeealpha",
+				"Engine": {
+					"$ref": "6"
+				},
+				"Path": "",
+				"SavePath": "Savegame",
+				"EmpirePath": "Empires",
+				"IsUnknown": false
+			},
+			{
+				"$id": "20",
+				"Code": "fqm210",
+				"Engine": {
+					"$ref": "4"
+				},
+				"Path": "GameTypes\\FyronsQuadrantModDeluxe",
+				"SavePath": "GameTypes\\FyronsQuadrantModDeluxe\\Savegame",
+				"EmpirePath": "GameTypes\\FyronsQuadrantModDeluxe\\Empires",
+				"IsUnknown": true
+			},
+			{
+				"$id": "21",
+				"Code": "balancese5_119h",
+				"Engine": {
+					"$ref": "3"
+				},
+				"Path": "Balance Mod v115+",
+				"SavePath": "Savegame",
+				"EmpirePath": "SavedEmpires",
+				"IsUnknown": false
+			},
+			{
+				"$id": "22",
+				"Code": "fm1153",
+				"Engine": {
+					"$ref": "4"
+				},
+				"Path": "GameTypes\\Fusion Mod v1.15.3",
+				"SavePath": "GameTypes\\Fusion Mod v1.15.3\\Savegame",
+				"EmpirePath": "GameTypes\\Fusion Mod v1.15.3\\Empires",
+				"IsUnknown": true
+			},
+			{
+				"$id": "24",
+				"Code": "infinitec",
+				"Engine": {
+					"$ref": "3"
+				},
+				"Path": "Infinitec",
+				"SavePath": "Savegame",
+				"EmpirePath": "SavedEmpires",
+				"IsUnknown": false
+			},
+			{
+				"$id": "25",
+				"Code": "stock_thancs_1",
+				"Engine": {
+					"$ref": "5"
+				},
+				"Path": "",
+				"SavePath": "Savegame",
+				"EmpirePath": "",
+				"IsUnknown": false
+			},
+			{
+				"$id": "26",
+				"Code": "stockse4_195",
+				"Engine": {
+					"$ref": "4"
+				},
+				"Path": "",
+				"SavePath": "Savegame",
+				"EmpirePath": "Empires",
+				"IsUnknown": false
+			}
+		]
+	}
 }
