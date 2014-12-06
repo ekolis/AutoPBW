@@ -75,11 +75,20 @@ namespace AutoPBW
 			SubmitForm(login_address, fields, "logging in");
 		}
 
+		/// <summary>
+		/// Enables logging in even if PBW's SSL certificate is invalid or expired.
+		/// http://stackoverflow.com/questions/2675133/c-sharp-ignore-certificate-errors
+		/// </summary>
+		public static void OverrideBadCertificates()
+		{
+			ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
+		}
+
 		public static void SubmitForm(string url, IDictionary<string, string> fields, string action = "submitting form")
 		{
 			HttpWebRequest request;
 			HttpWebResponse response;
-			
+
 			try
 			{
 				request = (HttpWebRequest)WebRequest.Create(url);
@@ -91,7 +100,7 @@ namespace AutoPBW
 				}
 				request.CookieContainer = new CookieContainer();
 				response = (HttpWebResponse)request.GetResponse();
-				
+
 
 				ConnectionStatus = response.StatusCode;
 
