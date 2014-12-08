@@ -35,7 +35,7 @@
 				"HostTurnUploadFilter": "{GameCode}_{TurnNumber}*.gam",
 				"PlayerTurnUploadFilter": "{GameCode}_{TurnNumber}_*.plr",
 				"IsUnknown": true,
-				"HostArguments": "\"{EnginePath}\\{ModPath}\" \"{EnginePath}\\{SavePath}\\{GameCode}\" \"{TurNumber}\"",
+				"HostArguments": "\"{EnginePath}\\{ModPath}\" \"{EnginePath}\\{SavePath}\\{GameCode}\" \"{TurnNumber}\"",
 				"PlayerArguments": "-g={GameCode} -t={TurnNumber} -p={PlayerNumber} -morestats"
 			},
 			{
@@ -47,7 +47,7 @@
 				"PlayerTurnUploadFilter": "{GameCode}_{TurnNumber}_*.plr",
 				"IsUnknown": true,
 				"HostArguments": "--process-turn \"{EnginePath}\\{SavePath}\\{GameCode}_{TurnNumber}.gam\"",
-				"PlayerArguments": "--play-turn \"{EnginePath}\\{SavePath}\\{GameCode}_{TurnNumber}_{PlayerNumber}.gam\""
+				"PlayerArguments": "--play \"{EnginePath}\\{SavePath}\\{GameCode}_{TurnNumber}_{PlayerNumber4}.gam\""
 			},
 			{
 				"$id": "7",
