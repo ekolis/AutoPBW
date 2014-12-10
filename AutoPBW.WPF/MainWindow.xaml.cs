@@ -291,31 +291,41 @@ namespace AutoPBW.WPF
 			currentTurnProcess = null;
 			currentTurnGame = null;
 			currentTurnExitCode = p.ExitCode;
-			if (currentTurnExitCode.Value == 0)
-			{
-				try
+			Dispatcher.Invoke(() =>
 				{
-					Dispatcher.Invoke(() => { g.UploadTurn(); });
-				}
-				catch (Exception ex)
-				{
-					Dispatcher.Invoke(() => { ShowBalloonTip("Error uploading turn", "Unable to upload new turn for hosted game {0}: {1}".F(g, ex.Message), g, BalloonIcon.Error); });
-				}
-				Dispatcher.Invoke(() => { RefreshData(); });
-				currentTurnExitCode = null;
-			}
-			else
-			{
-				Dispatcher.Invoke(() => ShowBalloonTip("Turn processing failed", "Turn processing for {0} failed with exit code {1}.".F(g, currentTurnExitCode), g, BalloonIcon.Error));
-				try
-				{
-					g.PlaceHold("{0} exited with error code {1}".F(System.IO.Path.GetFileName(p.StartInfo.FileName), currentTurnExitCode));
-				}
-				catch (Exception ex)
-				{
-					Dispatcher.Invoke(() => { ShowBalloonTip("Error placing hold", "Unable to place processing hold on {0}: {1}".F(g, ex.Message), g, BalloonIcon.Error); });
-				}
-			}
+					if (currentTurnExitCode.Value == 0)
+					{
+						try
+						{
+							g.UploadTurn();
+						}
+						catch (Exception ex)
+						{
+							var msg = "Unable to upload new turn for hosted game {0}: {1}".F(g, ex.Message);
+							PBW.Log.Write(msg);
+							ShowBalloonTip("Error uploading turn", msg, g, BalloonIcon.Error);
+						}
+						RefreshData();
+						currentTurnExitCode = null;
+					}
+					else
+					{
+						var msg = "Turn processing for {0} failed with exit code {1}.".F(g, currentTurnExitCode);
+						PBW.Log.Write(msg);
+						ShowBalloonTip("Turn processing failed", msg, g, BalloonIcon.Error);
+						try
+						{
+							g.PlaceHold("{0} exited with error code {1}".F(System.IO.Path.GetFileName(p.StartInfo.FileName.Trim('"')), currentTurnExitCode));
+							RefreshData();
+						}
+						catch (Exception ex)
+						{
+							msg = "Unable to place processing hold on {0}: {1}".F(g, ex.Message);
+							ShowBalloonTip("Error placing hold", msg, g, BalloonIcon.Error);
+							PBW.Log.Write(msg);
+						}
+					}
+				});
 		}
 
 		private void Login()

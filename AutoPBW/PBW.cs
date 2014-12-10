@@ -92,13 +92,13 @@ namespace AutoPBW
 			try
 			{
 				request = (HttpWebRequest)WebRequest.Create(url);
+				request.CookieContainer = cookies ?? new CookieContainer();
 				request.Method = "POST";
 				request.ContentType = "application/x-www-form-urlencoded";
 				using (StreamWriter writer = new StreamWriter(request.GetRequestStream(), Encoding.ASCII))
 				{
 					writer.Write(fields.ToQueryString());
 				}
-				request.CookieContainer = new CookieContainer();
 				response = (HttpWebResponse)request.GetResponse();
 
 
