@@ -207,7 +207,7 @@ namespace AutoPBW.WPF
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show("Unable to refresh games lists: " + ex.Message);
+				ShowBalloonTip("Unable to refresh", "Unable to refresh games lists: " + ex.Message, null, BalloonIcon.Error);
 			}
 			try
 			{
@@ -224,7 +224,7 @@ namespace AutoPBW.WPF
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show("Unable to refresh engines/mods lists: " + ex.Message);
+				ShowBalloonTip("Unable to refresh", "Unable to refresh engines/mods lists: " + ex.Message, null, BalloonIcon.Error);
 			}
 
 			// load log
@@ -347,7 +347,7 @@ namespace AutoPBW.WPF
 						}
 						catch (Exception ex2)
 						{
-							MessageBox.Show("Unable to log in to PBW: " + ex2.Message);
+							ShowBalloonTip("Login failed", "Unable to log in to PBW: " + ex2.Message, null, BalloonIcon.Error);
 						}
 					}
 					else
@@ -357,7 +357,7 @@ namespace AutoPBW.WPF
 					}
 				}
 				else
-					MessageBox.Show("Unable to log in to PBW: " + ex.Message);
+					ShowBalloonTip("Login failed", "Unable to log in to PBW: " + ex.Message, null, BalloonIcon.Error);
 			}
 		}
 
