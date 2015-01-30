@@ -71,6 +71,7 @@ namespace AutoPBW.WPF
 
 		void taskbarIcon_TrayBalloonTipClicked(object sender, RoutedEventArgs e)
 		{
+			Show();
 			if (balloonTipContext is PlayerGame)
 			{
 				// select game
