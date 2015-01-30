@@ -181,9 +181,12 @@ namespace AutoPBW
 		/// Prepares to process the turn for this game.
 		/// You will need to actually start the process yourself.
 		/// This is so you can attach an event handler to the process exit event.
+		/// Sets the "is processing" flag to true, on the assumption that the process will be started immediately.
 		/// </summary>
 		public ProcessStartInfo ProcessTurnPrepare()
 		{
+			IsProcessing = true;
+
 			var cmd = GenerateArgumentsOrFilter(Engine.HostExecutable, false);
 			var args = GenerateArgumentsOrFilter(Engine.HostArguments, false);
 			return new ProcessStartInfo(cmd, args);
@@ -191,6 +194,7 @@ namespace AutoPBW
 
 		/// <summary>
 		/// Uploads the next turn for this game.
+		/// Sets the "is processing" flag to false.
 		/// </summary>
 		public void UploadTurn()
 		{
@@ -201,6 +205,8 @@ namespace AutoPBW
 			// send to PBW
 			var url = "http://pbw.spaceempires.net/games/{0}/host-turn/upload".F(Code);
 			ArchiveUploadAndDeleteArchive(files, url, "turn_file", HttpStatusCode.Redirect); // for some reason PBW gives a 302 on host turn upload
+
+			IsProcessing = false;
 		}
 
 		// TODO - replace turn
@@ -241,6 +247,11 @@ namespace AutoPBW
 				.Replace("{GameCode}", Code)
 				.Replace("{TurnNumber}", (nextTurn ? TurnNumber + 1 : TurnNumber).ToString());
 		}
+
+		/// <summary>
+		/// Is the game turn currently processing or uploading?
+		/// </summary>
+		public bool IsProcessing { get; set; }
 	}
 
 	/// <summary>

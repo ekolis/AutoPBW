@@ -233,7 +233,7 @@ namespace AutoPBW.WPF
 			// process turn if needed
 			if (hostGames != null)
 			{
-				var gamesToProcess = hostGames.Where(g => g.Status == HostStatus.PlayersReady).ToList();
+				var gamesToProcess = hostGames.Where(g => g.Status == HostStatus.PlayersReady && !g.IsProcessing).ToList();
 				if (currentTurnProcess == null)
 				{
 					while (gamesToProcess.Any())
