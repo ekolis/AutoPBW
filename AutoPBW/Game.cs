@@ -178,14 +178,24 @@ namespace AutoPBW
 		}
 
 		/// <summary>
+		/// The game that's currently processing/uploading.
+		/// Don't attempt to process any more games if one is already processing, and don't attempt to upload the same game twice in a row!
+		/// </summary>
+		public static HostGame ProcessingGame { get; private set; }
+
+		/// <summary>
 		/// Prepares to process the turn for this game.
 		/// You will need to actually start the process yourself.
 		/// This is so you can attach an event handler to the process exit event.
-		/// Sets the "is processing" flag to true, on the assumption that the process will be started immediately.
+		/// Sets the "processing game" to this game, on the assumption that the process will be started immediately.
+		/// Only one game can be processed at a time.
 		/// </summary>
 		public ProcessStartInfo ProcessTurnPrepare()
 		{
-			IsProcessing = true;
+			if (ProcessingGame != null)
+				throw new InvalidOperationException("Cannot begin processing " + this + " because " + ProcessingGame + " is already being processed.");
+
+			ProcessingGame = this;
 
 			var cmd = GenerateArgumentsOrFilter(Engine.HostExecutable, false);
 			var args = GenerateArgumentsOrFilter(Engine.HostArguments, false);
@@ -194,7 +204,7 @@ namespace AutoPBW
 
 		/// <summary>
 		/// Uploads the next turn for this game.
-		/// Sets the "is processing" flag to false.
+		/// Sets the "processing game code" to null.
 		/// </summary>
 		public void UploadTurn()
 		{
@@ -206,7 +216,7 @@ namespace AutoPBW
 			var url = "http://pbw.spaceempires.net/games/{0}/host-turn/upload".F(Code);
 			ArchiveUploadAndDeleteArchive(files, url, "turn_file", HttpStatusCode.Redirect); // for some reason PBW gives a 302 on host turn upload
 
-			IsProcessing = false;
+			ProcessingGame = null;
 		}
 
 		// TODO - replace turn
@@ -247,11 +257,6 @@ namespace AutoPBW
 				.Replace("{GameCode}", Code)
 				.Replace("{TurnNumber}", (nextTurn ? TurnNumber + 1 : TurnNumber).ToString());
 		}
-
-		/// <summary>
-		/// Is the game turn currently processing or uploading?
-		/// </summary>
-		public bool IsProcessing { get; set; }
 	}
 
 	/// <summary>

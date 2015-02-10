@@ -232,9 +232,9 @@ namespace AutoPBW.WPF
 			lstLog.DataContext = PBW.Log.ReadAll();
 
 			// process turn if needed
-			if (hostGames != null)
+			if (hostGames != null && HostGame.ProcessingGame == null)
 			{
-				var gamesToProcess = hostGames.Where(g => g.Status == HostStatus.PlayersReady && !g.IsProcessing).ToList();
+				var gamesToProcess = hostGames.Where(g => g.Status == HostStatus.PlayersReady).ToList();
 				if (currentTurnProcess == null)
 				{
 					while (gamesToProcess.Any())
