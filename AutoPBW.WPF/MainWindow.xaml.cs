@@ -266,6 +266,7 @@ namespace AutoPBW.WPF
 									currentTurnExitCode = null;
 								}
 								gamesToProcess.Remove(game);
+								HostGame.ProcessingGame = null;
 							}
 						}
 						else

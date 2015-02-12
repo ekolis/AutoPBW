@@ -181,7 +181,7 @@ namespace AutoPBW
 		/// The game that's currently processing/uploading.
 		/// Don't attempt to process any more games if one is already processing, and don't attempt to upload the same game twice in a row!
 		/// </summary>
-		public static HostGame ProcessingGame { get; private set; }
+		public static HostGame ProcessingGame { get; set; }
 
 		/// <summary>
 		/// Prepares to process the turn for this game.
