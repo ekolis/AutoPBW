@@ -306,6 +306,7 @@ namespace AutoPBW.WPF
 							var msg = "Unable to upload new turn for hosted game {0}: {1}".F(g, ex.Message);
 							PBW.Log.Write(msg);
 							ShowBalloonTip("Error uploading turn", msg, g, BalloonIcon.Error);
+							HostGame.ProcessingGame = null; // allow processing a different game
 						}
 						RefreshData();
 						currentTurnExitCode = null;
