@@ -265,7 +265,7 @@ namespace AutoPBW.WPF
 									currentTurnProcess = null;
 									currentTurnGame = null;
 									currentTurnExitCode = null;
-									btnReset.Foreground = null;
+									btnReset.ClearValue(Control.ForegroundProperty);
 								}
 								gamesToProcess.Remove(game);
 								HostGame.ProcessingGame = null;
@@ -330,7 +330,7 @@ namespace AutoPBW.WPF
 							PBW.Log.Write(msg);
 						}
 					}
-					btnReset.Foreground = null;
+					btnReset.ClearValue(Control.ForegroundProperty);
 				});
 		}
 
@@ -702,7 +702,7 @@ namespace AutoPBW.WPF
 					currentTurnProcess = null;
 					currentTurnGame = null;
 					currentTurnExitCode = null;
-					btnReset.Foreground = null;
+					btnReset.ClearValue(Control.ForegroundProperty);
 				}
 			}
 			RefreshData();
