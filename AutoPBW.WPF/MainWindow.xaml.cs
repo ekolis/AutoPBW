@@ -251,6 +251,7 @@ namespace AutoPBW.WPF
 								currentTurnProcess.StartInfo = game.ProcessTurnPrepare();
 								currentTurnProcess.EnableRaisingEvents = true;
 								currentTurnProcess.Exited += process_Exited;
+								btnReset.Foreground = Brushes.Red;
 								currentTurnProcess.Start();
 								break; // wait till we finish this one
 							}
@@ -264,6 +265,7 @@ namespace AutoPBW.WPF
 									currentTurnProcess = null;
 									currentTurnGame = null;
 									currentTurnExitCode = null;
+									btnReset.Foreground = null;
 								}
 								gamesToProcess.Remove(game);
 								HostGame.ProcessingGame = null;
@@ -328,6 +330,7 @@ namespace AutoPBW.WPF
 							PBW.Log.Write(msg);
 						}
 					}
+					btnReset.Foreground = null;
 				});
 		}
 
@@ -687,6 +690,22 @@ namespace AutoPBW.WPF
 		{
 			balloonTipContext = context;
 			taskbarIcon.ShowBalloonTip(title, text, icon);
+		}
+
+		private void btnReset_Click(object sender, RoutedEventArgs e)
+		{
+			if (currentTurnProcess != null)
+			{
+				if (MessageBox.Show("Really halt processing of {0}?".F(currentTurnGame), "Confirm Reset", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+				{
+					currentTurnProcess.Kill();
+					currentTurnProcess = null;
+					currentTurnGame = null;
+					currentTurnExitCode = null;
+					btnReset.Foreground = null;
+				}
+			}
+			RefreshData();
 		}
 	}
 }
