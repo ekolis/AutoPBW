@@ -438,6 +438,7 @@ namespace AutoPBW
 				}
 
 				// Set up the request properties.
+				request.Timeout = 10 * 60 * 1000; // give it 10 minutes since the file might be big; TODO - user configurable or dynamic timeouts based on connection speed
 				request.Method = "POST";
 				request.ContentType = contentType;
 				request.UserAgent = userAgent;
