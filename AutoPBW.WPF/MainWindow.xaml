@@ -237,7 +237,7 @@
 				</ListBox>
 			</TabItem>
 		</TabControl>
-		<Menu IsMainMenu="True" Margin="0,0,0,338">
+		<Menu IsMainMenu="True" Margin="0,0,0,338" VerticalAlignment="Top">
 			<Button Content="Refresh" x:Name="btnRefresh" Click="btnRefresh_Click" ToolTip="Refreshes the list of games from PBW."/>
 			<Button Content="PBW Website" x:Name="btnWebsite" Click="btnWebsite_Click" ToolTip="Opens PBW in your web browser."/>
 			<Button Content="Help" x:Name="btnHelp" Click="btnHelp_Click" ToolTip="Opens the AutoPBW user manual in your web browser."/>
