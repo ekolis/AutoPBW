@@ -4,7 +4,7 @@
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:AutoPBW="clr-namespace:AutoPBW;assembly=AutoPBW" mc:Ignorable="d" x:Name="window" x:Class="AutoPBW.WPF.MainWindow"
 		xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
 		xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
-		Title="AutoPBW" Height="397" Width="547" Loaded="window_Loaded" Closing="window_Closing" Icon="AutoPBW.ico">
+		Title="AutoPBW" Height="397" Width="653" Loaded="window_Loaded" Closing="window_Closing" Icon="AutoPBW.ico">
 	<Window.Resources>
 		<CollectionViewSource x:Key="playerGameViewSource" d:DesignSource="{d:DesignInstance {x:Type AutoPBW:PlayerGame}, CreateList=True}"/>
 		<CollectionViewSource x:Key="hostGameViewSource" d:DesignSource="{d:DesignInstance {x:Type AutoPBW:HostGame}, CreateList=True}"/>
@@ -97,12 +97,13 @@
 						<RowDefinition Height="*"/>
 						<RowDefinition Height="32"/>
 					</Grid.RowDefinitions>
-					<DataGrid x:Name="gridPlayerGames" AutoGenerateColumns="False" EnableRowVirtualization="True" DataContext="{StaticResource playerGameViewSource}" ItemsSource="{Binding}" RowDetailsVisibilityMode="VisibleWhenSelected" RenderTransformOrigin="0.5,0.5" IsReadOnly="True" MouseDoubleClick="playerGameDataGrid_MouseDoubleClick" Margin="0,0,0,38" Grid.ColumnSpan="2" SelectionMode="Single">
+					<DataGrid x:Name="gridPlayerGames" AutoGenerateColumns="False" EnableRowVirtualization="True" DataContext="{StaticResource playerGameViewSource}" ItemsSource="{Binding}" RowDetailsVisibilityMode="VisibleWhenSelected" RenderTransformOrigin="0.5,0.5" IsReadOnly="True" MouseDoubleClick="playerGameDataGrid_MouseDoubleClick" Grid.ColumnSpan="2" SelectionMode="Single">
 						<DataGrid.Columns>
-							<DataGridTextColumn Binding="{Binding Code}" Header="Game" Width="100"/>
-							<DataGridTextColumn Binding="{Binding Status}" Header="Status" Width="100"/>
-							<DataGridTextColumn Binding="{Binding TurnMode}" Header="Turn Mode" Width="150"/>
-							<DataGridTextColumn Binding="{Binding TimeLeft,StringFormat='dd\\d\\ hh\\h\\ mm\\m'}" ClipboardContentBinding="{x:Null}" Header="Time Left" Width="150"/>
+							<DataGridTextColumn Binding="{Binding Code}" Header="Game" Width="100*"/>
+							<DataGridTextColumn Binding="{Binding Mod}" SortMemberPath="Mod.Code" Header="Mod" Width="100*"/>
+							<DataGridTextColumn Binding="{Binding Status}" Header="Status" Width="100*"/>
+							<DataGridTextColumn Binding="{Binding TurnMode}" Header="Turn Mode" Width="150*"/>
+							<DataGridTextColumn Binding="{Binding TimeLeft,StringFormat='dd\\d\\ hh\\h\\ mm\\m'}" ClipboardContentBinding="{x:Null}" Header="Time Left" Width="150*"/>
 						</DataGrid.Columns>
 					</DataGrid>
 					<Button x:Name="btnDownload" Content="Download" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Bottom" Width="75" Click="btnDownload_Click" Grid.Row="1"/>
@@ -114,10 +115,11 @@
 				<!-- TODO - buttons to upload/download files manually, including GSU and EMPs -->
 				<DataGrid x:Name="gridHostGames" AutoGenerateColumns="False" EnableRowVirtualization="True" DataContext="{StaticResource hostGameViewSource}" ItemsSource="{Binding}" RowDetailsVisibilityMode="VisibleWhenSelected" RenderTransformOrigin="0.5,0.5" IsReadOnly="True" MouseDoubleClick="playerGameDataGrid_MouseDoubleClick" Margin="0,0,0,38" Grid.ColumnSpan="2" SelectionMode="Single">
 					<DataGrid.Columns>
-						<DataGridTextColumn Binding="{Binding Code}" Header="Game" Width="100"/>
-						<DataGridTextColumn Binding="{Binding Status}" Header="Status" Width="100"/>
-						<DataGridTextColumn Binding="{Binding TurnMode}" Header="Turn Mode" Width="150"/>
-						<DataGridTextColumn Binding="{Binding TimeLeft,StringFormat='dd\\d\\ hh\\h\\ mm\\m'}" ClipboardContentBinding="{x:Null}" Header="Time Left" Width="150"/>
+						<DataGridTextColumn Binding="{Binding Code}" Header="Game" Width="100*"/>
+						<DataGridTextColumn Binding="{Binding Mod}" SortMemberPath="Mod.Code" Header="Mod" Width="100*"/>
+						<DataGridTextColumn Binding="{Binding Status}" Header="Status" Width="100*"/>
+						<DataGridTextColumn Binding="{Binding TurnMode}" Header="Turn Mode" Width="150*"/>
+						<DataGridTextColumn Binding="{Binding TimeLeft,StringFormat='dd\\d\\ hh\\h\\ mm\\m'}" ClipboardContentBinding="{x:Null}" Header="Time Left" Width="150*"/>
 					</DataGrid.Columns>
 				</DataGrid>
 			</TabItem>
