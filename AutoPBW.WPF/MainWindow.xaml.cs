@@ -213,6 +213,7 @@ namespace AutoPBW.WPF
 				if (!pbwIsDown)
 					ShowBalloonTip("Unable to refresh", "Unable to refresh games lists: " + ex.Message, null, BalloonIcon.Error);
 				pbwIsDown = true;
+				taskbarIcon.ToolTipText = "Unable to connect to PBW";
 			}
 			try
 			{
@@ -725,6 +726,7 @@ namespace AutoPBW.WPF
 			RefreshData();
 		}
 
+		// TODO - move pbwIsDown to PBW.IsDown
 		private bool pbwIsDown = false;
 	}
 }
