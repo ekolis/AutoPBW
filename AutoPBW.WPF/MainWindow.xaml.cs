@@ -204,9 +204,9 @@ namespace AutoPBW.WPF
 						taskbarIcon.ToolTipText = waitingEMP.Single() + " is awaiting an empire setup file.";
 					else
 						taskbarIcon.ToolTipText = "All caught up!";
-
-					pbwIsDown = false;
 				}
+
+				pbwIsDown = false;
 			}
 			catch (Exception ex)
 			{
@@ -227,8 +227,6 @@ namespace AutoPBW.WPF
 				var modViewSource = ((CollectionViewSource)(this.FindResource("modViewSource")));
 				modViewSource.Source = Config.Instance.Mods;
 				lstMods.GetBindingExpression(ListView.ItemsSourceProperty).UpdateTarget();
-
-				pbwIsDown = false;
 			}
 			catch (Exception ex)
 			{
