@@ -204,11 +204,15 @@ namespace AutoPBW.WPF
 						taskbarIcon.ToolTipText = waitingEMP.Single() + " is awaiting an empire setup file.";
 					else
 						taskbarIcon.ToolTipText = "All caught up!";
+
+					pbwIsDown = false;
 				}
 			}
 			catch (Exception ex)
 			{
-				ShowBalloonTip("Unable to refresh", "Unable to refresh games lists: " + ex.Message, null, BalloonIcon.Error);
+				if (!pbwIsDown)
+					ShowBalloonTip("Unable to refresh", "Unable to refresh games lists: " + ex.Message, null, BalloonIcon.Error);
+				pbwIsDown = true;
 			}
 			try
 			{
@@ -222,6 +226,8 @@ namespace AutoPBW.WPF
 				var modViewSource = ((CollectionViewSource)(this.FindResource("modViewSource")));
 				modViewSource.Source = Config.Instance.Mods;
 				lstMods.GetBindingExpression(ListView.ItemsSourceProperty).UpdateTarget();
+
+				pbwIsDown = false;
 			}
 			catch (Exception ex)
 			{
@@ -235,7 +241,8 @@ namespace AutoPBW.WPF
 			if (hostGames != null && HostGame.ProcessingGame == null)
 			{
 				var gamesToProcess = hostGames.Where(g => g.Status == HostStatus.PlayersReady).ToList();
-				if (currentTurnProcess == null)
+				// already checked HostGame.ProcessingGame...
+				//if (currentTurnProcess == null)
 				{
 					while (gamesToProcess.Any())
 					{
@@ -265,6 +272,7 @@ namespace AutoPBW.WPF
 									currentTurnProcess = null;
 									currentTurnGame = null;
 									currentTurnExitCode = null;
+									HostGame.ProcessingGame = null;
 									btnReset.ClearValue(Control.ForegroundProperty);
 								}
 								gamesToProcess.Remove(game);
@@ -331,6 +339,8 @@ namespace AutoPBW.WPF
 						}
 					}
 					btnReset.ClearValue(Control.ForegroundProperty);
+					currentTurnGame = null;
+					currentTurnProcess = null;
 				});
 		}
 
@@ -353,7 +363,9 @@ namespace AutoPBW.WPF
 						}
 						catch (Exception ex2)
 						{
-							ShowBalloonTip("Login failed", "Unable to log in to PBW: " + ex2.Message, null, BalloonIcon.Error);
+							if (!pbwIsDown)
+								ShowBalloonTip("Login failed", "Unable to log in to PBW: " + ex2.Message, null, BalloonIcon.Error);
+							pbwIsDown = true;
 						}
 					}
 					else
@@ -363,7 +375,11 @@ namespace AutoPBW.WPF
 					}
 				}
 				else
-					ShowBalloonTip("Login failed", "Unable to log in to PBW: " + ex.Message, null, BalloonIcon.Error);
+				{
+					if (!pbwIsDown)
+						ShowBalloonTip("Login failed", "Unable to log in to PBW: " + ex.Message, null, BalloonIcon.Error);
+					pbwIsDown = true;
+				}
 			}
 		}
 
@@ -702,11 +718,14 @@ namespace AutoPBW.WPF
 					currentTurnProcess = null;
 					currentTurnGame = null;
 					currentTurnExitCode = null;
+					HostGame.ProcessingGame = null;
 					btnReset.ClearValue(Control.ForegroundProperty);
 				}
 			}
 			RefreshData();
 		}
+
+		private bool pbwIsDown = false;
 	}
 }
 
