@@ -237,50 +237,46 @@ namespace AutoPBW.WPF
 			lstLog.DataContext = PBW.Log.ReadAll();
 
 			// process turn if needed
-			if (hostGames != null && HostGame.ProcessingGame == null)
+			if (hostGames != null && HostGame.ProcessingGame == null && currentTurnProcess == null)
 			{
 				var gamesToProcess = hostGames.Where(g => g.Status == HostStatus.PlayersReady).ToList();
-				// already checked HostGame.ProcessingGame...
-				//if (currentTurnProcess == null)
+				while (gamesToProcess.Any())
 				{
-					while (gamesToProcess.Any())
+					var game = gamesToProcess.First();
+					if (CheckModAndEngine(game))
 					{
-						var game = gamesToProcess.First();
-						if (CheckModAndEngine(game))
+						ShowBalloonTip("Processing turn", "Processing turn for " + game + ".", game);
+						try
 						{
-							ShowBalloonTip("Processing turn", "Processing turn for " + game + ".", game);
-							try
-							{
-								game.DownloadTurns();
-								currentTurnGame = game;
-								currentTurnProcess = new Process();
-								currentTurnProcess.StartInfo = game.ProcessTurnPrepare();
-								currentTurnProcess.EnableRaisingEvents = true;
-								currentTurnProcess.Exited += process_Exited;
-								btnReset.Foreground = Brushes.Red;
-								currentTurnProcess.Start();
-								break; // wait till we finish this one
-							}
-							catch (Exception ex)
-							{
-								ShowBalloonTip("Turn processing failed", "Turn processing for " + game + " failed:\n" + ex.Message, game);
-								game.PlaceHold(ex.Message);
-								if (currentTurnProcess != null)
-								{
-									currentTurnProcess.Close();
-									currentTurnProcess = null;
-									currentTurnGame = null;
-									currentTurnExitCode = null;
-									HostGame.ProcessingGame = null;
-									btnReset.ClearValue(Control.ForegroundProperty);
-								}
-								gamesToProcess.Remove(game);
-								HostGame.ProcessingGame = null;
-							}
+							game.DownloadTurns();
+							currentTurnGame = game;
+							currentTurnProcess = new Process();
+							currentTurnProcess.StartInfo = game.ProcessTurnPrepare();
+							currentTurnProcess.EnableRaisingEvents = true;
+							currentTurnProcess.Exited += process_Exited;
+							btnReset.Foreground = Brushes.Red;
+							currentTurnProcess.Start();
+							break; // wait till we finish this one
 						}
-						else
-							gamesToProcess.Remove(game); // can't process this game now
+						catch (Exception ex)
+						{
+							ShowBalloonTip("Turn processing failed", "Turn processing for " + game + " failed:\n" + ex.Message, game);
+							game.PlaceHold(ex.Message);
+							if (currentTurnProcess != null)
+							{
+								currentTurnProcess.Close();
+								currentTurnProcess = null;
+								currentTurnGame = null;
+								currentTurnExitCode = null;
+								HostGame.ProcessingGame = null;
+								btnReset.ClearValue(Control.ForegroundProperty);
+							}
+							gamesToProcess.Remove(game);
+							HostGame.ProcessingGame = null;
+						}
 					}
+					else
+						gamesToProcess.Remove(game); // can't process this game now
 				}
 			}
 
