@@ -285,7 +285,7 @@ namespace AutoPBW
 
 				Log.Write("Connection status to {0} is {1} {2}: {3}".F(response.ResponseUri, (int)response.StatusCode, response.StatusCode, response.StatusDescription));
 
-				int buffersize = 1024;
+				int buffersize = 1024 * 1024; // 1 megabyte
 				byte[] buffer = new byte[buffersize];
 				int bytesRead = 0;
 				WebHeaderCollection headders = response.Headers;
