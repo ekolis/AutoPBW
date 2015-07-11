@@ -153,6 +153,7 @@ namespace AutoPBW.WPF
 			// remember selection
 			var selGame = gridPlayerGames.SelectedItem as PlayerGame;
 			var selCode = selGame == null ? null : selGame.Code;
+			var selPlayerNumber = selGame == null ? null : (int?)selGame.PlayerNumber;
 			IEnumerable<HostGame> hostGames = null;
 
 			try
@@ -178,7 +179,7 @@ namespace AutoPBW.WPF
 					var waitingEMP = waiting.Where(g => g.TurnNumber == 0);
 					foreach (var ng in waiting)
 					{
-						var og = oldGames.SingleOrDefault(g => g.Code == ng.Code);
+						var og = oldGames.SingleOrDefault(g => g.Code == ng.Code && g.PlayerNumber == ng.PlayerNumber);
 						if (og == null || og.Status != PlayerStatus.Waiting)
 							newReady.Add(ng);
 					}
@@ -281,7 +282,7 @@ namespace AutoPBW.WPF
 			}
 
 			// remember selection
-			var newGame = gridPlayerGames.Items.Cast<PlayerGame>().SingleOrDefault(g => g.Code == selCode);
+			var newGame = gridPlayerGames.Items.Cast<PlayerGame>().SingleOrDefault(g => g.Code == selCode && g.PlayerNumber == selPlayerNumber);
 			gridPlayerGames.SelectedItem = newGame;
 
 			// start a timer so we can refresh in a few minutes
