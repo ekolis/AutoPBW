@@ -175,8 +175,8 @@ namespace AutoPBW.WPF
 					playerGameViewSource.Source = newGames;
 					var newReady = new HashSet<PlayerGame>();
 					var waiting = newGames.Where(g => g.Status == PlayerStatus.Waiting);
-					var waitingPLR = waiting.Where(g => g.TurnNumber > 0);
-					var waitingEMP = waiting.Where(g => g.TurnNumber == 0);
+					var waitingPLR = waiting.Where(g => g.PlayerNumber > 0 && g.TurnNumber > 0); // don't count waiting for host PLR, that would get annoying if not all players are even ready yet
+					var waitingEMP = waiting.Where(g => g.PlayerNumber > 0 && g.TurnNumber == 0);
 					foreach (var ng in waiting)
 					{
 						var og = oldGames.SingleOrDefault(g => g.Code == ng.Code && g.PlayerNumber == ng.PlayerNumber);
