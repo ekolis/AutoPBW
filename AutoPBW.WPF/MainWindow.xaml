@@ -99,7 +99,14 @@
 					</Grid.RowDefinitions>
 					<DataGrid x:Name="gridPlayerGames" AutoGenerateColumns="False" EnableRowVirtualization="True" DataContext="{StaticResource playerGameViewSource}" ItemsSource="{Binding}" RowDetailsVisibilityMode="VisibleWhenSelected" RenderTransformOrigin="0.5,0.5" IsReadOnly="True" MouseDoubleClick="playerGameDataGrid_MouseDoubleClick" Grid.ColumnSpan="2" SelectionMode="Single">
 						<DataGrid.Columns>
-							<DataGridTextColumn Binding="{Binding Code}" Header="Game" Width="100*"/>
+							<DataGridTextColumn Header="Game" Width="100*">
+								<DataGridTextColumn.Binding>
+									<MultiBinding StringFormat=" {0} [P{1}]">
+										<Binding Path="Code"/>
+										<Binding Path="PlayerNumber"/>
+									</MultiBinding>
+								</DataGridTextColumn.Binding>
+							</DataGridTextColumn>
 							<DataGridTextColumn Binding="{Binding Mod}" SortMemberPath="Mod.Code" Header="Mod" Width="100*"/>
 							<DataGridTextColumn Binding="{Binding Status}" Header="Status" Width="100*"/>
 							<DataGridTextColumn Binding="{Binding TurnMode}" Header="Turn Mode" Width="150*"/>
