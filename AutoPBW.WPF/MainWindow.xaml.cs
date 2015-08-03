@@ -294,10 +294,8 @@ namespace AutoPBW.WPF
 
 		void process_Exited(object sender, EventArgs e)
 		{
-			var p = (Process)sender;
+			var p = currentTurnProcess;
 			var g = currentTurnGame;
-			currentTurnProcess = null;
-			currentTurnGame = null;
 			currentTurnExitCode = p.ExitCode;
 			Dispatcher.Invoke(() =>
 				{
