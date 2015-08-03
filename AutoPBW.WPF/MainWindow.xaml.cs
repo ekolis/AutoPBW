@@ -294,7 +294,7 @@ namespace AutoPBW.WPF
 
 		void process_Exited(object sender, EventArgs e)
 		{
-			var p = currentTurnProcess;
+			var p = (Process)sender;
 			var g = currentTurnGame;
 			currentTurnProcess = null;
 			currentTurnGame = null;
