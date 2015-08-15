@@ -297,8 +297,6 @@ namespace AutoPBW.WPF
 		{
 			var p = currentTurnProcess;
 			var g = currentTurnGame;
-			currentTurnProcess = null;
-			currentTurnGame = null;
 			currentTurnExitCode = p.ExitCode;
 			Dispatcher.Invoke(() =>
 				{
