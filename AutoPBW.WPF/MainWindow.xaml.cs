@@ -131,6 +131,7 @@ namespace AutoPBW.WPF
 		{
 			txtUsername.Text = Config.Instance.Username;
 			txtPassword.Password = Config.Instance.Password;
+			chkEnableHosting.IsChecked = Config.Instance.EnableHosting;
 
 			if (string.IsNullOrWhiteSpace(Config.Instance.Username) || string.IsNullOrWhiteSpace(Config.Instance.Password))
 			{
@@ -238,7 +239,7 @@ namespace AutoPBW.WPF
 			lstLog.DataContext = PBW.Log.ReadAll();
 
 			// process turn if needed
-			if (hostGames != null && HostGame.ProcessingGame == null && currentTurnProcess == null)
+			if (Config.Instance.EnableHosting && hostGames != null && HostGame.ProcessingGame == null && currentTurnProcess == null)
 			{
 				var gamesToProcess = hostGames.Where(g => g.Status == HostStatus.PlayersReady).ToList();
 				while (gamesToProcess.Any())
@@ -383,6 +384,7 @@ namespace AutoPBW.WPF
 		{
 			Config.Instance.Username = txtUsername.Text;
 			Config.Instance.Password = txtPassword.Password;
+			Config.Instance.EnableHosting = chkEnableHosting.IsChecked ?? false;
 			Config.Save();
 			Login();
 			RefreshData();

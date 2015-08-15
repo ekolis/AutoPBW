@@ -104,6 +104,11 @@ namespace AutoPBW
 		public string Password { get; set; }
 
 		/// <summary>
+		/// Should this instance of AutoPBW host games?
+		/// </summary>
+		public bool EnableHosting { get; set; }
+
+		/// <summary>
 		/// Known game engines.
 		/// </summary>
 		public ObservableCollection<Engine> Engines { get; private set; }
