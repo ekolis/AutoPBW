@@ -10,7 +10,7 @@
 				"Code": "SE4",
 				"HostExecutable": "\"C:\\Autohost\\SE4\\se4.exe\"",
 				"PlayerExecutable": "\"C:\\Games\\SE4\\se4.exe\"",
-				"HostTurnUploadFilter": "{GameCode}_*.gam, {GameCode}_*.cmb, {GameCode}_*.trn, {GameCode}_*.txt",
+				"HostTurnUploadFilter": "{GameCode}.gam, {GameCode}_*.cmb, {GameCode}_*.trn, {GameCode}_*.txt",
 				"PlayerTurnUploadFilter": "{GameCode}_*.plr",
 				"IsUnknown": true,
 				"HostArguments": "\"{EnginePath}\\{SavePath}\\{GameCode}.gam\" \"{Password}\" \"0\" \"{ModPath}\"",
@@ -21,7 +21,7 @@
 				"Code": "SE5",
 				"HostExecutable": "\"C:\\Autohost\\SE5\\se5.exe\"",
 				"PlayerExecutable": "\"C:\\Games\\SE5\\se5.exe\"",
-				"HostTurnUploadFilter": "{GameCode}_*.gam, {GameCode}_*.cmb, {GameCode}_*.mvl, {GameCode}_*.hlg, {GameCode}_*.txt",
+				"HostTurnUploadFilter": "{GameCode}.gam, {GameCode}_*.cmb, {GameCode}_*.mvl, {GameCode}_*.hlg, {GameCode}_*.txt",
 				"PlayerTurnUploadFilter": "{GameCode}_*.plr",
 				"IsUnknown": true,
 				"HostArguments": "\"{EnginePath}\\Savegame\\{GameCode}.gam\" \"{Password}\" -moddir \"{ModPath}\"",
@@ -41,8 +41,8 @@
 			{
 				"$id": "6",
 				"Code": "FREEE",
-				"HostExecutable": "\"C:\\Autohost\\FrEee\\FrEee.exe",
-				"PlayerExecutable": "\"C:\\Games\\FrEee\\FrEee.exe",
+				"HostExecutable": "\"C:\\Autohost\\FrEee\\FrEee.exe\"",
+				"PlayerExecutable": "\"C:\\Games\\FrEee\\FrEee.exe\"",
 				"HostTurnUploadFilter": "{GameCode}_{TurnNumber}*.gam",
 				"PlayerTurnUploadFilter": "{GameCode}_{TurnNumber}_*.plr",
 				"IsUnknown": true,
@@ -237,8 +237,8 @@
 					"$ref": "5"
 				},
 				"Path": "",
-				"SavePath": "Savegame",
-				"EmpirePath": "",
+				"SavePath": "savegame",
+				"EmpirePath": "designs",
 				"IsUnknown": false
 			},
 			{
