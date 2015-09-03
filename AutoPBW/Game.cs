@@ -164,6 +164,7 @@ namespace AutoPBW
 		{
 			var url = "http://pbw.spaceempires.net/games/{0}/host-empire/download".F(Code);
 			var path = Path.Combine(Path.GetDirectoryName(Engine.HostExecutable.Trim('"')), Mod.EmpirePath);
+			PBW.Log.Write($"Downloading empires for {this} and saving to {path}.");
 			DownloadExtractAndDelete(url, path);
 		}
 
@@ -174,6 +175,7 @@ namespace AutoPBW
 		{
 			var url = "http://pbw.spaceempires.net/games/{0}/host-turn/download".F(Code);
 			var path = Path.Combine(Path.GetDirectoryName(Engine.HostExecutable.Trim('"')), Mod.SavePath);
+			PBW.Log.Write($"Downloading player turns for {this} and saving to {path}.");
 			DownloadExtractAndDelete(url, path);
 		}
 
@@ -199,6 +201,7 @@ namespace AutoPBW
 
 			var cmd = GenerateArgumentsOrFilter(Engine.HostExecutable, false);
 			var args = GenerateArgumentsOrFilter(Engine.HostArguments, false);
+			PBW.Log.Write($"Executing command to process {this}: {cmd} {args}");
 			return new ProcessStartInfo(cmd, args);
 		}
 
@@ -214,6 +217,7 @@ namespace AutoPBW
 
 			// send to PBW
 			var url = "http://pbw.spaceempires.net/games/{0}/host-turn/upload".F(Code);
+			PBW.Log.Write($"Uploading next turn for {this}.");
 			ArchiveUploadAndDeleteArchive(files, url, "turn_file", HttpStatusCode.Redirect); // for some reason PBW gives a 302 on host turn upload
 
 			ProcessingGame = null;
@@ -293,6 +297,7 @@ namespace AutoPBW
 		{
 			// just run the game so the player can create it in-game
 			var cmd = GenerateArgumentsOrFilter(Engine.PlayerExecutable);
+			PBW.Log.Write($"Launching {Engine} to create empire for {this}: {cmd}.");
 			Process.Start(cmd);
 		}
 
@@ -303,6 +308,7 @@ namespace AutoPBW
 		{
 			var url = "http://pbw.spaceempires.net/games/{0}/player-turn/download".F(Code);
 			var path = Path.Combine(Path.GetDirectoryName(Engine.PlayerExecutable.Trim('"')), Mod.SavePath);
+			PBW.Log.Write($"Downloading turn for {this} to {path}.");
 			DownloadExtractAndDelete(url, path);
 		}
 
@@ -313,6 +319,7 @@ namespace AutoPBW
 		{
 			var url = "http://pbw.spaceempires.net/games/{0}/player-empire/upload".F(Code);
 			var path = Path.Combine(Path.GetDirectoryName(Engine.PlayerExecutable).Trim('"'), Mod.EmpirePath);
+			PBW.Log.Write($"Uploading empire {path} for {this}.");
 			ArchiveUploadAndDeleteArchive(new string[] { empfile }, url, "emp_file");
 		}
 
@@ -330,6 +337,7 @@ namespace AutoPBW
 			if (files.Count() != 1)
 				throw new InvalidOperationException("Can only upload one PLR file at a time. " + files.Count() + " files were submitted.");
 
+			PBW.Log.Write($"Uploading player commands {path} for {this}.");
 			if (PBW.Upload(files.Single(), url, "plr_file"))
 				Status = PlayerStatus.Uploaded;
 			else
@@ -340,6 +348,7 @@ namespace AutoPBW
 		{
 			var cmd = GenerateArgumentsOrFilter(Engine.PlayerExecutable);
 			var args = GenerateArgumentsOrFilter(Engine.PlayerArguments);
+			PBW.Log.Write($"Launching {Engine} to play turn for {this}: {cmd} {args}");
 			Process.Start(cmd, args);
 		}
 
