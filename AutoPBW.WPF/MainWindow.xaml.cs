@@ -243,7 +243,7 @@ namespace AutoPBW.WPF
 			{
 				var gamesToProcess = hostGames.Where(g => g.Status == HostStatus.PlayersReady).ToList();
 				while (gamesToProcess.Any())
-					await GamesToProcess.First();
+					PBW.Log.Write($"{g} is ready to be processed; enqueueing it.");
 				{
 					var game = gamesToProcess.First();
 					if (CheckModAndEngine(game))
