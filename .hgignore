@@ -5,3 +5,5 @@ obj
 packages
 *.csproj.user
 .vs
+*.psess
+*.vsp
