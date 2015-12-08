@@ -147,7 +147,6 @@ namespace AutoPBW
 			HttpWebRequest request;
 			HttpWebResponse response;
 			Stream resStream = null;
-			string tempString = null;
 
 			try
 			{
@@ -158,20 +157,8 @@ namespace AutoPBW
 				response = (HttpWebResponse)request.GetResponse();
 				resStream = response.GetResponseStream();
 
-				int count = 0;
-				do
-				{
-					count = resStream.Read(buf, 0, buf.Length);
-
-					if (count != 0)
-					{
-						tempString = Encoding.ASCII.GetString(buf, 0, count);
-						sb.Append(tempString);
-					}
-				}
-				while (count > 0);
-
-				returnString = sb.ToString();
+				var sr = new StreamReader(resStream);
+				returnString = sr.ReadToEnd();
 			}
 			catch (WebException ex)
 			{
