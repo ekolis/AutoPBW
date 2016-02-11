@@ -36,11 +36,6 @@ namespace AutoPBW.WPF
 		private Process currentTurnProcess = null;
 
 		/// <summary>
-		/// Current game being processed.
-		/// </summary>
-		private HostGame currentTurnGame = null;
-
-		/// <summary>
 		/// Current turn processing exit code.
 		/// </summary>
 		private int? currentTurnExitCode = null;
@@ -252,7 +247,7 @@ namespace AutoPBW.WPF
 						try
 						{
 							game.DownloadTurns();
-							currentTurnGame = game;
+						HostGame.ProcessingGame = game;
 							currentTurnProcess = new Process();
 							currentTurnProcess.StartInfo = game.ProcessTurnPrepare();
 							currentTurnProcess.EnableRaisingEvents = true;
@@ -269,7 +264,7 @@ namespace AutoPBW.WPF
 							{
 								currentTurnProcess.Close();
 								currentTurnProcess = null;
-								currentTurnGame = null;
+							HostGame.ProcessingGame = null;
 								currentTurnExitCode = null;
 								HostGame.ProcessingGame = null;
 								btnReset.ClearValue(Control.ForegroundProperty);
@@ -297,7 +292,7 @@ namespace AutoPBW.WPF
 		void process_Exited(object sender, EventArgs e)
 		{
 			var p = currentTurnProcess;
-			var g = currentTurnGame;
+			var g = HostGame.ProcessingGame;
 			currentTurnExitCode = p.ExitCode;
 			Dispatcher.Invoke(() =>
 				{
@@ -335,7 +330,7 @@ namespace AutoPBW.WPF
 						}
 					}
 					btnReset.ClearValue(Control.ForegroundProperty);
-					currentTurnGame = null;
+					HostGame.ProcessingGame = null;
 					currentTurnProcess = null;
 				});
 		}
@@ -709,11 +704,10 @@ namespace AutoPBW.WPF
 		{
 			if (currentTurnProcess != null)
 			{
-				if (MessageBox.Show("Really halt processing of {0}?".F(currentTurnGame), "Confirm Reset", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+				if (MessageBox.Show("Really halt processing of {0}?".F(HostGame.ProcessingGame), "Confirm Reset", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
 				{
 					currentTurnProcess.Kill();
 					currentTurnProcess = null;
-					currentTurnGame = null;
 					currentTurnExitCode = null;
 					HostGame.ProcessingGame = null;
 					btnReset.ClearValue(Control.ForegroundProperty);
