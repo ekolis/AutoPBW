@@ -258,7 +258,7 @@ namespace AutoPBW.WPF
 						}
 						catch (Exception ex)
 						{
-							ShowBalloonTip("Turn processing failed", "Turn processing for " + game + " failed:\n" + ex.Message, game);
+					ShowBalloonTip("Turn processing failed", "Turn processing for " + game + " failed:\n" + ex.Message + "\n" + ex.Message.Split('\n').First(), game);
 							game.PlaceHold(ex.Message);
 							if (currentTurnProcess != null)
 							{
