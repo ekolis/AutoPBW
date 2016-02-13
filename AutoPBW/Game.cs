@@ -101,7 +101,13 @@ namespace AutoPBW
 			// log file list
 			PBW.Log.Write("List of files extracted:");
 			foreach (var f in x.ArchiveFileNames)
-				PBW.Log.Write("\t" + f);
+			{
+				// lowercase it, requires 2 steps since Windows won't let you rename a file changing only the case
+				var temp = MakeTempFile(Path.GetExtension(f));
+				File.Move(f, temp);
+				File.Move(temp, f.ToLowerInvariant());
+				PBW.Log.Write("\t" + f.ToLowerInvariant());
+			}
 
 			// delete the archive
 			PBW.Log.Write("Deleting {0}".F(tempfile));
