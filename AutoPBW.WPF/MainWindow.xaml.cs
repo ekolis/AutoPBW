@@ -238,16 +238,15 @@ namespace AutoPBW.WPF
 			{
 				var gamesToProcess = hostGames.Where(g => g.Status == HostStatus.PlayersReady).ToList();
 				while (gamesToProcess.Any())
-					PBW.Log.Write($"{g} is ready to be processed; enqueueing it.");
 				{
 					var game = gamesToProcess.First();
+					PBW.Log.Write($"{game} is ready to be processed; enqueueing it.");
 					if (CheckModAndEngine(game))
 					{
 						ShowBalloonTip("Processing turn", "Processing turn for " + game + ".", game);
 						try
 						{
 							game.DownloadTurns();
-						HostGame.ProcessingGame = game;
 							currentTurnProcess = new Process();
 							currentTurnProcess.StartInfo = game.ProcessTurnPrepare();
 							currentTurnProcess.EnableRaisingEvents = true;
@@ -258,13 +257,13 @@ namespace AutoPBW.WPF
 						}
 						catch (Exception ex)
 						{
-					ShowBalloonTip("Turn processing failed", "Turn processing for " + game + " failed:\n" + ex.Message + "\n" + ex.Message.Split('\n').First(), game);
+							ShowBalloonTip("Turn processing failed", "Turn processing for " + game + " failed:\n" + ex.Message + "\n" + ex.Message.Split('\n').First(), game);
 							game.PlaceHold(ex.Message);
 							if (currentTurnProcess != null)
 							{
 								currentTurnProcess.Close();
 								currentTurnProcess = null;
-							HostGame.ProcessingGame = null;
+								HostGame.ProcessingGame = null;
 								currentTurnExitCode = null;
 								HostGame.ProcessingGame = null;
 								btnReset.ClearValue(Control.ForegroundProperty);
@@ -275,6 +274,7 @@ namespace AutoPBW.WPF
 					}
 					else
 						gamesToProcess.Remove(game); // can't process this game now
+					}
 				}
 			}
 
@@ -332,6 +332,7 @@ namespace AutoPBW.WPF
 					btnReset.ClearValue(Control.ForegroundProperty);
 					HostGame.ProcessingGame = null;
 					currentTurnProcess = null;
+					RefreshData();
 				});
 		}
 
