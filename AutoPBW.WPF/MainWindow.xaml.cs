@@ -273,6 +273,8 @@ namespace AutoPBW.WPF
 						}
 					}
 					else
+					{
+						PBW.Log.Write($"Can't process {game}: unconfigured mod {game.Mod} or engine {game.Engine}.");
 						gamesToProcess.Remove(game); // can't process this game now
 					}
 				}
