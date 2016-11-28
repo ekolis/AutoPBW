@@ -103,10 +103,12 @@ namespace AutoPBW
 			foreach (var f in x.ArchiveFileNames.Select(f => Path.Combine(path, f)))
 			{
 				// lowercase it, requires 2 steps since Windows won't let you rename a file changing only the case
-				var temp = MakeTempFile(Path.GetExtension(f));
-				File.Move(f, temp);
-				var f2 = f.ToLowerInvariant();
-				File.Move(temp, f2);
+				// disabled this feature since it was causing issues with combat/movement files not being downloaded from PBW and it was only used as a workaround for a game with an uppercase name
+				//var temp = MakeTempFile(Path.GetExtension(f));
+				//File.Move(f, temp);
+				//var f2 = f.ToLowerInvariant();
+				var f2 = f;
+				//File.Move(temp, f2);
 				PBW.Log.Write("\t" + Path.GetFileName(f2));
 			}
 
