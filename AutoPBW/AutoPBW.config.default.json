@@ -251,6 +251,17 @@
 				"SavePath": "Savegame",
 				"EmpirePath": "Empires",
 				"IsUnknown": false
+			},
+			{
+				"$id": "27",
+				"Code": "bmv120",
+				"Engine": {
+					"$ref": "3"
+				},
+				"Path": "Balance Mod v120+",
+				"SavePath": "Savegame",
+				"EmpirePath": "SavedEmpires",
+				"IsUnknown": false
 			}
 		]
 	}
