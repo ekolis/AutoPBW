@@ -735,6 +735,20 @@ namespace AutoPBW.WPF
 			if (game != null)
 				Process.Start($"http://pbw.spaceempires.net/games/{game.Code}");
 		}
+
+		private void BtnBrowseHostExecutable_Click(object sender, RoutedEventArgs e)
+		{
+			var dlg = new OpenFileDialog();
+			if (dlg.ShowDialog() ?? false)
+				hostExecutableTextBox.Text = '"' + dlg.FileName + '"';
+		}
+
+		private void BtnBrowsePlayerExecutable_Click(object sender, RoutedEventArgs e)
+		{
+			var dlg = new OpenFileDialog();
+			if (dlg.ShowDialog() ?? false)
+				playerExecutableTextBox.Text = '"' + dlg.FileName + '"';
+		}
 	}
 }
 

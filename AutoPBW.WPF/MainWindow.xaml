@@ -207,6 +207,8 @@
 					<Button x:Name="btnAddEngine" Grid.Column="1" Content="Add" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" Height="24" Click="btnAddEngine_Click" RenderTransformOrigin="2.04,4.458" Margin="0,0,170,10"/>
 					<Button x:Name="btnDeleteEngine" Grid.Column="1" Content="Delete" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" Height="24" Click="btnDeleteEngine_Click" RenderTransformOrigin="2.04,4.458" Margin="0,0,90,10"/>
 					<Button x:Name="btnSaveEngine" Grid.Column="1" Content="Save" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" Height="24" Click="btnSaveEngine_Click" RenderTransformOrigin="2.04,4.458" Margin="0,0,10,10"/>
+					<Button x:Name="btnBrowseHostExecutable" Grid.Column="1" Content="Browse..." HorizontalAlignment="Left" Width="75" RenderTransformOrigin="2.04,4.458" Margin="378,47,0,0" Click="BtnBrowseHostExecutable_Click" Height="24" VerticalAlignment="Top"/>
+					<Button x:Name="btnBrowsePlayerExecutable" Grid.Column="1" Content="Browse..." RenderTransformOrigin="2.04,4.458" Margin="378,141,0,0" Click="BtnBrowsePlayerExecutable_Click" Height="24" VerticalAlignment="Top" HorizontalAlignment="Left" Width="75"/>
 				</Grid>
 			</TabItem>
 			<TabItem Header="Mods" x:Name="tabMods">
