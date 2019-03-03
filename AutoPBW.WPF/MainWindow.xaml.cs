@@ -721,6 +721,20 @@ namespace AutoPBW.WPF
 
 		// TODO - move pbwIsDown to PBW.IsDown
 		private bool pbwIsDown = false;
+
+		private void btnView_Click(object sender, RoutedEventArgs e)
+		{
+			var game = (PlayerGame)gridPlayerGames.SelectedItem;
+			if (game != null)
+				Process.Start($"http://pbw.spaceempires.net/games/{game.Code}");
+		}
+
+		private void btnViewHost_Click(object sender, RoutedEventArgs e)
+		{
+			var game = (HostGame)gridHostGames.SelectedItem;
+			if (game != null)
+				Process.Start($"http://pbw.spaceempires.net/games/{game.Code}");
+		}
 	}
 }
 
