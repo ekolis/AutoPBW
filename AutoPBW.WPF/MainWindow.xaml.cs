@@ -167,7 +167,11 @@ namespace AutoPBW.WPF
 					var oldGames = (IEnumerable<PlayerGame>)playerGameViewSource.Source;
 					if (oldGames == null)
 						oldGames = Enumerable.Empty<PlayerGame>();
-					var newGames = PBW.GetPlayerGames().ToArray();
+					IEnumerable<PlayerGame> newGames;
+					if (Config.Instance.HidePlayerZero)
+						newGames = PBW.GetPlayerGames().Where(q => q.PlayerNumber > 0).ToArray();
+					else
+						newGames = PBW.GetPlayerGames().ToArray();
 					playerGameViewSource.Source = newGames;
 					var newReady = new HashSet<PlayerGame>();
 					var waiting = newGames.Where(g => g.Status == PlayerStatus.Waiting);
@@ -382,6 +386,7 @@ namespace AutoPBW.WPF
 			Config.Instance.Username = txtUsername.Text;
 			Config.Instance.Password = txtPassword.Password;
 			Config.Instance.EnableHosting = chkEnableHosting.IsChecked ?? false;
+			Config.Instance.HidePlayerZero = chkHidePlayerZero.IsChecked ?? false;
 			Config.Save();
 			Login();
 			RefreshData();

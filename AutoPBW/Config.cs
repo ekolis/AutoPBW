@@ -109,6 +109,11 @@ namespace AutoPBW
 		public bool EnableHosting { get; set; }
 
 		/// <summary>
+		/// Should games in which we are player zero (host player) be hidden?
+		/// </summary>
+		public bool HidePlayerZero { get; set; }
+
+		/// <summary>
 		/// Known game engines.
 		/// </summary>
 		public ObservableCollection<Engine> Engines { get; private set; }
