@@ -49,8 +49,7 @@ namespace AutoPBW.WPF
 		{
 			InitializeComponent();
 
-			// TODO - get refresh time from PBW
-			refreshTimer = new Timer(1000 * 60 * 2); // 2 minute refresh by default
+			refreshTimer = new Timer(1000 * Config.Instance.PollingInterval);
 			refreshTimer.Elapsed += refreshTimer_Elapsed;
 
 			taskbarIcon = new TaskbarIcon();
@@ -128,6 +127,7 @@ namespace AutoPBW.WPF
 			txtPassword.Password = Config.Instance.Password;
 			chkEnableHosting.IsChecked = Config.Instance.EnableHosting;
 			chkHidePlayerZero.IsChecked = Config.Instance.HidePlayerZero;
+			ddlPollingInterval.SelectedItem = ddlPollingInterval.Items.Cast<ComboBoxItem>().SingleOrDefault(q => (int)Convert.ChangeType(q.Tag, typeof(int)) == Config.Instance.PollingInterval);
 
 			if (string.IsNullOrWhiteSpace(Config.Instance.Username) || string.IsNullOrWhiteSpace(Config.Instance.Password))
 			{
@@ -388,6 +388,7 @@ namespace AutoPBW.WPF
 			Config.Instance.Password = txtPassword.Password;
 			Config.Instance.EnableHosting = chkEnableHosting.IsChecked ?? false;
 			Config.Instance.HidePlayerZero = chkHidePlayerZero.IsChecked ?? false;
+			Config.Instance.PollingInterval = (int)Convert.ChangeType((ddlPollingInterval.SelectedItem as ComboBoxItem).Tag, typeof(int));
 			Config.Save();
 			Login();
 			RefreshData();

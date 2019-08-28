@@ -152,6 +152,7 @@
 						<RowDefinition Height="24"/>
 						<RowDefinition Height="24"/>
 						<RowDefinition Height="24"/>
+                        <RowDefinition Height="24"/>
 						<RowDefinition Height="*"/>
 					</Grid.RowDefinitions>
 					<Grid.ColumnDefinitions>
@@ -163,12 +164,24 @@
 					</Label>
 					<TextBox x:Name="txtUsername" Grid.Column="1" TextWrapping="Wrap" RenderTransformOrigin="-0.008,0"  Height="24" ToolTip="Your PBW username."/>
 					<PasswordBox x:Name="txtPassword" Grid.Column="1" Grid.Row="1" Height="21" ToolTip="Your PBW password."/>
-					<Button x:Name="btnSaveSettings" Content="Save" Grid.Column="1" HorizontalAlignment="Right" Margin="0,10,0,0" Grid.Row="4" VerticalAlignment="Top" Width="75" Height="24" Click="btnSaveSettings_Click"/>
+					<Button x:Name="btnSaveSettings" Content="Save" Grid.Column="1" HorizontalAlignment="Right" Margin="0,10,0,0" Grid.Row="5" VerticalAlignment="Top" Width="75" Height="24" Click="btnSaveSettings_Click"/>
 					<Label Content="Enable Hosting" Grid.Row ="2" RenderTransformOrigin="0.5,0.5"/>
 					<CheckBox x:Name="chkEnableHosting" Content="" Grid.Column="1" HorizontalAlignment="Left" Margin="0,4,0,0" Grid.Row="2" VerticalAlignment="Top"/>
 					<CheckBox x:Name="chkHidePlayerZero" Content="" Grid.Column="1" HorizontalAlignment="Left" Margin="0,4,0,0" Grid.Row="3" VerticalAlignment="Top"/>
 					<Label Content="Hide Player Zero" Grid.Row ="3" />
-				</Grid>
+                    <Label Content="Polling Interval" Grid.Row ="4" />
+                    <ComboBox x:Name="ddlPollingInterval" Grid.Column="1" HorizontalAlignment="Left" Grid.Row="4" VerticalAlignment="Top" Width="120">
+                        <ComboBoxItem Content="15s" Tag="15" />
+                        <ComboBoxItem Content="30s" Tag="30" />
+                        <ComboBoxItem Content="1m"  Tag="60" />
+                        <ComboBoxItem Content="2m" Tag="120" />
+                        <ComboBoxItem Content="5m" Tag="300" />
+                        <ComboBoxItem Content="10m" Tag="600" />
+                        <ComboBoxItem Content="15m" Tag="900" />
+                        <ComboBoxItem Content="30m" Tag="1800" />
+                        <ComboBoxItem Content="1h" Tag="3600" />
+                    </ComboBox>
+                </Grid>
 			</TabItem>
 			<TabItem Header="Engines" x:Name="tabEngines">
 				<Grid Margin="0">

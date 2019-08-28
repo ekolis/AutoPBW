@@ -114,6 +114,11 @@ namespace AutoPBW
 		public bool HidePlayerZero { get; set; }
 
 		/// <summary>
+		/// The polling interval to check with PBW, in seconds.
+		/// </summary>
+		public int PollingInterval { get; set; } = 120;
+
+		/// <summary>
 		/// Known game engines.
 		/// </summary>
 		public ObservableCollection<Engine> Engines { get; private set; }
