@@ -127,6 +127,7 @@ namespace AutoPBW.WPF
 			txtUsername.Text = Config.Instance.Username;
 			txtPassword.Password = Config.Instance.Password;
 			chkEnableHosting.IsChecked = Config.Instance.EnableHosting;
+			chkHidePlayerZero.IsChecked = Config.Instance.HidePlayerZero;
 
 			if (string.IsNullOrWhiteSpace(Config.Instance.Username) || string.IsNullOrWhiteSpace(Config.Instance.Password))
 			{
