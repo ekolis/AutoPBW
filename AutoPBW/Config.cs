@@ -114,6 +114,11 @@ namespace AutoPBW
 		public bool HidePlayerZero { get; set; }
 
 		/// <summary>
+		/// Should we silently ignore bad SSL certificates on the PBW site, or prompt the user about them?
+		/// </summary>
+		public bool IgnoreBadCertificates { get; set; }
+
+		/// <summary>
 		/// The polling interval to check with PBW, in seconds.
 		/// </summary>
 		public int PollingInterval { get; set; } = 120;

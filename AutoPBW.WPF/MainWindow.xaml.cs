@@ -127,6 +127,7 @@ namespace AutoPBW.WPF
 			txtPassword.Password = Config.Instance.Password;
 			chkEnableHosting.IsChecked = Config.Instance.EnableHosting;
 			chkHidePlayerZero.IsChecked = Config.Instance.HidePlayerZero;
+			chkIgnoreBadCertificates.IsChecked = Config.Instance.IgnoreBadCertificates;
 			ddlPollingInterval.SelectedItem = ddlPollingInterval.Items.Cast<ComboBoxItem>().SingleOrDefault(q => (int)Convert.ChangeType(q.Tag, typeof(int)) == Config.Instance.PollingInterval);
 
 			if (string.IsNullOrWhiteSpace(Config.Instance.Username) || string.IsNullOrWhiteSpace(Config.Instance.Password))
@@ -353,7 +354,7 @@ namespace AutoPBW.WPF
 			{
 				if (ex.InnerException is AuthenticationException && ex.InnerException.Message == "The remote certificate is invalid according to the validation procedure.")
 				{
-					if (MessageBox.Show("PBW's security certificate appears to be invalid or expired. Log in anyway?", "Invalid Certificate", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) == MessageBoxResult.Yes)
+					if (Config.Instance.IgnoreBadCertificates || MessageBox.Show("PBW's security certificate appears to be invalid or expired. Log in anyway?", "Invalid Certificate", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) == MessageBoxResult.Yes)
 					{
 						try
 						{
@@ -388,6 +389,7 @@ namespace AutoPBW.WPF
 			Config.Instance.Password = txtPassword.Password;
 			Config.Instance.EnableHosting = chkEnableHosting.IsChecked ?? false;
 			Config.Instance.HidePlayerZero = chkHidePlayerZero.IsChecked ?? false;
+			Config.Instance.IgnoreBadCertificates = chkIgnoreBadCertificates.IsChecked ?? false;
 			Config.Instance.PollingInterval = (int)Convert.ChangeType((ddlPollingInterval.SelectedItem as ComboBoxItem).Tag, typeof(int));
 			Config.Save();
 			Login();

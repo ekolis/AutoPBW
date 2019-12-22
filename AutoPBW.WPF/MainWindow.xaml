@@ -5,172 +5,175 @@
 		xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
 		xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
 		Title="AutoPBW" Height="397" Width="653" Loaded="window_Loaded" Closing="window_Closing" Icon="AutoPBW.ico">
-	<Window.Resources>
-		<CollectionViewSource x:Key="playerGameViewSource" d:DesignSource="{d:DesignInstance {x:Type AutoPBW:PlayerGame}, CreateList=True}"/>
-		<CollectionViewSource x:Key="hostGameViewSource" d:DesignSource="{d:DesignInstance {x:Type AutoPBW:HostGame}, CreateList=True}"/>
-		<CollectionViewSource x:Key="engineViewSource" d:DesignSource="{d:DesignInstance {x:Type AutoPBW:Engine}, CreateList=True}">
-			<CollectionViewSource.SortDescriptions>
-				<scm:SortDescription PropertyName="Code"/>
-			</CollectionViewSource.SortDescriptions>
-		</CollectionViewSource>
-		<CollectionViewSource x:Key="modViewSource" d:DesignSource="{d:DesignInstance {x:Type AutoPBW:Mod}, CreateList=True}">
-			<CollectionViewSource.SortDescriptions>
-				<scm:SortDescription PropertyName="Code"/>
-			</CollectionViewSource.SortDescriptions>
-		</CollectionViewSource>
-		<SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF6495ED"/>
-		<SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#ffbbbbbb"/>
-		<Style x:Key="ListItemStyle" TargetType="{x:Type ListBoxItem}">
-			<Style.Resources>
-				<Style x:Key="FocusVisual">
-					<Setter Property="Control.Template">
-						<Setter.Value>
-							<ControlTemplate>
-								<Rectangle Margin="2" SnapsToDevicePixels="true" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" StrokeThickness="1" StrokeDashArray="1 2"/>
-							</ControlTemplate>
-						</Setter.Value>
-					</Setter>
-				</Style>
-				<SolidColorBrush x:Key="Item.MouseOver.Background" Color="#2226A0DA"/>
-				<SolidColorBrush x:Key="Item.MouseOver.Border" Color="#3326A0Da"/>
-				<SolidColorBrush x:Key="Item.SelectedInactive.Background" Color="#eebbbbbb"/>
-				<SolidColorBrush x:Key="Item.SelectedInactive.Border" Color="#ffbbbbbb"/>
-				<SolidColorBrush x:Key="Item.SelectedActive.Background" Color="#ee6495ED"/>
-				<SolidColorBrush x:Key="Item.SelectedActive.Border" Color="#FF6495ED"/>
-			</Style.Resources>
-			<Setter Property="SnapsToDevicePixels" Value="True"/>
-			<Setter Property="Padding" Value="4,1"/>
-			<Setter Property="HorizontalContentAlignment" Value="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
-			<Setter Property="VerticalContentAlignment" Value="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
-			<Setter Property="Background" Value="Transparent"/>
-			<Setter Property="BorderBrush" Value="Transparent"/>
-			<Setter Property="BorderThickness" Value="1"/>
-			<Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
-			<Setter Property="Template">
-				<Setter.Value>
-					<ControlTemplate TargetType="{x:Type ListBoxItem}">
-						<Border x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
-							<ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
-						</Border>
-						<ControlTemplate.Triggers>
-							<MultiTrigger>
-								<MultiTrigger.Conditions>
-									<Condition Property="IsMouseOver" Value="True"/>
-								</MultiTrigger.Conditions>
-								<Setter Property="Background" TargetName="Bd" Value="{StaticResource Item.MouseOver.Background}"/>
-								<Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource Item.MouseOver.Border}"/>
-							</MultiTrigger>
-							<MultiTrigger>
-								<MultiTrigger.Conditions>
-									<Condition Property="Selector.IsSelectionActive" Value="False"/>
-									<Condition Property="IsSelected" Value="True"/>
-								</MultiTrigger.Conditions>
-								<Setter Property="Background" TargetName="Bd" Value="{StaticResource Item.SelectedInactive.Background}"/>
-								<Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource Item.SelectedInactive.Border}"/>
-							</MultiTrigger>
-							<MultiTrigger>
-								<MultiTrigger.Conditions>
-									<Condition Property="Selector.IsSelectionActive" Value="True"/>
-									<Condition Property="IsSelected" Value="True"/>
-								</MultiTrigger.Conditions>
-								<Setter Property="Background" TargetName="Bd" Value="{StaticResource Item.SelectedActive.Background}"/>
-								<Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource Item.SelectedActive.Border}"/>
-							</MultiTrigger>
-							<Trigger Property="IsEnabled" Value="False">
-								<Setter Property="TextElement.Foreground" TargetName="Bd" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
-							</Trigger>
-						</ControlTemplate.Triggers>
-					</ControlTemplate>
-				</Setter.Value>
-			</Setter>
-		</Style>
-	</Window.Resources>
-	<Grid>
-		<TabControl x:Name="tabber" Margin="0,33,0,0">
-			<TabItem x:Name="tabPlayerGames" Header="Games I Play">
-				<Grid Background="#FFE5E5E5" Margin="0">
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="61*"/>
-						<ColumnDefinition Width="99*"/>
-						<ColumnDefinition Width="160*"/>
-					</Grid.ColumnDefinitions>
-					<Grid.RowDefinitions>
-						<RowDefinition Height="*"/>
-						<RowDefinition Height="32"/>
-					</Grid.RowDefinitions>
-					<DataGrid x:Name="gridPlayerGames" AutoGenerateColumns="False" EnableRowVirtualization="True" DataContext="{StaticResource playerGameViewSource}" ItemsSource="{Binding}" RowDetailsVisibilityMode="VisibleWhenSelected" RenderTransformOrigin="0.5,0.5" IsReadOnly="True" MouseDoubleClick="playerGameDataGrid_MouseDoubleClick" Grid.ColumnSpan="3" SelectionMode="Single">
-						<DataGrid.Columns>
-							<DataGridTextColumn Header="Game" Width="100*">
-								<DataGridTextColumn.Binding>
-									<MultiBinding StringFormat=" {0} [P{1}]">
-										<Binding Path="Code"/>
-										<Binding Path="PlayerNumber"/>
-									</MultiBinding>
-								</DataGridTextColumn.Binding>
-							</DataGridTextColumn>
-							<DataGridTextColumn Binding="{Binding Mod}" SortMemberPath="Mod.Code" Header="Mod" Width="100*"/>
-							<DataGridTextColumn Binding="{Binding Status}" Header="Status" Width="100*"/>
-							<DataGridTextColumn Binding="{Binding TurnMode}" Header="Turn Mode" Width="150*"/>
-							<DataGridTextColumn Binding="{Binding TimeLeft,StringFormat='dd\\d\\ hh\\h\\ mm\\m'}" ClipboardContentBinding="{x:Null}" Header="Time Left" Width="150*"/>
-						</DataGrid.Columns>
-					</DataGrid>
-					<Button x:Name="btnDownload" Content="Download" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Bottom" Width="75" Click="btnDownload_Click" Grid.Row="1"/>
-					<Button x:Name="btnPlay" Content="Play" HorizontalAlignment="Left" Margin="80,0,0,0" Width="75" Height="20" VerticalAlignment="Bottom" Click="btnPlay_Click" Grid.Row="1" Grid.ColumnSpan="2"/>
-					<Button x:Name="btnUpload" Content="Upload" HorizontalAlignment="Right" Margin="0,0,-1,0" VerticalAlignment="Bottom" Width="75" Click="btnUpload_Click" Grid.Row="1" Grid.Column="2"/>
-					<Button x:Name="btnView" Content="View" HorizontalAlignment="Center" Width="75" Height="20" VerticalAlignment="Bottom" Click="btnView_Click" Grid.Row="1" Grid.ColumnSpan="2" Grid.Column="1" Margin="160,0,282,0"/>
-				</Grid>
-			</TabItem>
-			<TabItem x:Name="tabHostGames" Header="Games I Host">
-				<Grid Background="#FFE5E5E5" Margin="0">
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="61*"/>
-						<ColumnDefinition Width="99*"/>
-						<ColumnDefinition Width="160*"/>
-					</Grid.ColumnDefinitions>
-					<Grid.RowDefinitions>
-						<RowDefinition Height="*"/>
-						<RowDefinition Height="32"/>
-					</Grid.RowDefinitions>
-					<!-- TODO - buttons to upload/download files manually, including GSU and EMPs -->
-					<DataGrid x:Name="gridHostGames" AutoGenerateColumns="False" EnableRowVirtualization="True" DataContext="{StaticResource hostGameViewSource}" ItemsSource="{Binding}" RowDetailsVisibilityMode="VisibleWhenSelected" RenderTransformOrigin="0.5,0.5" IsReadOnly="True" MouseDoubleClick="playerGameDataGrid_MouseDoubleClick" Margin="0,0,0,38" Grid.ColumnSpan="3" Grid.RowSpan="2" SelectionMode="Single">
-						<DataGrid.Columns>
-							<DataGridTextColumn Binding="{Binding Code}" Header="Game" Width="100*"/>
-							<DataGridTextColumn Binding="{Binding Mod}" SortMemberPath="Mod.Code" Header="Mod" Width="100*"/>
-							<DataGridTextColumn Binding="{Binding Status}" Header="Status" Width="100*"/>
-							<DataGridTextColumn Binding="{Binding TurnMode}" Header="Turn Mode" Width="150*"/>
-							<DataGridTextColumn Binding="{Binding TimeLeft,StringFormat='dd\\d\\ hh\\h\\ mm\\m'}" ClipboardContentBinding="{x:Null}" Header="Time Left" Width="150*"/>
-						</DataGrid.Columns>
-					</DataGrid>
-					<!-- TODO - buttons to upload/download files manually, including GSU and EMPs -->
-					<Button x:Name="btnViewHost" Content="View" HorizontalAlignment="Center" Width="75" Height="20" VerticalAlignment="Bottom" Click="btnViewHost_Click" Grid.Row="1" Grid.ColumnSpan="2" Grid.Column="1" Margin="160,0,282,0"/>
-				</Grid>
-			</TabItem>
-			<TabItem Header="Settings" x:Name="tabSettings" HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="55">
-				<Grid Background="#FFE5E5E5" Margin="0,10,0,-10">
-					<Grid.RowDefinitions>
-						<RowDefinition Height="24"/>
-						<RowDefinition Height="24"/>
-						<RowDefinition Height="24"/>
-						<RowDefinition Height="24"/>
+    <Window.Resources>
+        <CollectionViewSource x:Key="playerGameViewSource" d:DesignSource="{d:DesignInstance {x:Type AutoPBW:PlayerGame}, CreateList=True}"/>
+        <CollectionViewSource x:Key="hostGameViewSource" d:DesignSource="{d:DesignInstance {x:Type AutoPBW:HostGame}, CreateList=True}"/>
+        <CollectionViewSource x:Key="engineViewSource" d:DesignSource="{d:DesignInstance {x:Type AutoPBW:Engine}, CreateList=True}">
+            <CollectionViewSource.SortDescriptions>
+                <scm:SortDescription PropertyName="Code"/>
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
+        <CollectionViewSource x:Key="modViewSource" d:DesignSource="{d:DesignInstance {x:Type AutoPBW:Mod}, CreateList=True}">
+            <CollectionViewSource.SortDescriptions>
+                <scm:SortDescription PropertyName="Code"/>
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
+        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF6495ED"/>
+        <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#ffbbbbbb"/>
+        <Style x:Key="ListItemStyle" TargetType="{x:Type ListBoxItem}">
+            <Style.Resources>
+                <Style x:Key="FocusVisual">
+                    <Setter Property="Control.Template">
+                        <Setter.Value>
+                            <ControlTemplate>
+                                <Rectangle Margin="2" SnapsToDevicePixels="true" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" StrokeThickness="1" StrokeDashArray="1 2"/>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+                <SolidColorBrush x:Key="Item.MouseOver.Background" Color="#2226A0DA"/>
+                <SolidColorBrush x:Key="Item.MouseOver.Border" Color="#3326A0Da"/>
+                <SolidColorBrush x:Key="Item.SelectedInactive.Background" Color="#eebbbbbb"/>
+                <SolidColorBrush x:Key="Item.SelectedInactive.Border" Color="#ffbbbbbb"/>
+                <SolidColorBrush x:Key="Item.SelectedActive.Background" Color="#ee6495ED"/>
+                <SolidColorBrush x:Key="Item.SelectedActive.Border" Color="#FF6495ED"/>
+            </Style.Resources>
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+            <Setter Property="Padding" Value="4,1"/>
+            <Setter Property="HorizontalContentAlignment" Value="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+            <Setter Property="VerticalContentAlignment" Value="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                        <Border x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsMouseOver" Value="True"/>
+                                </MultiTrigger.Conditions>
+                                <Setter Property="Background" TargetName="Bd" Value="{StaticResource Item.MouseOver.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource Item.MouseOver.Border}"/>
+                            </MultiTrigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="Selector.IsSelectionActive" Value="False"/>
+                                    <Condition Property="IsSelected" Value="True"/>
+                                </MultiTrigger.Conditions>
+                                <Setter Property="Background" TargetName="Bd" Value="{StaticResource Item.SelectedInactive.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource Item.SelectedInactive.Border}"/>
+                            </MultiTrigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="Selector.IsSelectionActive" Value="True"/>
+                                    <Condition Property="IsSelected" Value="True"/>
+                                </MultiTrigger.Conditions>
+                                <Setter Property="Background" TargetName="Bd" Value="{StaticResource Item.SelectedActive.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource Item.SelectedActive.Border}"/>
+                            </MultiTrigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="TextElement.Foreground" TargetName="Bd" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <TabControl x:Name="tabber" Margin="0,33,0,0">
+            <TabItem x:Name="tabPlayerGames" Header="Games I Play">
+                <Grid Background="#FFE5E5E5" Margin="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="61*"/>
+                        <ColumnDefinition Width="99*"/>
+                        <ColumnDefinition Width="160*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="32"/>
+                    </Grid.RowDefinitions>
+                    <DataGrid x:Name="gridPlayerGames" AutoGenerateColumns="False" EnableRowVirtualization="True" DataContext="{StaticResource playerGameViewSource}" ItemsSource="{Binding}" RowDetailsVisibilityMode="VisibleWhenSelected" RenderTransformOrigin="0.5,0.5" IsReadOnly="True" MouseDoubleClick="playerGameDataGrid_MouseDoubleClick" Grid.ColumnSpan="3" SelectionMode="Single">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Game" Width="100*">
+                                <DataGridTextColumn.Binding>
+                                    <MultiBinding StringFormat=" {0} [P{1}]">
+                                        <Binding Path="Code"/>
+                                        <Binding Path="PlayerNumber"/>
+                                    </MultiBinding>
+                                </DataGridTextColumn.Binding>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Binding="{Binding Mod}" SortMemberPath="Mod.Code" Header="Mod" Width="100*"/>
+                            <DataGridTextColumn Binding="{Binding Status}" Header="Status" Width="100*"/>
+                            <DataGridTextColumn Binding="{Binding TurnMode}" Header="Turn Mode" Width="150*"/>
+                            <DataGridTextColumn Binding="{Binding TimeLeft,StringFormat='dd\\d\\ hh\\h\\ mm\\m'}" ClipboardContentBinding="{x:Null}" Header="Time Left" Width="150*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <Button x:Name="btnDownload" Content="Download" HorizontalAlignment="Left" Margin="0" VerticalAlignment="Bottom" Width="75" Click="btnDownload_Click" Grid.Row="1"/>
+                    <Button x:Name="btnPlay" Content="Play" HorizontalAlignment="Left" Margin="80,0,0,0" Width="75" Height="20" VerticalAlignment="Bottom" Click="btnPlay_Click" Grid.Row="1" Grid.ColumnSpan="2"/>
+                    <Button x:Name="btnUpload" Content="Upload" HorizontalAlignment="Right" Margin="0,0,-1,0" VerticalAlignment="Bottom" Width="75" Click="btnUpload_Click" Grid.Row="1" Grid.Column="2"/>
+                    <Button x:Name="btnView" Content="View" HorizontalAlignment="Center" Width="75" Height="20" VerticalAlignment="Bottom" Click="btnView_Click" Grid.Row="1" Grid.ColumnSpan="2" Grid.Column="1" Margin="160,0,282,0"/>
+                </Grid>
+            </TabItem>
+            <TabItem x:Name="tabHostGames" Header="Games I Host">
+                <Grid Background="#FFE5E5E5" Margin="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="61*"/>
+                        <ColumnDefinition Width="99*"/>
+                        <ColumnDefinition Width="160*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="32"/>
+                    </Grid.RowDefinitions>
+                    <!-- TODO - buttons to upload/download files manually, including GSU and EMPs -->
+                    <DataGrid x:Name="gridHostGames" AutoGenerateColumns="False" EnableRowVirtualization="True" DataContext="{StaticResource hostGameViewSource}" ItemsSource="{Binding}" RowDetailsVisibilityMode="VisibleWhenSelected" RenderTransformOrigin="0.5,0.5" IsReadOnly="True" MouseDoubleClick="playerGameDataGrid_MouseDoubleClick" Margin="0,0,0,38" Grid.ColumnSpan="3" Grid.RowSpan="2" SelectionMode="Single">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Binding="{Binding Code}" Header="Game" Width="100*"/>
+                            <DataGridTextColumn Binding="{Binding Mod}" SortMemberPath="Mod.Code" Header="Mod" Width="100*"/>
+                            <DataGridTextColumn Binding="{Binding Status}" Header="Status" Width="100*"/>
+                            <DataGridTextColumn Binding="{Binding TurnMode}" Header="Turn Mode" Width="150*"/>
+                            <DataGridTextColumn Binding="{Binding TimeLeft,StringFormat='dd\\d\\ hh\\h\\ mm\\m'}" ClipboardContentBinding="{x:Null}" Header="Time Left" Width="150*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <!-- TODO - buttons to upload/download files manually, including GSU and EMPs -->
+                    <Button x:Name="btnViewHost" Content="View" HorizontalAlignment="Center" Width="75" Height="20" VerticalAlignment="Bottom" Click="btnViewHost_Click" Grid.Row="1" Grid.ColumnSpan="2" Grid.Column="1" Margin="160,0,282,0"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Settings" x:Name="tabSettings" HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="55">
+                <Grid Background="#FFE5E5E5" Margin="0,10,0,-10">
+                    <Grid.RowDefinitions>
                         <RowDefinition Height="24"/>
-						<RowDefinition Height="*"/>
-					</Grid.RowDefinitions>
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="100"/>
-						<ColumnDefinition Width="*"/>
-					</Grid.ColumnDefinitions>
-					<Label Content="Username"/>
-					<Label Content="Password" Grid.Row ="1" RenderTransformOrigin="0.5,0.5">
-					</Label>
-					<TextBox x:Name="txtUsername" Grid.Column="1" TextWrapping="Wrap" RenderTransformOrigin="-0.008,0"  Height="24" ToolTip="Your PBW username."/>
-					<PasswordBox x:Name="txtPassword" Grid.Column="1" Grid.Row="1" Height="21" ToolTip="Your PBW password."/>
-					<Button x:Name="btnSaveSettings" Content="Save" Grid.Column="1" HorizontalAlignment="Right" Margin="0,10,0,0" Grid.Row="5" VerticalAlignment="Top" Width="75" Height="24" Click="btnSaveSettings_Click"/>
-					<Label Content="Enable Hosting" Grid.Row ="2" RenderTransformOrigin="0.5,0.5"/>
-					<CheckBox x:Name="chkEnableHosting" Content="" Grid.Column="1" HorizontalAlignment="Left" Margin="0,4,0,0" Grid.Row="2" VerticalAlignment="Top"/>
-					<CheckBox x:Name="chkHidePlayerZero" Content="" Grid.Column="1" HorizontalAlignment="Left" Margin="0,4,0,0" Grid.Row="3" VerticalAlignment="Top"/>
-					<Label Content="Hide Player Zero" Grid.Row ="3" />
-                    <Label Content="Polling Interval" Grid.Row ="4" />
-                    <ComboBox x:Name="ddlPollingInterval" Grid.Column="1" HorizontalAlignment="Left" Grid.Row="4" VerticalAlignment="Top" Width="120">
+                        <RowDefinition Height="24"/>
+                        <RowDefinition Height="24"/>
+                        <RowDefinition Height="24"/>
+                        <RowDefinition Height="24"/>
+                        <RowDefinition Height="24"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Content="Username"/>
+                    <Label Content="Password" Grid.Row ="1" RenderTransformOrigin="0.5,0.5">
+                    </Label>
+                    <TextBox x:Name="txtUsername" Grid.Column="1" TextWrapping="Wrap" RenderTransformOrigin="-0.008,0"  Height="24" ToolTip="Your PBW username."/>
+                    <PasswordBox x:Name="txtPassword" Grid.Column="1" Grid.Row="1" Height="21" ToolTip="Your PBW password."/>
+                    <Button x:Name="btnSaveSettings" Content="Save" Grid.Column="1" HorizontalAlignment="Right" Margin="0,10,0,0" Grid.Row="6" VerticalAlignment="Top" Width="75" Height="24" Click="btnSaveSettings_Click"/>
+                    <Label Content="Enable Hosting" Grid.Row ="2" RenderTransformOrigin="0.5,0.5"/>
+                    <CheckBox x:Name="chkEnableHosting" Content="" Grid.Column="1" HorizontalAlignment="Left" Margin="0,4,0,0" Grid.Row="2" VerticalAlignment="Top"/>
+                    <Label Content="Hide Player Zero" Grid.Row ="3" />
+                    <CheckBox x:Name="chkHidePlayerZero" Content="" Grid.Column="1" HorizontalAlignment="Left" Margin="0,4,0,0" Grid.Row="3" VerticalAlignment="Top"/>
+                    <Label Content="Ignore Bad Certificates" Grid.Row ="4" />
+                    <CheckBox x:Name="chkIgnoreBadCertificates" Content="" Grid.Column="1" HorizontalAlignment="Left" Margin="0,4,0,0" Grid.Row="4" VerticalAlignment="Top"/>
+                    <Label Content="Polling Interval" Grid.Row ="5" />
+                    <ComboBox x:Name="ddlPollingInterval" Grid.Column="1" HorizontalAlignment="Left" Grid.Row="5" VerticalAlignment="Top" Width="120">
                         <ComboBoxItem Content="15s" Tag="15" />
                         <ComboBoxItem Content="30s" Tag="30" />
                         <ComboBoxItem Content="1m"  Tag="60" />
@@ -182,111 +185,112 @@
                         <ComboBoxItem Content="1h" Tag="3600" />
                     </ComboBox>
                 </Grid>
-			</TabItem>
-			<TabItem Header="Engines" x:Name="tabEngines">
-				<Grid Margin="0">
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="150"/>
-						<ColumnDefinition Width="*"/>
-					</Grid.ColumnDefinitions>
-					<ListBox x:Name="lstEngines" HorizontalAlignment="Stretch" Margin="0" VerticalAlignment="Stretch" DataContext="{StaticResource engineViewSource}" ItemsSource="{Binding}" SelectionChanged="lstEngines_SelectionChanged" ItemContainerStyle="{StaticResource ListItemStyle}"/>
-					<Grid x:Name="gridEngineDetails" Grid.Column="1" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top">
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="150"/>
-							<ColumnDefinition Width="0*"/>
-						</Grid.ColumnDefinitions>
-						<Grid.RowDefinitions>
-							<RowDefinition Height="Auto"/>
-							<RowDefinition Height="Auto"/>
-							<RowDefinition Height="Auto"/>
-							<RowDefinition Height="Auto"/>
-							<RowDefinition Height="Auto"/>
-							<RowDefinition Height="Auto"/>
-							<RowDefinition Height="Auto"/>
-							<RowDefinition Height="Auto"/>
-						</Grid.RowDefinitions>
-						<Label Content="Code:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="0" VerticalAlignment="Center" Height="26" Width="40" />
-						<TextBox x:Name="engineCodeTextBox" Grid.Column="1" Height="24" Margin="10,4,-210,4" Grid.Row="0" Text="{Binding Code, Mode=OneWay}" Width="200" VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="Unique alphanumeric code used to represent this game engine. Must match what's used on PBW."/>
-						<Label Content="Host Executable:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="2" VerticalAlignment="Center" Height="26" Width="97" />
-						<TextBox x:Name="hostExecutableTextBox" Grid.Column="1" Height="24" Margin="10,4,-210,4" Grid.Row="2" Text="{Binding HostExecutable, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="Full path to the executable to run when hosting this game. If there are spaces in the path, it needs to be enclosed in double quotes."/>
-						<Label Content="Host Arguments:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="3" VerticalAlignment="Center" Height="26" Width="99" />
-						<TextBox x:Name="hostArgumentsTextBox" Grid.Column="1" Height="24" Margin="10,4,-210,4" Grid.Row="3" Text="{Binding HostArguments, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="Arguments which should be passed to the host executable. Click the &quot;Help&quot; button for more information."/>
-						<Label Content="Host Turn Upload Filter:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="4" VerticalAlignment="Center" Height="26" Width="136" />
-						<TextBox x:Name="hostTurnUploadFilterTextBox" Grid.Column="1" Height="24" Margin="10,4,-210,4" Grid.Row="4" Text="{Binding HostTurnUploadFilter, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="Comma-separated list of filename filters to apply to the savegame folder when uploading turns as a host."/>
-						<Label Content="Player Executable:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="5" VerticalAlignment="Center" Height="26" Width="104" />
-						<TextBox x:Name="playerExecutableTextBox" Grid.Column="1" Height="24" Margin="10,4,-210,4" Grid.Row="5" Text="{Binding PlayerExecutable, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="Full path to the executable to run when playing a turn. If there are spaces in the path, it needs to be enclosed in double quotes."/>
-						<Label Content="Player Arguments:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="6" VerticalAlignment="Center" Height="26" Width="106" />
-						<TextBox x:Name="playerArgumentsTextBox" Grid.Column="1" Height="24" Margin="10,4,-210,4" Grid.Row="6" Text="{Binding PlayerArguments, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="Arguments which should be passed to the player executable. Click the &quot;Help&quot; button for more information."/>
-						<Label Content="Player Turn Upload Filter:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="7" VerticalAlignment="Center" Height="26" Width="143" />
-						<TextBox x:Name="playerTurnUploadFilterTextBox" Grid.Column="1" Height="24" Margin="10,4,-210,4" Grid.Row="7" Text="{Binding PlayerTurnUploadFilter, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="Comma-separated list of filename filters to apply to the savegame folder when uploading turns as a player."/>
-					</Grid>
-					<Button x:Name="btnAddEngine" Grid.Column="1" Content="Add" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" Height="24" Click="btnAddEngine_Click" RenderTransformOrigin="2.04,4.458" Margin="0,0,170,10"/>
-					<Button x:Name="btnDeleteEngine" Grid.Column="1" Content="Delete" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" Height="24" Click="btnDeleteEngine_Click" RenderTransformOrigin="2.04,4.458" Margin="0,0,90,10"/>
-					<Button x:Name="btnSaveEngine" Grid.Column="1" Content="Save" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" Height="24" Click="btnSaveEngine_Click" RenderTransformOrigin="2.04,4.458" Margin="0,0,10,10"/>
-					<Button x:Name="btnBrowseHostExecutable" Grid.Column="1" Content="Browse..." HorizontalAlignment="Left" Width="75" RenderTransformOrigin="2.04,4.458" Margin="378,47,0,0" Click="BtnBrowseHostExecutable_Click" Height="24" VerticalAlignment="Top"/>
-					<Button x:Name="btnBrowsePlayerExecutable" Grid.Column="1" Content="Browse..." RenderTransformOrigin="2.04,4.458" Margin="378,141,0,0" Click="BtnBrowsePlayerExecutable_Click" Height="24" VerticalAlignment="Top" HorizontalAlignment="Left" Width="75"/>
-				</Grid>
-			</TabItem>
-			<TabItem Header="Mods" x:Name="tabMods">
-				<Grid Margin="0">
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="150"/>
-						<ColumnDefinition Width="*"/>
-					</Grid.ColumnDefinitions>
-					<ListBox x:Name="lstMods" HorizontalAlignment="Stretch" Margin="0" VerticalAlignment="Stretch" DataContext="{StaticResource modViewSource}" ItemsSource="{Binding}" SelectionChanged="lstMods_SelectionChanged" ItemContainerStyle="{StaticResource ListItemStyle}">
-						<ListBox.ItemTemplate>
-							<DataTemplate>
-								<TextBlock Text="{Binding Code}"/>
-							</DataTemplate>
-						</ListBox.ItemTemplate>
-					</ListBox>
-					<Grid x:Name="gridModDetails" Grid.Column="1" Margin="10,10,10,10" DataContext="{Binding SelectedItem, ElementName=lstMods}" VerticalAlignment="Top">
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="150"/>
-							<ColumnDefinition Width="*"/>
-						</Grid.ColumnDefinitions>
-						<Grid.RowDefinitions>
-							<RowDefinition Height="Auto"/>
-							<RowDefinition Height="Auto"/>
-							<RowDefinition Height="Auto"/>
-							<RowDefinition Height="Auto"/>
-							<RowDefinition Height="Auto"/>
-							<RowDefinition Height="Auto"/>
-							<RowDefinition Height="Auto"/>
-							<RowDefinition Height="Auto"/>
-						</Grid.RowDefinitions>
-						<Label Content="Code:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="0" VerticalAlignment="Center" />
-						<TextBox x:Name="modCodeTextBox" Grid.Column="1" Height="24" Margin="4,3,0,5" Grid.Row="0" Text="{Binding Code, Mode=OneWay}" Width="200" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Unique alphanumeric code used to represent this mod. Must match what's used on PBW."/>
-						<Label Content="Engine:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="1" VerticalAlignment="Center"  />
-						<ComboBox x:Name="ddlEngine" Grid.Column="1" Grid.Row="1" Height="32" ItemsSource="{Binding Mode=OneWay, Source={StaticResource engineViewSource}}" SelectedItem="{Binding Engine}" Margin="4,0,0,0" Width="200" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Game engine used by this mod."/>
-						<Label Content="Path:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="2" VerticalAlignment="Center" />
-						<TextBox x:Name="modPathTextBox" Grid.Column="1" Height="24" Margin="4,3,0,5" Grid.Row="2" Text="{Binding Path, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Path to this mod, relative to the game engine's standard mods path."/>
-						<Label Content="Save Path:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="3" VerticalAlignment="Center" />
-						<TextBox x:Name="savePathTextBox" Grid.Column="1" Height="24" Margin="4,3,0,5" Grid.Row="3" Text="{Binding SavePath, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Path to this mod's savegame folder, relative to the location of the game's executable."/>
-						<Label Content="Empire Path:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="4" VerticalAlignment="Center" />
-						<TextBox x:Name="empirePathTextBox" Grid.Column="1" Height="24" Margin="4,3,0,5" Grid.Row="4" Text="{Binding EmpirePath, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Path to this mod's empire folder, relative to the location of the game's executable."/>
-					</Grid>
-					<Button x:Name="btnAddMod" Grid.Column="1" Content="Add" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" Height="24" Click="btnAddMod_Click" RenderTransformOrigin="2.04,4.458" Margin="0,0,170,10"/>
-					<Button x:Name="btnDeleteMod" Grid.Column="1" Content="Delete" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" Height="24" Click="btnDeleteMod_Click" RenderTransformOrigin="2.04,4.458" Margin="0,0,90,10"/>
-					<Button x:Name="btnSaveMod" Grid.Column="1" Content="Save" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" Height="24" Click="btnSaveMod_Click" RenderTransformOrigin="2.04,4.458" Margin="0,0,10,10"/>
-				</Grid>
-			</TabItem>
-			<TabItem Header="Log" x:Name="tabLog">
-				<ListBox x:Name="lstLog" ItemsSource="{Binding}">
-					<ListBox.ItemTemplate>
-						<DataTemplate>
-							<TextBlock Text="{Binding}"/>
-						</DataTemplate>
-					</ListBox.ItemTemplate>
-				</ListBox>
-			</TabItem>
-		</TabControl>
-		<Menu IsMainMenu="True" Margin="0,0,0,338" VerticalAlignment="Top">
-			<Button Content="Refresh" x:Name="btnRefresh" Click="btnRefresh_Click" ToolTip="Refreshes the list of games from PBW."/>
-			<Button Content="PBW Website" x:Name="btnWebsite" Click="btnWebsite_Click" ToolTip="Opens PBW in your web browser."/>
-			<Button Content="Help" x:Name="btnHelp" Click="btnHelp_Click" ToolTip="Opens the AutoPBW user manual in your web browser."/>
-			<Button Content="Reset" x:Name="btnReset" Click="btnReset_Click" ToolTip="Halts any turn processing in progress, and clears stalls due to PBW outages."/>
-			<Button Content="Exit AutoPBW" x:Name="btnExit" Click="btnExit_Click" ToolTip="Exits AutoPBW."/>
-		</Menu>
-	</Grid>
+            </TabItem>
+            <TabItem Header="Engines" x:Name="tabEngines">
+                <Grid Margin="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition Width="11*"/>
+                        <ColumnDefinition Width="152*"/>
+                    </Grid.ColumnDefinitions>
+                    <ListBox x:Name="lstEngines" HorizontalAlignment="Stretch" Margin="0" VerticalAlignment="Stretch" DataContext="{StaticResource engineViewSource}" ItemsSource="{Binding}" SelectionChanged="lstEngines_SelectionChanged" ItemContainerStyle="{StaticResource ListItemStyle}"/>
+                    <Grid x:Name="gridEngineDetails" Grid.Column="1" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="0*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Label Content="Code:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="0" VerticalAlignment="Center" Height="26" Width="40" />
+                        <TextBox x:Name="engineCodeTextBox" Grid.Column="1" Height="24" Margin="10,4,-210,4" Grid.Row="0" Text="{Binding Code, Mode=OneWay}" Width="200" VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="Unique alphanumeric code used to represent this game engine. Must match what's used on PBW."/>
+                        <Label Content="Host Executable:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="2" VerticalAlignment="Center" Height="26" Width="97" />
+                        <TextBox x:Name="hostExecutableTextBox" Grid.Column="1" Height="24" Margin="10,4,-210,4" Grid.Row="2" Text="{Binding HostExecutable, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="Full path to the executable to run when hosting this game. If there are spaces in the path, it needs to be enclosed in double quotes."/>
+                        <Label Content="Host Arguments:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="3" VerticalAlignment="Center" Height="26" Width="99" />
+                        <TextBox x:Name="hostArgumentsTextBox" Grid.Column="1" Height="24" Margin="10,4,-210,4" Grid.Row="3" Text="{Binding HostArguments, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="Arguments which should be passed to the host executable. Click the &quot;Help&quot; button for more information."/>
+                        <Label Content="Host Turn Upload Filter:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="4" VerticalAlignment="Center" Height="26" Width="136" />
+                        <TextBox x:Name="hostTurnUploadFilterTextBox" Grid.Column="1" Height="24" Margin="10,4,-210,4" Grid.Row="4" Text="{Binding HostTurnUploadFilter, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="Comma-separated list of filename filters to apply to the savegame folder when uploading turns as a host."/>
+                        <Label Content="Player Executable:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="5" VerticalAlignment="Center" Height="26" Width="104" />
+                        <TextBox x:Name="playerExecutableTextBox" Grid.Column="1" Height="24" Margin="10,4,-210,4" Grid.Row="5" Text="{Binding PlayerExecutable, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="Full path to the executable to run when playing a turn. If there are spaces in the path, it needs to be enclosed in double quotes."/>
+                        <Label Content="Player Arguments:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="6" VerticalAlignment="Center" Height="26" Width="106" />
+                        <TextBox x:Name="playerArgumentsTextBox" Grid.Column="1" Height="24" Margin="10,4,-210,4" Grid.Row="6" Text="{Binding PlayerArguments, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="Arguments which should be passed to the player executable. Click the &quot;Help&quot; button for more information."/>
+                        <Label Content="Player Turn Upload Filter:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="7" VerticalAlignment="Center" Height="26" Width="143" />
+                        <TextBox x:Name="playerTurnUploadFilterTextBox" Grid.Column="1" Height="24" Margin="10,4,-210,4" Grid.Row="7" Text="{Binding PlayerTurnUploadFilter, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" VerticalAlignment="Center" HorizontalAlignment="Left" ToolTip="Comma-separated list of filename filters to apply to the savegame folder when uploading turns as a player."/>
+                    </Grid>
+                    <Button x:Name="btnAddEngine" Grid.Column="2" Content="Add" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" Height="24" Click="btnAddEngine_Click" RenderTransformOrigin="2.04,4.458" Margin="0,0,170,10"/>
+                    <Button x:Name="btnDeleteEngine" Grid.Column="2" Content="Delete" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" Height="24" Click="btnDeleteEngine_Click" RenderTransformOrigin="2.04,4.458" Margin="0,0,90,10"/>
+                    <Button x:Name="btnSaveEngine" Grid.Column="2" Content="Save" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" Height="24" Click="btnSaveEngine_Click" RenderTransformOrigin="2.04,4.458" Margin="0,0,10,10"/>
+                    <Button x:Name="btnBrowseHostExecutable" Grid.Column="2" Content="Browse..." HorizontalAlignment="Left" Width="75" RenderTransformOrigin="2.04,4.458" Margin="344.604,47,0,0" Click="BtnBrowseHostExecutable_Click" Height="24" VerticalAlignment="Top"/>
+                    <Button x:Name="btnBrowsePlayerExecutable" Grid.Column="2" Content="Browse..." RenderTransformOrigin="2.04,4.458" Margin="344.604,141,0,0" Click="BtnBrowsePlayerExecutable_Click" Height="24" VerticalAlignment="Top" HorizontalAlignment="Left" Width="75"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Mods" x:Name="tabMods">
+                <Grid Margin="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <ListBox x:Name="lstMods" HorizontalAlignment="Stretch" Margin="0" VerticalAlignment="Stretch" DataContext="{StaticResource modViewSource}" ItemsSource="{Binding}" SelectionChanged="lstMods_SelectionChanged" ItemContainerStyle="{StaticResource ListItemStyle}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Code}"/>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <Grid x:Name="gridModDetails" Grid.Column="1" Margin="10,10,10,10" DataContext="{Binding SelectedItem, ElementName=lstMods}" VerticalAlignment="Top">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Label Content="Code:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="0" VerticalAlignment="Center" />
+                        <TextBox x:Name="modCodeTextBox" Grid.Column="1" Height="24" Margin="4,3,0,5" Grid.Row="0" Text="{Binding Code, Mode=OneWay}" Width="200" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Unique alphanumeric code used to represent this mod. Must match what's used on PBW."/>
+                        <Label Content="Engine:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="1" VerticalAlignment="Center"  />
+                        <ComboBox x:Name="ddlEngine" Grid.Column="1" Grid.Row="1" Height="32" ItemsSource="{Binding Mode=OneWay, Source={StaticResource engineViewSource}}" SelectedItem="{Binding Engine}" Margin="4,0,0,0" Width="200" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Game engine used by this mod."/>
+                        <Label Content="Path:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="2" VerticalAlignment="Center" />
+                        <TextBox x:Name="modPathTextBox" Grid.Column="1" Height="24" Margin="4,3,0,5" Grid.Row="2" Text="{Binding Path, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Path to this mod, relative to the game engine's standard mods path."/>
+                        <Label Content="Save Path:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="3" VerticalAlignment="Center" />
+                        <TextBox x:Name="savePathTextBox" Grid.Column="1" Height="24" Margin="4,3,0,5" Grid.Row="3" Text="{Binding SavePath, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Path to this mod's savegame folder, relative to the location of the game's executable."/>
+                        <Label Content="Empire Path:" Grid.Column="0" HorizontalAlignment="Left" Margin="3,3,0,3" Grid.Row="4" VerticalAlignment="Center" />
+                        <TextBox x:Name="empirePathTextBox" Grid.Column="1" Height="24" Margin="4,3,0,5" Grid.Row="4" Text="{Binding EmpirePath, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" Width="200" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Path to this mod's empire folder, relative to the location of the game's executable."/>
+                    </Grid>
+                    <Button x:Name="btnAddMod" Grid.Column="1" Content="Add" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" Height="24" Click="btnAddMod_Click" RenderTransformOrigin="2.04,4.458" Margin="0,0,170,10"/>
+                    <Button x:Name="btnDeleteMod" Grid.Column="1" Content="Delete" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" Height="24" Click="btnDeleteMod_Click" RenderTransformOrigin="2.04,4.458" Margin="0,0,90,10"/>
+                    <Button x:Name="btnSaveMod" Grid.Column="1" Content="Save" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" Height="24" Click="btnSaveMod_Click" RenderTransformOrigin="2.04,4.458" Margin="0,0,10,10"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Log" x:Name="tabLog">
+                <ListBox x:Name="lstLog" ItemsSource="{Binding}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </TabItem>
+        </TabControl>
+        <Menu IsMainMenu="True" Margin="0,0,0,338" VerticalAlignment="Top">
+            <Button Content="Refresh" x:Name="btnRefresh" Click="btnRefresh_Click" ToolTip="Refreshes the list of games from PBW."/>
+            <Button Content="PBW Website" x:Name="btnWebsite" Click="btnWebsite_Click" ToolTip="Opens PBW in your web browser."/>
+            <Button Content="Help" x:Name="btnHelp" Click="btnHelp_Click" ToolTip="Opens the AutoPBW user manual in your web browser."/>
+            <Button Content="Reset" x:Name="btnReset" Click="btnReset_Click" ToolTip="Halts any turn processing in progress, and clears stalls due to PBW outages."/>
+            <Button Content="Exit AutoPBW" x:Name="btnExit" Click="btnExit_Click" ToolTip="Exits AutoPBW."/>
+        </Menu>
+    </Grid>
 </Window>
