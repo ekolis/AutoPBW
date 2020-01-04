@@ -109,7 +109,7 @@
                                 </DataGridTextColumn.Binding>
                             </DataGridTextColumn>
                             <DataGridTextColumn Binding="{Binding Mod}" SortMemberPath="Mod.Code" Header="Mod" Width="100*"/>
-                            <DataGridTextColumn Binding="{Binding Status}" Header="Status" Width="100*"/>
+                            <DataGridTextColumn Binding="{Binding DisplayStatus}" Header="Status" Width="100*"/>
                             <DataGridTextColumn Binding="{Binding TurnMode}" Header="Turn Mode" Width="150*"/>
                             <DataGridTextColumn Binding="{Binding TimeLeft,StringFormat='dd\\d\\ hh\\h\\ mm\\m'}" ClipboardContentBinding="{x:Null}" Header="Time Left" Width="150*"/>
                         </DataGrid.Columns>
@@ -157,23 +157,23 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <Label Content="Username"/>
-                    <Label Content="Password" Grid.Row ="1" RenderTransformOrigin="0.5,0.5">
-                    </Label>
                     <TextBox x:Name="txtUsername" Grid.Column="1" TextWrapping="Wrap" RenderTransformOrigin="-0.008,0"  Height="24" ToolTip="Your PBW username."/>
+                    <Label Content="Password" Grid.Row ="1" RenderTransformOrigin="0.5,0.5"/>
                     <PasswordBox x:Name="txtPassword" Grid.Column="1" Grid.Row="1" Height="21" ToolTip="Your PBW password."/>
-                    <Button x:Name="btnSaveSettings" Content="Save" Grid.Column="1" HorizontalAlignment="Right" Margin="0,10,0,0" Grid.Row="6" VerticalAlignment="Top" Width="75" Height="24" Click="btnSaveSettings_Click"/>
                     <Label Content="Enable Hosting" Grid.Row ="2" RenderTransformOrigin="0.5,0.5"/>
-                    <CheckBox x:Name="chkEnableHosting" Content="" Grid.Column="1" HorizontalAlignment="Left" Margin="0,4,0,0" Grid.Row="2" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="chkEnableHosting" Grid.Row="2" Grid.Column="1" Content="" HorizontalAlignment="Left" Margin="0,4,0,0" VerticalAlignment="Top"/>
                     <Label Content="Hide Player Zero" Grid.Row ="3" />
-                    <CheckBox x:Name="chkHidePlayerZero" Content="" Grid.Column="1" HorizontalAlignment="Left" Margin="0,4,0,0" Grid.Row="3" VerticalAlignment="Top"/>
-                    <Label Content="Ignore Bad Certificates" Grid.Row ="4" />
-                    <CheckBox x:Name="chkIgnoreBadCertificates" Content="" Grid.Column="1" HorizontalAlignment="Left" Margin="0,4,0,0" Grid.Row="4" VerticalAlignment="Top"/>
-                    <Label Content="Polling Interval" Grid.Row ="5" />
-                    <ComboBox x:Name="ddlPollingInterval" Grid.Column="1" HorizontalAlignment="Left" Grid.Row="5" VerticalAlignment="Top" Width="120">
+                    <CheckBox x:Name="chkHidePlayerZero" Grid.Row="3" Grid.Column="1" Content="" HorizontalAlignment="Left" Margin="0,4,0,0" VerticalAlignment="Top"/>
+                    <Label Content="Download Turns Automatically" Grid.Row ="4" />
+                    <CheckBox x:Name="chkAutoDownload" Grid.Row="4" Grid.Column="1" Content="" HorizontalAlignment="Left" Margin="0,4,0,0" VerticalAlignment="Top"/>
+                    <Label Content="Ignore Bad Certificates" Grid.Row ="5" />
+                    <CheckBox x:Name="chkIgnoreBadCertificates" Grid.Row="5" Grid.Column="1" Content="" HorizontalAlignment="Left" Margin="0,4,0,0" VerticalAlignment="Top"/>
+                    <Label Content="Polling Interval" Grid.Row ="6" />
+                    <ComboBox x:Name="ddlPollingInterval" Grid.Row="6" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="120">
                         <ComboBoxItem Content="15s" Tag="15" />
                         <ComboBoxItem Content="30s" Tag="30" />
                         <ComboBoxItem Content="1m"  Tag="60" />
@@ -184,6 +184,7 @@
                         <ComboBoxItem Content="30m" Tag="1800" />
                         <ComboBoxItem Content="1h" Tag="3600" />
                     </ComboBox>
+                    <Button x:Name="btnSaveSettings" Content="Save" Grid.Row="7" Grid.Column="1" HorizontalAlignment="Right" Margin="0,10,0,0" VerticalAlignment="Top" Width="75" Height="24" Click="btnSaveSettings_Click"/>
                 </Grid>
             </TabItem>
             <TabItem Header="Engines" x:Name="tabEngines">

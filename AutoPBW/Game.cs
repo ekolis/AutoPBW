@@ -292,6 +292,24 @@ namespace AutoPBW
 		/// </summary>
 		public string ShipsetCode { get; set; }
 
+		/// <summary>
+		/// Have we downloaded this game turn yet?
+		/// </summary>
+		public bool HasDownloaded { get; set; }
+
+		/// <summary>
+		/// The string to display for the status in the UI
+		/// </summary>
+		public string DisplayStatus {
+			get
+			{
+				// Display "Waiting [D]" for downloaded turns
+				if (Status == PlayerStatus.Waiting && HasDownloaded)
+					return Status.ToString() + " [D]";
+				return Status.ToString();
+			}
+		}
+
 		public static PlayerStatus ParseStatus(string s)
 		{
 			if (s == "waiting")
@@ -319,6 +337,7 @@ namespace AutoPBW
 			var path = Path.Combine(Path.GetDirectoryName(Engine.PlayerExecutable.Trim('"')), Mod.SavePath);
 			PBW.Log.Write($"Downloading turn for {this} to {path}.");
 			DownloadExtractAndDelete(url, path);
+			HasDownloaded = true;
 		}
 
 		/// <summary>

@@ -127,6 +127,7 @@ namespace AutoPBW.WPF
 			txtPassword.Password = Config.Instance.Password;
 			chkEnableHosting.IsChecked = Config.Instance.EnableHosting;
 			chkHidePlayerZero.IsChecked = Config.Instance.HidePlayerZero;
+			chkAutoDownload.IsChecked = Config.Instance.AutoDownload;
 			chkIgnoreBadCertificates.IsChecked = Config.Instance.IgnoreBadCertificates;
 			ddlPollingInterval.SelectedItem = ddlPollingInterval.Items.Cast<ComboBoxItem>().SingleOrDefault(q => (int)Convert.ChangeType(q.Tag, typeof(int)) == Config.Instance.PollingInterval);
 
@@ -153,6 +154,7 @@ namespace AutoPBW.WPF
 			var selCode = selGame == null ? null : selGame.Code;
 			var selPlayerNumber = selGame == null ? null : (int?)selGame.PlayerNumber;
 			IEnumerable<HostGame> hostGames = null;
+			IEnumerable<PlayerGame> playerGames = null;
 
 			try
 			{
@@ -169,14 +171,13 @@ namespace AutoPBW.WPF
 					var oldGames = (IEnumerable<PlayerGame>)playerGameViewSource.Source;
 					if (oldGames == null)
 						oldGames = Enumerable.Empty<PlayerGame>();
-					IEnumerable<PlayerGame> newGames;
 					if (Config.Instance.HidePlayerZero)
-						newGames = PBW.GetPlayerGames().Where(q => q.PlayerNumber > 0).ToArray();
+						playerGames = PBW.GetPlayerGames().Where(q => q.PlayerNumber > 0).ToArray();
 					else
-						newGames = PBW.GetPlayerGames().ToArray();
-					playerGameViewSource.Source = newGames;
+						playerGames = PBW.GetPlayerGames().ToArray();
+					playerGameViewSource.Source = playerGames;
 					var newReady = new HashSet<PlayerGame>();
-					var waiting = newGames.Where(g => g.Status == PlayerStatus.Waiting);
+					var waiting = playerGames.Where(g => g.Status == PlayerStatus.Waiting);
 					var waitingPLR = waiting.Where(g => g.PlayerNumber > 0 && g.TurnNumber > 0); // don't count waiting for host PLR, that would get annoying if not all players are even ready yet
 					var waitingEMP = waiting.Where(g => g.PlayerNumber > 0 && g.TurnNumber == 0);
 					foreach (var ng in waiting)
@@ -184,6 +185,8 @@ namespace AutoPBW.WPF
 						var og = oldGames.SingleOrDefault(g => g.Code == ng.Code && g.PlayerNumber == ng.PlayerNumber);
 						if (og == null || og.Status != PlayerStatus.Waiting)
 							newReady.Add(ng);
+						if (og != null && og.TurnNumber == ng.TurnNumber)
+							ng.HasDownloaded = og.HasDownloaded;
 					}
 
 					// newly ready games, show a popup
@@ -282,6 +285,23 @@ namespace AutoPBW.WPF
 					{
 						PBW.Log.Write($"Can't process {game}: unconfigured mod {game.Mod} or engine {game.Engine}.");
 						gamesToProcess.Remove(game); // can't process this game now
+					}
+				}
+			}
+
+			// auto-download
+			if (Config.Instance.AutoDownload && playerGames != null)
+			{
+				var waitingPLR = playerGames.Where(g => g.Status == PlayerStatus.Waiting && !g.HasDownloaded && g.PlayerNumber > 0 && g.TurnNumber > 0);
+				foreach (var ng in waitingPLR)
+				{
+					try
+					{
+						ng.DownloadTurn();
+					}
+					catch (Exception ex)
+					{
+						ShowBalloonTip("Download failed", "Auto-download for " + ng + " failed:\n" + ex.Message + "\n" + ex.Message.Split('\n').First(), ng);
 					}
 				}
 			}
@@ -389,6 +409,7 @@ namespace AutoPBW.WPF
 			Config.Instance.Password = txtPassword.Password;
 			Config.Instance.EnableHosting = chkEnableHosting.IsChecked ?? false;
 			Config.Instance.HidePlayerZero = chkHidePlayerZero.IsChecked ?? false;
+			Config.Instance.AutoDownload = chkAutoDownload.IsChecked ?? false;
 			Config.Instance.IgnoreBadCertificates = chkIgnoreBadCertificates.IsChecked ?? false;
 			Config.Instance.PollingInterval = (int)Convert.ChangeType((ddlPollingInterval.SelectedItem as ComboBoxItem).Tag, typeof(int));
 			Config.Save();
