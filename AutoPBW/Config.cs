@@ -114,6 +114,11 @@ namespace AutoPBW
 		public bool HidePlayerZero { get; set; }
 
 		/// <summary>
+		/// Should new player turns be automatically downloaded?
+		/// </summary>
+		public bool AutoDownload { get; set; }
+
+		/// <summary>
 		/// Should we silently ignore bad SSL certificates on the PBW site, or prompt the user about them?
 		/// </summary>
 		public bool IgnoreBadCertificates { get; set; }
