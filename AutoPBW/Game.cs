@@ -150,9 +150,9 @@ namespace AutoPBW
 			foreach (var filter in filters.Split(','))
 			{
 				foreach (var file in Directory.EnumerateFiles(path, filter.Trim()))
-					files.Add(file);
+					if (files.Add(file))
+						yield return file;
 			}
-			return files;
 		}
 	}
 
@@ -328,13 +328,18 @@ namespace AutoPBW
 			Process.Start(cmd);
 		}
 
+		public string GetSavePath()
+		{
+			return Path.Combine(Engine.GetPlayerExecutableDirectory(), Mod.SavePath);
+		}
+
 		/// <summary>
 		/// Downloads the turn for this game.
 		/// </summary>
 		public void DownloadTurn()
 		{
 			var url = "http://pbw.spaceempires.net/games/{0}/player-turn/download".F(Code);
-			var path = Path.Combine(Path.GetDirectoryName(Engine.PlayerExecutable.Trim('"')), Mod.SavePath);
+			var path = GetSavePath();
 			PBW.Log.Write($"Downloading turn for {this} to {path}.");
 			DownloadExtractAndDelete(url, path);
 			HasDownloaded = true;
@@ -346,9 +351,26 @@ namespace AutoPBW
 		public void UploadEmpire(string empfile)
 		{
 			var url = "http://pbw.spaceempires.net/games/{0}/player-empire/upload".F(Code);
-			var path = Path.Combine(Path.GetDirectoryName(Engine.PlayerExecutable).Trim('"'), Mod.EmpirePath);
+			var path = Path.Combine(Engine.GetPlayerExecutableDirectory(), Mod.EmpirePath);
 			PBW.Log.Write($"Uploading empire {path} for {this}.");
 			ArchiveUploadAndDeleteArchive(new string[] { empfile }, url, "emp_file");
+		}
+
+		/// <summary>
+		/// Checks if we have a turn file pending upload
+		/// </summary>
+		public bool IsReadyToUploadTurn()
+		{
+			if (Status == PlayerStatus.Waiting)
+			{
+				// get list of files
+				var path = GetSavePath();
+				var files = GetFiles(path, GenerateArgumentsOrFilter(Engine.PlayerTurnUploadFilter));
+
+				if (files.Any())
+					return true;
+			}
+			return false;
 		}
 
 		/// <summary>
@@ -357,7 +379,7 @@ namespace AutoPBW
 		public void UploadTurn()
 		{
 			// get list of files
-			var path = Path.Combine(Path.GetDirectoryName(Engine.PlayerExecutable.Trim('"')), Mod.SavePath);
+			var path = GetSavePath();
 			var files = GetFiles(path, GenerateArgumentsOrFilter(Engine.PlayerTurnUploadFilter));
 
 			// send to PBW
@@ -384,7 +406,7 @@ namespace AutoPBW
 		{
 			return basestring
 				.Replace("{Executable}", Engine.PlayerExecutable)
-				.Replace("{EnginePath}", Path.GetDirectoryName(Engine.PlayerExecutable.Trim('"')))
+				.Replace("{EnginePath}", Engine.GetPlayerExecutableDirectory())
 				.Replace("{ModPath}", Mod.Path)
 				.Replace("{SavePath}", Mod.SavePath)
 				.Replace("{Password}", Password)

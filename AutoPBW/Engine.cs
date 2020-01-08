@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,6 +38,14 @@ namespace AutoPBW
 		/// The full path to the player instance of the game engine executable.
 		/// </summary>
 		public string PlayerExecutable { get; set; }
+
+		/// <summary>
+		/// The path to the directory containing the player game executable
+		/// </summary>
+		public string GetPlayerExecutableDirectory()
+		{
+			return Path.GetDirectoryName(PlayerExecutable.Trim('"'));
+		}
 
 		/// <summary>
 		/// Comma separated list of filename filters for the host turn upload.
