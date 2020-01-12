@@ -146,6 +146,9 @@ namespace AutoPBW.WPF
 
 		private void RefreshData()
 		{
+			// refresh app icon prior to refreshing data
+			RefreshIcon();
+
 			// set cursor
 			Cursor = Cursors.Wait;
 
@@ -315,6 +318,9 @@ namespace AutoPBW.WPF
 
 			// reset cursor
 			Cursor = Cursors.Arrow;
+
+			// refresh icon again once we are done
+			RefreshIcon();
 		}
 
 		void process_Exited(object sender, EventArgs e)
@@ -778,6 +784,20 @@ namespace AutoPBW.WPF
 			var dlg = new OpenFileDialog();
 			if (dlg.ShowDialog() ?? false)
 				playerExecutableTextBox.Text = '"' + dlg.FileName + '"';
+		}
+
+		private void RefreshIcon()
+		{
+			var hosting = PBW.GetHostGames().Any(q => q.Status == HostStatus.InProgress);
+			var playerReady = PBW.GetPlayerGames().Any(q => q.Status == PlayerStatus.Waiting && q.TurnNumber > 0);
+			if (hosting && playerReady)
+				Icon = new BitmapImage(new Uri("AutoPBW-hosting-playerReady.ico", UriKind.Relative));
+			else if (hosting)
+				Icon = new BitmapImage(new Uri("AutoPBW-hosting.ico", UriKind.Relative));
+			else if (playerReady)
+				Icon = new BitmapImage(new Uri("AutoPBW-playerReady.ico", UriKind.Relative));
+			else
+				Icon = new BitmapImage(new Uri("AutoPBW.ico", UriKind.Relative));
 		}
 	}
 }
