@@ -243,6 +243,7 @@ namespace AutoPBW
 			g.Mod = Mod.Find(gx.Element("mod_code").Value, gx.Element("game_type").Value);
 			g.TurnMode = Game.ParseTurnMode(gx.Element("turn_mode").Value);
 			g.TurnNumber = int.Parse(gx.Element("turn").Value);
+			g.TurnStartDate = UnixTimeToDateTime(gx.Element("turn_start_date").Value);
 			g.TurnDueDate = UnixTimeToDateTime(gx.Element("next_turn_date").Value);
 			g.Status = PlayerGame.ParseStatus(gx.Element("plr_status").Value);
 			g.PlayerNumber = int.Parse(gx.Element("number").Value);

@@ -51,6 +51,12 @@ namespace AutoPBW
 		public int TurnNumber { get; set; }
 
 		/// <summary>
+		/// When the current turn started.
+		/// Or null if the game hasn't started yet.
+		/// </summary>
+		public DateTime? TurnStartDate { get; set; }
+
+		/// <summary>
 		/// When the next turn is due.
 		/// Or null if the game hasn't started yet.
 		/// </summary>
@@ -367,7 +373,8 @@ namespace AutoPBW
 				var path = GetSavePath();
 				var files = GetFiles(path, GenerateArgumentsOrFilter(Engine.PlayerTurnUploadFilter));
 
-				if (files.Any())
+				var turnfile = files.SingleOrDefault();
+				if (turnfile != null && File.GetLastWriteTime(turnfile) > TurnStartDate)
 					return true;
 			}
 			return false;
