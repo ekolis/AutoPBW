@@ -119,6 +119,11 @@ namespace AutoPBW
 		public bool AutoDownload { get; set; }
 
 		/// <summary>
+		/// Should we watch for and automatically upload player turn files?
+		/// </summary>
+		public bool EnableAutoUpload { get; set; }
+
+		/// <summary>
 		/// Should we silently ignore bad SSL certificates on the PBW site, or prompt the user about them?
 		/// </summary>
 		public bool IgnoreBadCertificates { get; set; }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Security.Authentication;
 using System.Text;
@@ -14,7 +15,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 using AutoPBW;
 using AutoPBW.WPF.Properties;
 using Hardcodet.Wpf.TaskbarNotification;
@@ -44,6 +44,11 @@ namespace AutoPBW.WPF
 		/// Context item for balloon tip.
 		/// </summary>
 		private object balloonTipContext = null;
+
+		/// <summary>
+		/// Watchers for automatically uploading player turns
+		/// </summary>
+		private Dictionary<string, FileSystemWatcher> TurnUploadWatchers;
 
 		public MainWindow()
 		{
@@ -128,6 +133,7 @@ namespace AutoPBW.WPF
 			chkEnableHosting.IsChecked = Config.Instance.EnableHosting;
 			chkHidePlayerZero.IsChecked = Config.Instance.HidePlayerZero;
 			chkAutoDownload.IsChecked = Config.Instance.AutoDownload;
+			chkEnableAutoUpload.IsChecked = Config.Instance.EnableAutoUpload;
 			chkIgnoreBadCertificates.IsChecked = Config.Instance.IgnoreBadCertificates;
 			ddlPollingInterval.SelectedItem = ddlPollingInterval.Items.Cast<ComboBoxItem>().SingleOrDefault(q => (int)Convert.ChangeType(q.Tag, typeof(int)) == Config.Instance.PollingInterval);
 
@@ -188,6 +194,7 @@ namespace AutoPBW.WPF
 						if (og != null && og.TurnNumber == ng.TurnNumber)
 							ng.HasDownloaded = og.HasDownloaded;
 					}
+					RefreshDirectoryWatchers();
 
 					// newly ready games, show a popup
 					if (waitingPLR.Intersect(newReady).Count() > 1)
@@ -410,6 +417,7 @@ namespace AutoPBW.WPF
 			Config.Instance.EnableHosting = chkEnableHosting.IsChecked ?? false;
 			Config.Instance.HidePlayerZero = chkHidePlayerZero.IsChecked ?? false;
 			Config.Instance.AutoDownload = chkAutoDownload.IsChecked ?? false;
+			Config.Instance.EnableAutoUpload = chkEnableAutoUpload.IsChecked ?? false;
 			Config.Instance.IgnoreBadCertificates = chkIgnoreBadCertificates.IsChecked ?? false;
 			Config.Instance.PollingInterval = (int)Convert.ChangeType((ddlPollingInterval.SelectedItem as ComboBoxItem).Tag, typeof(int));
 			Config.Save();
@@ -633,6 +641,95 @@ namespace AutoPBW.WPF
 				RefreshData();
 				Cursor = Cursors.Arrow;
 
+			}
+		}
+
+		private void RefreshDirectoryWatchers()
+		{
+			var OldWatchers = TurnUploadWatchers;
+
+			if (Config.Instance.EnableAutoUpload)
+			{
+				TurnUploadWatchers = new Dictionary<string, FileSystemWatcher>();
+
+				var playerGameViewSource = ((CollectionViewSource)(this.FindResource("playerGameViewSource")));
+				var playerGames = (IEnumerable<PlayerGame>)playerGameViewSource.Source;
+				if (playerGames != null)
+				{
+					var waiting = playerGames.Where(g => g.Status == PlayerStatus.Waiting && g.PlayerNumber > 0 && g.TurnNumber > 0);
+					foreach (var game in waiting)
+					{
+						string savepath = game.GetSavePath();
+						if (!TurnUploadWatchers.ContainsKey(savepath))
+						{
+							FileSystemWatcher watcher = null;
+							if (OldWatchers != null && OldWatchers.TryGetValue(savepath, out watcher))
+							{
+								OldWatchers.Remove(savepath);
+							}
+							else
+							{
+								if (Directory.Exists(savepath))
+								{
+									watcher = new FileSystemWatcher(savepath, "*.plr");
+									watcher.Changed += OnTurnFileChanged;
+									watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size;
+									watcher.EnableRaisingEvents = true;
+								}
+							}
+							TurnUploadWatchers.Add(savepath, watcher);
+						}
+					}
+				}
+			}
+			else
+			{
+				TurnUploadWatchers = null;
+			}
+
+			if (OldWatchers != null)
+			{
+				foreach (var watcher in OldWatchers.Values)
+				{
+					watcher.Dispose();
+				}
+			}
+		}
+
+		public void OnTurnFileChanged(object source, FileSystemEventArgs e)
+		{
+			Application.Current.Dispatcher.BeginInvoke((Action)(() => OnTurnFileChanged_MainThread(source, e)));
+		}
+
+		public void OnTurnFileChanged_MainThread(object source, FileSystemEventArgs e)
+		{
+			var playerGameViewSource = ((CollectionViewSource)(this.FindResource("playerGameViewSource")));
+			var playerGames = (IEnumerable<PlayerGame>)playerGameViewSource.Source;
+			if (playerGames != null)
+			{
+				var waiting = playerGames.Where(g => g.Status == PlayerStatus.Waiting && g.PlayerNumber > 0 && g.TurnNumber > 0);
+				var matching = waiting.Where(g => g.GetSavePath() == Path.GetDirectoryName(e.FullPath));
+
+				bool anyUploaded = false;
+				foreach (var game in matching)
+				{
+					if (game.IsReadyToUploadTurn())
+					{
+						try
+						{
+							game.UploadTurn();
+							anyUploaded = true;
+						}
+						catch (Exception ex)
+						{
+							ShowBalloonTip("Upload failed", "Could not upload turn: " + ex.Message, null, BalloonIcon.Error);
+						}
+					}
+				}
+				if (anyUploaded)
+				{
+					RefreshData();
+				}
 			}
 		}
 

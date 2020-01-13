@@ -154,6 +154,8 @@
                         <RowDefinition Height="24"/>
                         <RowDefinition Height="24"/>
                         <RowDefinition Height="24"/>
+                        <RowDefinition Height="24"/>
+                        <RowDefinition Height="24"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
@@ -163,17 +165,19 @@
                     <Label Content="Username"/>
                     <TextBox x:Name="txtUsername" Grid.Column="1" TextWrapping="Wrap" RenderTransformOrigin="-0.008,0"  Height="24" ToolTip="Your PBW username."/>
                     <Label Content="Password" Grid.Row ="1" RenderTransformOrigin="0.5,0.5"/>
-                    <PasswordBox x:Name="txtPassword" Grid.Column="1" Grid.Row="1" Height="21" ToolTip="Your PBW password."/>
+                    <PasswordBox x:Name="txtPassword" Grid.Row="1" Grid.Column="1" Height="21" ToolTip="Your PBW password."/>
                     <Label Content="Enable Hosting" Grid.Row ="2" RenderTransformOrigin="0.5,0.5"/>
                     <CheckBox x:Name="chkEnableHosting" Grid.Row="2" Grid.Column="1" Content="" HorizontalAlignment="Left" Margin="0,4,0,0" VerticalAlignment="Top"/>
                     <Label Content="Hide Player Zero" Grid.Row ="3" />
                     <CheckBox x:Name="chkHidePlayerZero" Grid.Row="3" Grid.Column="1" Content="" HorizontalAlignment="Left" Margin="0,4,0,0" VerticalAlignment="Top"/>
                     <Label Content="Download Turns Automatically" Grid.Row ="4" />
                     <CheckBox x:Name="chkAutoDownload" Grid.Row="4" Grid.Column="1" Content="" HorizontalAlignment="Left" Margin="0,4,0,0" VerticalAlignment="Top"/>
-                    <Label Content="Ignore Bad Certificates" Grid.Row ="5" />
-                    <CheckBox x:Name="chkIgnoreBadCertificates" Grid.Row="5" Grid.Column="1" Content="" HorizontalAlignment="Left" Margin="0,4,0,0" VerticalAlignment="Top"/>
-                    <Label Content="Polling Interval" Grid.Row ="6" />
-                    <ComboBox x:Name="ddlPollingInterval" Grid.Row="6" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="120">
+                    <Label Content="Automatically upload player turns" Grid.Row ="5" />
+                    <CheckBox x:Name="chkEnableAutoUpload" Content="" Grid.Row="5" Grid.Column="1" HorizontalAlignment="Left" Margin="0,4,0,0" VerticalAlignment="Top"/>
+                    <Label Content="Ignore Bad Certificates" Grid.Row ="6" />
+                    <CheckBox x:Name="chkIgnoreBadCertificates" Grid.Row="6" Grid.Column="1" Content="" HorizontalAlignment="Left" Margin="0,4,0,0" VerticalAlignment="Top"/>
+                    <Label Content="Polling Interval" Grid.Row ="7" />
+                    <ComboBox x:Name="ddlPollingInterval" Grid.Row="7" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="120">
                         <ComboBoxItem Content="15s" Tag="15" />
                         <ComboBoxItem Content="30s" Tag="30" />
                         <ComboBoxItem Content="1m"  Tag="60" />
@@ -184,7 +188,7 @@
                         <ComboBoxItem Content="30m" Tag="1800" />
                         <ComboBoxItem Content="1h" Tag="3600" />
                     </ComboBox>
-                    <Button x:Name="btnSaveSettings" Content="Save" Grid.Row="7" Grid.Column="1" HorizontalAlignment="Right" Margin="0,10,0,0" VerticalAlignment="Top" Width="75" Height="24" Click="btnSaveSettings_Click"/>
+                    <Button x:Name="btnSaveSettings" Content="Save" Grid.Row="8" Grid.Column="1" HorizontalAlignment="Right" Margin="0,10,0,0" VerticalAlignment="Top" Width="75" Height="24" Click="btnSaveSettings_Click"/>
                 </Grid>
             </TabItem>
             <TabItem Header="Engines" x:Name="tabEngines">
