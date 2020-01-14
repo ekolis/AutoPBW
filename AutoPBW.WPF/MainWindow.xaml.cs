@@ -677,7 +677,10 @@ namespace AutoPBW.WPF
 									watcher.EnableRaisingEvents = true;
 								}
 							}
-							TurnUploadWatchers.Add(savepath, watcher);
+							if (watcher != null)
+							{
+								TurnUploadWatchers.Add(savepath, watcher);
+							}
 						}
 					}
 				}
