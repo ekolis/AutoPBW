@@ -54,6 +54,28 @@ namespace AutoPBW
 
 		private static CookieContainer cookies;
 
+		private static string cachedIP = "64.22.124.205";
+
+		private static HttpWebRequest RetryRequestWithCachedIP(HttpWebRequest originalRequest)
+		{
+			UriBuilder uriBuilder = new UriBuilder(originalRequest.RequestUri);
+			uriBuilder.Host = cachedIP;
+			HttpWebRequest request2 = (HttpWebRequest)WebRequest.Create(uriBuilder.ToString());
+			request2.Host = originalRequest.Host;
+
+			request2.CookieContainer = originalRequest.CookieContainer;
+			request2.UserAgent       = originalRequest.UserAgent;
+			request2.Method          = originalRequest.Method;
+			request2.ContentType     = originalRequest.ContentType;
+			if (originalRequest.ContentLength >= 0) // HttpWebRequest throws an exception if we set ContentLength to -1 ourselves
+				request2.ContentLength = originalRequest.ContentLength;
+			request2.Timeout         = originalRequest.Timeout;
+			// add as needed
+
+			return request2;
+		}
+		public static bool isLoggedIn { get; private set; } = false;
+
 		/// <summary>
 		/// Logs into PBW using HTTPS.
 		/// </summary>
@@ -73,6 +95,15 @@ namespace AutoPBW
 				{"password", password},
 			};
 			SubmitForm(login_address, fields, "logging in");
+
+			isLoggedIn = true;
+
+			try
+			{
+				// if we login successfully, cache the IP address of the pbw web service in case we have connection issues later
+				cachedIP = Dns.GetHostEntry(new Uri(login_address).Host).AddressList.First().ToString();
+			}
+			catch { }
 		}
 
 		/// <summary>
@@ -95,12 +126,13 @@ namespace AutoPBW
 				request.CookieContainer = cookies ?? new CookieContainer();
 				request.Method = "POST";
 				request.ContentType = "application/x-www-form-urlencoded";
+
 				using (StreamWriter writer = new StreamWriter(request.GetRequestStream(), Encoding.ASCII))
 				{
 					writer.Write(fields.ToQueryString());
 				}
-				response = (HttpWebResponse)request.GetResponse();
 
+				response = (HttpWebResponse)request.GetResponse();
 
 				ConnectionStatus = response.StatusCode;
 
@@ -154,7 +186,16 @@ namespace AutoPBW
 				request.CookieContainer = cookies;
 
 				request.UserAgent = "AutoPBW/" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-				response = (HttpWebResponse)request.GetResponse();
+
+				try
+				{
+					response = (HttpWebResponse)request.GetResponse();
+				}
+				catch (WebException)
+				{
+					request = RetryRequestWithCachedIP(request);
+					response = (HttpWebResponse)request.GetResponse();
+				}
 				resStream = response.GetResponseStream();
 
 				var sr = new StreamReader(resStream);
@@ -268,7 +309,17 @@ namespace AutoPBW
 				request.CookieContainer = cookies;
 				request.Method = WebRequestMethods.Http.Get;
 
-				HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+				HttpWebResponse response;
+				try
+				{
+					response = (HttpWebResponse)request.GetResponse();
+				}
+				catch (WebException)
+				{
+					request = RetryRequestWithCachedIP(request);
+					response = (HttpWebResponse)request.GetResponse();
+				}
+
 				Stream responseStream = response.GetResponseStream();
 
 				Log.Write("Connection status to {0} is {1} {2}: {3}".F(response.ResponseUri, (int)response.StatusCode, response.StatusCode, response.StatusDescription));
@@ -439,7 +490,18 @@ namespace AutoPBW
 				// request.Headers.Add("Authorization", "Basic " + Convert.ToBase64String(System.Text.Encoding.Default.GetBytes("username" + ":" + "password")));
 
 				// Send the form data to the request.
-				using (Stream requestStream = request.GetRequestStream())
+				Stream requestStream;
+				try
+				{
+					requestStream = request.GetRequestStream();
+				}
+				catch (WebException)
+				{
+					request = RetryRequestWithCachedIP(request);
+					requestStream = request.GetRequestStream();
+				}
+
+				using (requestStream)
 				{
 					requestStream.Write(formData, 0, formData.Length);
 					requestStream.Close();
