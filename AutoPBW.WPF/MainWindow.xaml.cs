@@ -887,6 +887,14 @@ namespace AutoPBW.WPF
 			if (dlg.ShowDialog() ?? false)
 				playerExecutableTextBox.Text = '"' + dlg.FileName + '"';
 		}
+
+		private void btnCopy_Click(object sender, RoutedEventArgs e)
+		{
+			var ctl = sender as Control;
+			var parent = VisualTreeHelper.GetParent(ctl) as StackPanel;
+			var txt = parent.Children.Cast<object>().OfType<TextBlock>().Single();
+			Clipboard.SetText(txt.Text);
+		}
 	}
 }
 
