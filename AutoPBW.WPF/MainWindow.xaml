@@ -280,11 +280,14 @@
                     <Button x:Name="btnSaveMod" Grid.Column="1" Content="Save" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" Height="24" Click="btnSaveMod_Click" RenderTransformOrigin="2.04,4.458" Margin="0,0,10,10"/>
                 </Grid>
             </TabItem>
-            <TabItem Header="Log" x:Name="tabLog">
+            <TabItem Header="Log" x:Name="tabLog" HorizontalAlignment="Right" Width="36">
                 <ListBox x:Name="lstLog" ItemsSource="{Binding}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding}"/>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock x:Name="txtLogEntry" Text="{Binding}"/>
+                                <Button x:Name="btnCopy" Content="Copy" Click="btnCopy_Click" />
+                            </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
