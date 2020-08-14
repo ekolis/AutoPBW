@@ -348,11 +348,10 @@ namespace AutoPBW
 		}
 
 
-		public static bool Upload(string file, string uploadurl, string uploadFormParam, HttpStatusCode expectedStatus = HttpStatusCode.OK)
+		public static void Upload(string file, string uploadurl, string uploadFormParam, HttpStatusCode expectedStatus = HttpStatusCode.OK)
 		{
 			//adapted from and many thanks to: http://www.briangrinstead.com/blog/multipart-form-post-in-c
 			Log.Write("Attempting to upload {0} to {1} as form field {2}.".F(file, uploadurl, uploadFormParam));
-			bool success = false;
 
 			string filename = Path.GetFileName(file);
 			string fileformat = uploadFormParam;
@@ -382,19 +381,25 @@ namespace AutoPBW
 
 				// Process response
 				StreamReader responseReader = new StreamReader(response.GetResponseStream());
-				if (response.StatusCode == expectedStatus)
-					success = true;
+				if (response.StatusCode != expectedStatus)
+				{
+					if (response.StatusCode == HttpStatusCode.OK)
+					{
+						Log.Write($"Warning while uploading {filename}: Expected http response {(int)expectedStatus} {HttpWorkerRequest.GetStatusDescription((int)expectedStatus)} but received 200 {response.StatusDescription}\n");
+					}
+					else
+					{
+						throw new WebException($"Could not upload {filename} to PBW, response {(int)response.StatusCode} {response.StatusDescription}. Try uploading it manually to see if there is an error.");
+					}
+				}
 				response.Close();
 			}
-
 			catch (Exception ex)
 			{
-				Log.Write("Error while uploading file:\n");
+				Log.Write($"Error while uploading {filename}:\n");
 				Log.Write(ex.ToString());
 				throw;
 			}
-
-			return success;
 		}
 
 		/// <summary>
