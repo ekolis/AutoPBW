@@ -681,7 +681,7 @@ namespace AutoPBW.WPF
 								{
 									watcher = new FileSystemWatcher(savepath, "*.plr");
 									watcher.Changed += OnTurnFileChanged;
-									watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size;
+									watcher.NotifyFilter = NotifyFilters.LastWrite;
 									watcher.EnableRaisingEvents = true;
 								}
 							}
@@ -730,6 +730,11 @@ namespace AutoPBW.WPF
 						{
 							game.UploadTurn();
 							anyUploaded = true;
+						}
+						catch (IOException ioex) when ((ioex.HResult & 0x0000FFFF) == 0x0020)
+						{
+							// Sharing violation - this means the game hasn't finished writing the file yet
+							// we can expect another filewatcher event when the file is closed by the game, so we can just ignore it for now
 						}
 						catch (Exception ex)
 						{
