@@ -395,10 +395,8 @@ namespace AutoPBW
 				throw new InvalidOperationException("Can only upload one PLR file at a time. " + files.Count() + " files were submitted.");
 
 			PBW.Log.Write($"Uploading player commands {path} for {this}.");
-			if (PBW.Upload(files.Single(), url, "plr_file"))
-				Status = PlayerStatus.Uploaded;
-			else
-				throw new WebException("Could not upload " + files.Single() + " to PBW. Try uploading it manually to see if there is an error.");
+			PBW.Upload(files.Single(), url, "plr_file");
+			Status = PlayerStatus.Uploaded;
 		}
 
 		public void PlayTurn()
