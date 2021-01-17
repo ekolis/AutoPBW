@@ -25,9 +25,14 @@ jobs:
     #  uses: skx/github-action-publish-binaries@release-0.14
    # - name: Test
    #   run: dotnet test --no-restore --verbosity normal
+    - name: Copy Directory
+      uses: MadaraUchiha/copy-action@0.0.1
+      with:
+        source: AutoPBW.WPF\bin\Release\net5.0-windows
+        target: AutoPBW.WPF\Artifact\AutoPBW.WPF\AutoPBW
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
       with:
         name: AutoPBW.WPF 
-        path: AutoPBW.WPF\bin\Release\net5.0-windows\
+        path: AutoPBW.WPF\Artifact\AutoPBW.WPF
 
