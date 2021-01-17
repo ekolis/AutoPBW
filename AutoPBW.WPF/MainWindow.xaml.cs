@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Authentication;
 using System.Text;
 using System.Threading.Tasks;
@@ -387,14 +388,17 @@ namespace AutoPBW.WPF
 			}
 			catch (Exception ex)
 			{
-				if (ex.InnerException is AuthenticationException && ex.InnerException.Message == "The remote certificate is invalid according to the validation procedure.")
+				var inex = ex.InnermostException();
+				if (inex is AuthenticationException &&
+					(inex.Message == "The remote certificate is invalid according to the validation procedure."
+					|| inex.Message.StartsWith("The remote certificate is invalid because of errors in the certificate chain:")))
 				{
 					if (Config.Instance.IgnoreBadCertificates || MessageBox.Show("PBW's security certificate appears to be invalid or expired. Log in anyway?", "Invalid Certificate", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) == MessageBoxResult.Yes)
 					{
 						try
 						{
 							PBW.OverrideBadCertificates();
-							PBW.Login(Config.Instance.Username, Config.Instance.Password);
+							PBW.Login(Config.Instance.Username, Config.Instance.Password, false);
 						}
 						catch (Exception ex2)
 						{

@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Collections.ObjectModel;
+using System.Net.Http;
 
 namespace AutoPBW
 {
@@ -77,17 +78,18 @@ namespace AutoPBW
 		public static bool isLoggedIn { get; private set; } = false;
 
 		/// <summary>
-		/// Logs into PBW using HTTPS.
+		/// Logs into PBW.
 		/// </summary>
 		/// <param name="login_address">The full login path.</param>
 		/// <param name="username">The username.</param>
 		/// <param name="password">The password.</param>
+		/// <param name="useHttps">Use HTTPS (default), or just HTTP?</param>
 		/// <remarks>
 		/// Todo: handle errors. better.
 		/// </remarks>
-		public static void Login(string username, string password)
+		public static void Login(string username, string password, bool useHttps = true)
 		{
-			var login_address = "https://pbw.spaceempires.net/login/process";
+			var login_address = $"http{(useHttps ? "s" : "")}://pbw.spaceempires.net/login/process";
 			Log.Write("Attempting to connect to PBW at {0} using username={1} and password={2}.".F(login_address, username, new string('*', password.Length)));
 			var fields = new Dictionary<string, string>
 			{
@@ -385,7 +387,7 @@ namespace AutoPBW
 				{
 					if (response.StatusCode == HttpStatusCode.OK)
 					{
-						Log.Write($"Warning while uploading {filename}: Expected http response {(int)expectedStatus} {HttpWorkerRequest.GetStatusDescription((int)expectedStatus)} but received 200 {response.StatusDescription}\n");
+						Log.Write($"Warning while uploading {filename}: Expected http response {(int)expectedStatus} {new HttpResponseMessage(expectedStatus).ReasonPhrase} but received 200 {response.StatusDescription}\n");
 					}
 					else
 					{
