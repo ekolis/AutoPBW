@@ -29,5 +29,5 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: AutoPBW.WPF 
-        path: "*"
+        path: AutoPBW.WPF\bin\Release\net5.0-windows\
 
