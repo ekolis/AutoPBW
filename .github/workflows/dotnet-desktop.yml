@@ -27,11 +27,13 @@ jobs:
    #   run: dotnet test --no-restore --verbosity normal
     - shell: bash
       run: |
-        mkdir AutoPBW.WPF/Artifact/AutoPBW.WPF/AutoPBW
-        mv AutoPBW.WPF/bin/Release/net5.0-windows/* AutoPBW.WPF/Artifact/AutoPBW.WPF/AutoPBW/
+        mkdir Artifact
+        mkdir Artifact/AutoPBW.WPF
+        mkdir Artifact/AutoPBW.WPF/AutoPBW
+        mv AutoPBW.WPF/bin/Release/net5.0-windows/* Artifact/AutoPBW.WPF/AutoPBW/
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
       with:
         name: AutoPBW.WPF 
-        path: AutoPBW.WPF\Artifact\AutoPBW.WPF
+        path: Artifact/AutoPBW.WPF
 
