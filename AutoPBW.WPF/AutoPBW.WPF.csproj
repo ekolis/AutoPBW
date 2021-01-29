@@ -20,7 +20,13 @@
     <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="AutoPBW-Manual.html" />
     <None Remove="AutoPBW.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="AutoPBW-Manual.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="AutoPBW.ico">
