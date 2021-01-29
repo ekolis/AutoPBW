@@ -9,4 +9,4 @@ Features:
 * Go straight to the PBW website with one click
 * Preconfigured with settings for a variety of commonly used game engines and mods (you'll need to manually configure any others you want to use)
 
-AutoPBW requires Windows Vista/7+ or later to run due to using the latest .NET Framework.
+AutoPBW requires Windows 7/8/8.1/10 to run due to using [.NET](https://dotnet.microsoft.com/) 5 and WPF.

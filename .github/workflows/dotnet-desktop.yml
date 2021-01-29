@@ -25,8 +25,15 @@ jobs:
     #  uses: skx/github-action-publish-binaries@release-0.14
    # - name: Test
    #   run: dotnet test --no-restore --verbosity normal
+    - shell: bash
+      run: |
+        mkdir Artifact
+        mkdir Artifact/AutoPBW.WPF
+        mkdir Artifact/AutoPBW.WPF/AutoPBW
+        mv AutoPBW.WPF/bin/Release/net5.0-windows/* Artifact/AutoPBW.WPF/AutoPBW/
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
       with:
-        path: D:\a\AutoPBW\AutoPBW\AutoPBW.WPF\\bin\Release\net5.0\
+        name: AutoPBW.WPF 
+        path: Artifact/AutoPBW.WPF
 
