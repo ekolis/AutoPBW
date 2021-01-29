@@ -16,12 +16,16 @@
   <ItemGroup>
     <None Remove="7z.dll" />
     <None Remove="7z64.dll" />
+    <None Remove="AutoPBW.config.default.json" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="7z.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="7z64.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="AutoPBW.config.default.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
