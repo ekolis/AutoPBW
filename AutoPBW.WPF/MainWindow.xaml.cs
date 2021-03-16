@@ -830,7 +830,7 @@ namespace AutoPBW.WPF
 
 		private void btnWebsite_Click(object sender, RoutedEventArgs e)
 		{
-			Process.Start("http://pbw.spaceempires.net/dashboard");
+			Launcher.Launch("http://pbw.spaceempires.net/dashboard");
 		}
 
 		private void btnExit_Click(object sender, RoutedEventArgs e)
@@ -841,7 +841,7 @@ namespace AutoPBW.WPF
 
 		private void btnHelp_Click(object sender, RoutedEventArgs e)
 		{
-			Process.Start("AutoPBW-Manual.html");
+			Launcher.Launch("AutoPBW-Manual.html");
 		}
 
 		private void ShowBalloonTip(string title, string text, object context = null, BalloonIcon icon = BalloonIcon.None)
@@ -873,14 +873,14 @@ namespace AutoPBW.WPF
 		{
 			var game = (PlayerGame)gridPlayerGames.SelectedItem;
 			if (game != null)
-				Process.Start($"http://pbw.spaceempires.net/games/{game.Code}");
+				Launcher.Launch($"http://pbw.spaceempires.net/games/{game.Code}");
 		}
 
 		private void btnViewHost_Click(object sender, RoutedEventArgs e)
 		{
 			var game = (HostGame)gridHostGames.SelectedItem;
 			if (game != null)
-				Process.Start($"http://pbw.spaceempires.net/games/{game.Code}");
+				Launcher.Launch($"http://pbw.spaceempires.net/games/{game.Code}");
 		}
 
 		private void BtnBrowseHostExecutable_Click(object sender, RoutedEventArgs e)
