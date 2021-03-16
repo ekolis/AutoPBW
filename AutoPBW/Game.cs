@@ -331,7 +331,7 @@ namespace AutoPBW
 			// just run the game so the player can create it in-game
 			var cmd = GenerateArgumentsOrFilter(Engine.PlayerExecutable);
 			PBW.Log.Write($"Launching {Engine} to create empire for {this}: {cmd}.");
-			Process.Start(cmd);
+			Launcher.Launch(cmd);
 		}
 
 		public string GetSavePath()
@@ -404,7 +404,7 @@ namespace AutoPBW
 			var cmd = GenerateArgumentsOrFilter(Engine.PlayerExecutable);
 			var args = GenerateArgumentsOrFilter(Engine.PlayerArguments);
 			PBW.Log.Write($"Launching {Engine} to play turn for {this}: {cmd} {args}");
-			Process.Start(cmd, args);
+			Launcher.Launch(cmd, args);
 		}
 
 		private string GenerateArgumentsOrFilter(string basestring)
