@@ -1,0 +1,11 @@
+﻿<Project>
+	<PropertyGroup>
+		<PackageProjectUrl>http://edkolis.com/autopbw</PackageProjectUrl>
+		<Product>AutoPBW</Product>
+		<Version>2.0.0</Version>
+		<Copyright>Copyright © 2014-2021 Ed Kolis</Copyright>
+		<Description>AutoPBW, the Play By Web desktop client.</Description>
+		<ApplicationIcon>../AutoPBW/AutoPBW.ico</ApplicationIcon>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+</Project>

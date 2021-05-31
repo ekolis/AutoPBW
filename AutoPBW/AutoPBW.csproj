@@ -2,14 +2,8 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net5.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <Product>AutoPBW</Product>
-    <Company />
-    <Version>1.2.0</Version>
-    <Copyright>Copyright © 2014-2021 Ed Kolis</Copyright>
-    <PackageProjectUrl>http://edkolis.com/autopbw</PackageProjectUrl>
-    <Description>AutoPBW, the Play By Web desktop client.</Description>
   </PropertyGroup>
+	<Import Project="../AutoPBW/CommonProjectProperties.xml" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
@@ -17,6 +11,7 @@
     <None Remove="7z.dll" />
     <None Remove="7z64.dll" />
     <None Remove="AutoPBW.config.default.json" />
+    <None Remove="AutoPBW.ico" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="7z.dll">
@@ -35,5 +30,10 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="AutoPBW.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 </Project>

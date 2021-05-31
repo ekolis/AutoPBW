@@ -3,16 +3,9 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWpf>true</UseWpf>
-    <Nullable>enable</Nullable>
-    <Product>AutoPBW</Product>
-    <Company />
-    <Version>1.2.0</Version>
-    <Copyright>Copyright © 2014-2021 Ed Kolis</Copyright>
-    <PackageProjectUrl>http://edkolis.com/autopbw</PackageProjectUrl>
-    <Description>AutoPBW, the Play By Web desktop client.</Description>
     <StartupObject>AutoPBW.WPF.App</StartupObject>
-    <ApplicationIcon>AutoPBW.ico</ApplicationIcon>
   </PropertyGroup>
+	<Import Project="../AutoPBW/CommonProjectProperties.xml" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
@@ -21,17 +14,11 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="AutoPBW-Manual.html" />
-    <None Remove="AutoPBW.ico" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="AutoPBW-Manual.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="AutoPBW.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Hardcodet.NotifyIcon.Wpf.NetCore" Version="1.0.17" />
