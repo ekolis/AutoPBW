@@ -65,8 +65,8 @@ namespace AutoPBW
 			}
 			catch (Exception ex)
 			{
-				PBW.Log.Write("Could not load default config from " + filename + ".");
-				PBW.Log.Write("Error that occurred: " + ex.Message);
+				Log.Write("Could not load default config from " + filename + ".");
+				Log.Write("Error that occurred: " + ex.Message);
 				Default = new Config();
 			}
 
@@ -76,8 +76,8 @@ namespace AutoPBW
 			}
 			catch (Exception ex)
 			{
-				PBW.Log.Write("Could not load config from " + filename + "; reverting to default settings.");
-				PBW.Log.Write("Error that occurred: " + ex.Message);
+				Log.Write("Could not load config from " + filename + "; reverting to default settings.");
+				Log.Write("Error that occurred: " + ex.Message);
 				Instance = new Config();
 				Instance.Username = Default.Username;
 				Instance.Password = Default.Password;

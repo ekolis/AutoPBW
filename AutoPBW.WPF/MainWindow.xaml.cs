@@ -3,21 +3,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Security.Authentication;
-using System.Text;
-using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using AutoPBW;
-using AutoPBW.WPF.Properties;
 using Hardcodet.Wpf.TaskbarNotification;
 using Microsoft.Win32;
 
@@ -50,6 +42,15 @@ namespace AutoPBW.WPF
 		/// Watchers for automatically uploading player turns
 		/// </summary>
 		private Dictionary<string, FileSystemWatcher> TurnUploadWatchers;
+
+		/// <summary>
+		/// Any known multiplayer services.
+		/// </summary>
+		private IList<IMultiplayerService> Services { get; } = new List<IMultiplayerService>()
+		{
+			// TODO: create more multiplayer service types and let the user connect to instances of them
+			new PBW(),
+		};
 
 		public MainWindow()
 		{
@@ -156,174 +157,178 @@ namespace AutoPBW.WPF
 			// set cursor
 			Cursor = Cursors.Wait;
 
-			if (!PBW.isLoggedIn)
+			foreach (var service in Services)
 			{
-				Login();
-			}
-
-			if (PBW.isLoggedIn)
-			{
-				// remember selection
-				var selGame = gridPlayerGames.SelectedItem as PlayerGame;
-				var selCode = selGame == null ? null : selGame.Code;
-				var selPlayerNumber = selGame == null ? null : (int?)selGame.PlayerNumber;
-				IEnumerable<HostGame> hostGames = null;
-				IEnumerable<PlayerGame> playerGames = null;
-
-				try
+				if (!service.IsLoggedIn)
 				{
-					// load host games
-					{
-						var hostGameViewSource = ((CollectionViewSource)(this.FindResource("hostGameViewSource")));
-						hostGames = PBW.GetHostGames().ToArray();
-						hostGameViewSource.Source = hostGames;
-					}
+					// TODO: separate logins for each service
+					service.Login(Config.Instance.Username, Config.Instance.Password);
+				}
 
-					// load player games
+				if (service.IsLoggedIn)
+				{
+					// remember selection
+					var selGame = gridPlayerGames.SelectedItem as PlayerGame;
+					var selCode = selGame == null ? null : selGame.Code;
+					var selPlayerNumber = selGame == null ? null : (int?)selGame.PlayerNumber;
+					IEnumerable<HostGame> hostGames = Enumerable.Empty<HostGame>();
+					IEnumerable<PlayerGame> playerGames = Enumerable.Empty<PlayerGame>();
+
+					try
 					{
-						var playerGameViewSource = ((CollectionViewSource)(this.FindResource("playerGameViewSource")));
-						var oldGames = (IEnumerable<PlayerGame>)playerGameViewSource.Source;
-						if (oldGames == null)
-							oldGames = Enumerable.Empty<PlayerGame>();
-						if (Config.Instance.HidePlayerZero)
-							playerGames = PBW.GetPlayerGames().Where(q => q.PlayerNumber > 0).ToArray();
-						else
-							playerGames = PBW.GetPlayerGames().ToArray();
-						playerGameViewSource.Source = playerGames;
-						var newReady = new HashSet<PlayerGame>();
-						var waiting = playerGames.Where(g => g.Status == PlayerStatus.Waiting);
-						var waitingPLR = waiting.Where(g => g.PlayerNumber > 0 && g.TurnNumber > 0); // don't count waiting for host PLR, that would get annoying if not all players are even ready yet
-						var waitingEMP = waiting.Where(g => g.PlayerNumber > 0 && g.TurnNumber == 0);
-						foreach (var ng in waiting)
+						// load host games
 						{
-							var og = oldGames.SingleOrDefault(g => g.Code == ng.Code && g.PlayerNumber == ng.PlayerNumber);
-							if (og == null || og.Status != PlayerStatus.Waiting)
-								newReady.Add(ng);
-							if (og != null && og.TurnNumber == ng.TurnNumber)
-								ng.HasDownloaded = og.HasDownloaded;
+							var hostGameViewSource = ((CollectionViewSource)(FindResource("hostGameViewSource")));
+							hostGames = hostGames.Concat(service.GetHostGames().ToArray());
+							hostGameViewSource.Source = hostGames;
 						}
-						RefreshDirectoryWatchers();
 
-						// newly ready games, show a popup
-						if (waitingPLR.Intersect(newReady).Count() > 1)
-							ShowBalloonTip("New turns ready", waitingPLR.Intersect(newReady).Count() + " new games are ready to play.", waitingPLR.Intersect(newReady));
-						else if (waitingPLR.Intersect(newReady).Count() == 1)
-							ShowBalloonTip("New turn ready", waitingPLR.Intersect(newReady).Single() + " is ready to play.", waitingPLR.Intersect(newReady).Single());
-						else if (waitingEMP.Intersect(newReady).Count() > 1)
-							ShowBalloonTip("Awaiting empires", waitingEMP.Intersect(newReady).Count() + " games are awaiting empire setup files.", waitingEMP.Intersect(newReady));
-						else if (waitingEMP.Intersect(newReady).Count() == 1)
-							ShowBalloonTip("Awaiting empire", waitingEMP.Intersect(newReady).Single() + " is awaiting an empire setup file.", waitingEMP.Intersect(newReady).Single());
+						// load player games
+						{
+							var playerGameViewSource = ((CollectionViewSource)(FindResource("playerGameViewSource")));
+							var oldGames = (IEnumerable<PlayerGame>)playerGameViewSource.Source;
+							if (oldGames == null)
+								oldGames = Enumerable.Empty<PlayerGame>();
+							if (Config.Instance.HidePlayerZero)
+								playerGames = playerGames.Concat(service.GetPlayerGames().Where(q => q.PlayerNumber > 0).ToArray());
+							else
+								playerGames = playerGames.Concat(service.GetPlayerGames().ToArray());
+							playerGameViewSource.Source = playerGames;
+							var newReady = new HashSet<PlayerGame>();
+							var waiting = playerGames.Where(g => g.Status == PlayerStatus.Waiting);
+							var waitingPLR = waiting.Where(g => g.PlayerNumber > 0 && g.TurnNumber > 0); // don't count waiting for host PLR, that would get annoying if not all players are even ready yet
+							var waitingEMP = waiting.Where(g => g.PlayerNumber > 0 && g.TurnNumber == 0);
+							foreach (var ng in waiting)
+							{
+								var og = oldGames.SingleOrDefault(g => g.Code == ng.Code && g.PlayerNumber == ng.PlayerNumber);
+								if (og == null || og.Status != PlayerStatus.Waiting)
+									newReady.Add(ng);
+								if (og != null && og.TurnNumber == ng.TurnNumber)
+									ng.HasDownloaded = og.HasDownloaded;
+							}
+							RefreshDirectoryWatchers();
 
-						// all ready games, set a tooltip
-						if (waitingPLR.Count() > 1)
-							taskbarIcon.ToolTipText = waitingPLR.Count() + " games are ready to play.";
-						else if (waitingPLR.Count() == 1)
-							taskbarIcon.ToolTipText = waitingPLR.Single() + " is ready to play.";
-						else if (waitingEMP.Count() > 1)
-							taskbarIcon.ToolTipText = waitingEMP.Count() + " games are awaiting empire setup files.";
-						else if (waitingEMP.Count() == 1)
-							taskbarIcon.ToolTipText = waitingEMP.Single() + " is awaiting an empire setup file.";
-						else
-							taskbarIcon.ToolTipText = "All caught up!";
+							// newly ready games, show a popup
+							if (waitingPLR.Intersect(newReady).Count() > 1)
+								ShowBalloonTip("New turns ready", waitingPLR.Intersect(newReady).Count() + " new games are ready to play.", waitingPLR.Intersect(newReady));
+							else if (waitingPLR.Intersect(newReady).Count() == 1)
+								ShowBalloonTip("New turn ready", waitingPLR.Intersect(newReady).Single() + " is ready to play.", waitingPLR.Intersect(newReady).Single());
+							else if (waitingEMP.Intersect(newReady).Count() > 1)
+								ShowBalloonTip("Awaiting empires", waitingEMP.Intersect(newReady).Count() + " games are awaiting empire setup files.", waitingEMP.Intersect(newReady));
+							else if (waitingEMP.Intersect(newReady).Count() == 1)
+								ShowBalloonTip("Awaiting empire", waitingEMP.Intersect(newReady).Single() + " is awaiting an empire setup file.", waitingEMP.Intersect(newReady).Single());
+
+							// all ready games, set a tooltip
+							if (waitingPLR.Count() > 1)
+								taskbarIcon.ToolTipText = waitingPLR.Count() + " games are ready to play.";
+							else if (waitingPLR.Count() == 1)
+								taskbarIcon.ToolTipText = waitingPLR.Single() + " is ready to play.";
+							else if (waitingEMP.Count() > 1)
+								taskbarIcon.ToolTipText = waitingEMP.Count() + " games are awaiting empire setup files.";
+							else if (waitingEMP.Count() == 1)
+								taskbarIcon.ToolTipText = waitingEMP.Single() + " is awaiting an empire setup file.";
+							else
+								taskbarIcon.ToolTipText = "All caught up!";
+						}
+
+						pbwIsDown = false;
+					}
+					catch (Exception ex)
+					{
+						if (!pbwIsDown)
+							ShowBalloonTip("Unable to refresh", "Unable to refresh games lists: " + ex.Message, null, BalloonIcon.Error);
+						pbwIsDown = true;
+						taskbarIcon.ToolTipText = "Unable to connect to PBW";
+					}
+					try
+					{
+						// load engines
+						var engineViewSource = ((CollectionViewSource)(this.FindResource("engineViewSource")));
+						engineViewSource.Source = Config.Instance.Engines;
+						lstEngines.GetBindingExpression(ListView.ItemsSourceProperty).UpdateTarget();
+						ddlEngine.GetBindingExpression(ComboBox.ItemsSourceProperty).UpdateTarget();
+
+						// load mods
+						var modViewSource = ((CollectionViewSource)(this.FindResource("modViewSource")));
+						modViewSource.Source = Config.Instance.Mods;
+						lstMods.GetBindingExpression(ListView.ItemsSourceProperty).UpdateTarget();
+					}
+					catch (Exception ex)
+					{
+						ShowBalloonTip("Unable to refresh", "Unable to refresh engines/mods lists: " + ex.Message, null, BalloonIcon.Error);
 					}
 
-					pbwIsDown = false;
-				}
-				catch (Exception ex)
-				{
-					if (!pbwIsDown)
-						ShowBalloonTip("Unable to refresh", "Unable to refresh games lists: " + ex.Message, null, BalloonIcon.Error);
-					pbwIsDown = true;
-					taskbarIcon.ToolTipText = "Unable to connect to PBW";
-				}
-				try
-				{
-					// load engines
-					var engineViewSource = ((CollectionViewSource)(this.FindResource("engineViewSource")));
-					engineViewSource.Source = Config.Instance.Engines;
-					lstEngines.GetBindingExpression(ListView.ItemsSourceProperty).UpdateTarget();
-					ddlEngine.GetBindingExpression(ComboBox.ItemsSourceProperty).UpdateTarget();
+					// load log
+					lstLog.DataContext = Log.ReadAll();
 
-					// load mods
-					var modViewSource = ((CollectionViewSource)(this.FindResource("modViewSource")));
-					modViewSource.Source = Config.Instance.Mods;
-					lstMods.GetBindingExpression(ListView.ItemsSourceProperty).UpdateTarget();
-				}
-				catch (Exception ex)
-				{
-					ShowBalloonTip("Unable to refresh", "Unable to refresh engines/mods lists: " + ex.Message, null, BalloonIcon.Error);
-				}
-
-				// load log
-				lstLog.DataContext = PBW.Log.ReadAll();
-
-				// process turn if needed
-				if (Config.Instance.EnableHosting && hostGames != null && HostGame.ProcessingGame == null && currentTurnProcess == null)
-				{
-					var gamesToProcess = hostGames.Where(g => g.Status == HostStatus.PlayersReady).ToList();
-					while (gamesToProcess.Any())
+					// process turn if needed
+					if (Config.Instance.EnableHosting && hostGames != null && HostGame.ProcessingGame == null && currentTurnProcess == null)
 					{
-						var game = gamesToProcess.First();
-						PBW.Log.Write($"{game} is ready to be processed; enqueueing it.");
-						if (CheckModAndEngine(game))
+						var gamesToProcess = hostGames.Where(g => g.Status == HostStatus.PlayersReady).ToList();
+						while (gamesToProcess.Any())
 						{
-							ShowBalloonTip("Processing turn", "Processing turn for " + game + ".", game);
+							var game = gamesToProcess.First();
+							Log.Write($"{game} is ready to be processed; enqueueing it.");
+							if (CheckModAndEngine(game))
+							{
+								ShowBalloonTip("Processing turn", "Processing turn for " + game + ".", game);
+								try
+								{
+									game.DownloadTurns();
+									currentTurnProcess = new Process();
+									currentTurnProcess.StartInfo = game.ProcessTurnPrepare();
+									currentTurnProcess.EnableRaisingEvents = true;
+									currentTurnProcess.Exited += process_Exited;
+									btnReset.Foreground = Brushes.Red;
+									currentTurnProcess.Start();
+									break; // wait till we finish this one
+								}
+								catch (Exception ex)
+								{
+									ShowBalloonTip("Turn processing failed", "Turn processing for " + game + " failed:\n" + ex.Message + "\n" + ex.Message.Split('\n').First(), game);
+									game.PlaceHold(ex.Message);
+									if (currentTurnProcess != null)
+									{
+										currentTurnProcess.Close();
+										currentTurnProcess = null;
+										HostGame.ProcessingGame = null;
+										currentTurnExitCode = null;
+										HostGame.ProcessingGame = null;
+										btnReset.ClearValue(Control.ForegroundProperty);
+									}
+									gamesToProcess.Remove(game);
+									HostGame.ProcessingGame = null;
+								}
+							}
+							else
+							{
+								Log.Write($"Can't process {game}: unconfigured mod {game.Mod} or engine {game.Engine}.");
+								gamesToProcess.Remove(game); // can't process this game now
+							}
+						}
+					}
+
+					// auto-download
+					if (Config.Instance.AutoDownload && playerGames != null)
+					{
+						var waitingPLR = playerGames.Where(g => g.Status == PlayerStatus.Waiting && !g.HasDownloaded && g.PlayerNumber > 0 && g.TurnNumber > 0);
+						foreach (var ng in waitingPLR)
+						{
 							try
 							{
-								game.DownloadTurns();
-								currentTurnProcess = new Process();
-								currentTurnProcess.StartInfo = game.ProcessTurnPrepare();
-								currentTurnProcess.EnableRaisingEvents = true;
-								currentTurnProcess.Exited += process_Exited;
-								btnReset.Foreground = Brushes.Red;
-								currentTurnProcess.Start();
-								break; // wait till we finish this one
+								ng.DownloadTurn();
 							}
 							catch (Exception ex)
 							{
-								ShowBalloonTip("Turn processing failed", "Turn processing for " + game + " failed:\n" + ex.Message + "\n" + ex.Message.Split('\n').First(), game);
-								game.PlaceHold(ex.Message);
-								if (currentTurnProcess != null)
-								{
-									currentTurnProcess.Close();
-									currentTurnProcess = null;
-									HostGame.ProcessingGame = null;
-									currentTurnExitCode = null;
-									HostGame.ProcessingGame = null;
-									btnReset.ClearValue(Control.ForegroundProperty);
-								}
-								gamesToProcess.Remove(game);
-								HostGame.ProcessingGame = null;
+								ShowBalloonTip("Download failed", "Auto-download for " + ng + " failed:\n" + ex.Message + "\n" + ex.Message.Split('\n').First(), ng);
 							}
 						}
-						else
-						{
-							PBW.Log.Write($"Can't process {game}: unconfigured mod {game.Mod} or engine {game.Engine}.");
-							gamesToProcess.Remove(game); // can't process this game now
-						}
 					}
-				}
 
-				// auto-download
-				if (Config.Instance.AutoDownload && playerGames != null)
-				{
-					var waitingPLR = playerGames.Where(g => g.Status == PlayerStatus.Waiting && !g.HasDownloaded && g.PlayerNumber > 0 && g.TurnNumber > 0);
-					foreach (var ng in waitingPLR)
-					{
-						try
-						{
-							ng.DownloadTurn();
-						}
-						catch (Exception ex)
-						{
-							ShowBalloonTip("Download failed", "Auto-download for " + ng + " failed:\n" + ex.Message + "\n" + ex.Message.Split('\n').First(), ng);
-						}
-					}
+					// remember selection
+					var newGame = gridPlayerGames.Items.Cast<PlayerGame>().SingleOrDefault(g => g.Code == selCode && g.PlayerNumber == selPlayerNumber);
+					gridPlayerGames.SelectedItem = newGame;
 				}
-
-				// remember selection
-				var newGame = gridPlayerGames.Items.Cast<PlayerGame>().SingleOrDefault(g => g.Code == selCode && g.PlayerNumber == selPlayerNumber);
-				gridPlayerGames.SelectedItem = newGame;
 			}
 
 			// start a timer so we can refresh in a few minutes
@@ -348,8 +353,8 @@ namespace AutoPBW.WPF
 						}
 						catch (Exception ex)
 						{
-							var msg = "Unable to upload new turn for hosted game {0}: {1}".F(g, ex.Message);
-							PBW.Log.Write(msg);
+							var msg = $"Unable to upload new turn for hosted game {g}: {ex.Message}";
+							Log.Write(msg);
 							ShowBalloonTip("Error uploading turn", msg, g, BalloonIcon.Error);
 							HostGame.ProcessingGame = null; // allow processing a different game
 						}
@@ -358,19 +363,19 @@ namespace AutoPBW.WPF
 					}
 					else
 					{
-						var msg = "Turn processing for {0} failed with exit code {1}.".F(g, currentTurnExitCode);
-						PBW.Log.Write(msg);
+						var msg = $"Turn processing for {g} failed with exit code {currentTurnExitCode}.";
+						Log.Write(msg);
 						ShowBalloonTip("Turn processing failed", msg, g, BalloonIcon.Error);
 						try
 						{
-							g.PlaceHold("{0} exited with error code {1}".F(System.IO.Path.GetFileName(p.StartInfo.FileName.Trim('"')), currentTurnExitCode));
+							g.PlaceHold($"{Path.GetFileName(p.StartInfo.FileName.Trim('"'))} exited with error code {currentTurnExitCode}");
 							RefreshData();
 						}
 						catch (Exception ex)
 						{
-							msg = "Unable to place processing hold on {0}: {1}".F(g, ex.Message);
+							msg = $"Unable to place processing hold on {g}: {ex.Message}";
 							ShowBalloonTip("Error placing hold", msg, g, BalloonIcon.Error);
-							PBW.Log.Write(msg);
+							Log.Write(msg);
 						}
 					}
 					btnReset.ClearValue(Control.ForegroundProperty);
@@ -382,42 +387,46 @@ namespace AutoPBW.WPF
 
 		private void Login()
 		{
-			try
+			foreach (var service in Services)
 			{
-				PBW.Login(Config.Instance.Username, Config.Instance.Password);
-			}
-			catch (Exception ex)
-			{
-				var inex = ex.InnermostException();
-				if (inex is AuthenticationException &&
-					(inex.Message == "The remote certificate is invalid according to the validation procedure."
-					|| inex.Message.StartsWith("The remote certificate is invalid because of errors in the certificate chain:")))
+				try
 				{
-					if (Config.Instance.IgnoreBadCertificates || MessageBox.Show("PBW's security certificate appears to be invalid or expired. Log in anyway?", "Invalid Certificate", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) == MessageBoxResult.Yes)
+					// TODO: separate logins for each service
+					service.Login(Config.Instance.Username, Config.Instance.Password);
+				}
+				catch (Exception ex)
+				{
+					var inex = ex.InnermostException();
+					if (inex is AuthenticationException &&
+						(inex.Message == "The remote certificate is invalid according to the validation procedure."
+						|| inex.Message.StartsWith("The remote certificate is invalid because of errors in the certificate chain:")))
 					{
-						try
+						if (Config.Instance.IgnoreBadCertificates || MessageBox.Show($"{service}'s security certificate appears to be invalid or expired. Log in anyway?", "Invalid Certificate", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) == MessageBoxResult.Yes)
 						{
-							PBW.OverrideBadCertificates();
-							PBW.Login(Config.Instance.Username, Config.Instance.Password, false);
+							try
+							{
+								PBW.OverrideBadCertificates();
+								service.Login(Config.Instance.Username, Config.Instance.Password);
+							}
+							catch (Exception ex2)
+							{
+								if (!pbwIsDown)
+									ShowBalloonTip("Login failed", $"Unable to log in to {service}: " + ex2.Message, null, BalloonIcon.Error);
+								pbwIsDown = true;
+							}
 						}
-						catch (Exception ex2)
+						else
 						{
-							if (!pbwIsDown)
-								ShowBalloonTip("Login failed", "Unable to log in to PBW: " + ex2.Message, null, BalloonIcon.Error);
-							pbwIsDown = true;
+							exiting = true;
+							Close();
 						}
 					}
 					else
 					{
-						exiting = true;
-						Close();
+						if (!pbwIsDown)
+							ShowBalloonTip("Login failed", $"Unable to log in to {service}: " + ex.Message, null, BalloonIcon.Error);
+						pbwIsDown = true;
 					}
-				}
-				else
-				{
-					if (!pbwIsDown)
-						ShowBalloonTip("Login failed", "Unable to log in to PBW: " + ex.Message, null, BalloonIcon.Error);
-					pbwIsDown = true;
 				}
 			}
 		}
@@ -854,7 +863,7 @@ namespace AutoPBW.WPF
 		{
 			if (currentTurnProcess != null)
 			{
-				if (MessageBox.Show("Really halt processing of {0}?".F(HostGame.ProcessingGame), "Confirm Reset", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+				if (MessageBox.Show($"Really halt processing of {HostGame.ProcessingGame}?", "Confirm Reset", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
 				{
 					currentTurnProcess.Kill();
 					currentTurnProcess = null;

@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
+using System.Collections.ObjectModel;
+using System.Composition;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Web;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using System.Collections.ObjectModel;
 using System.Net.Http;
+using System.Reflection;
+using System.Text;
+using System.Xml.Linq;
 
 namespace AutoPBW
 {
@@ -17,45 +16,19 @@ namespace AutoPBW
 	/// Adapted from Jon Sorensen's PBW Autoclient
 	/// https://github.com/se5a/PBWAutoClient
 	/// </summary>
-	public static class PBW
+	[Export(typeof(IMultiplayerService))]
+	public class PBW
+		: IMultiplayerService
 	{
-		/// <summary>
-		/// For parsing UNIX timestamps
-		/// </summary>
-		private static readonly DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+		public string ServiceTypeName { get; } = "PBW";
 
-		private static DateTime? UnixTimeToDateTime(string text)
-		{
-			if (string.IsNullOrWhiteSpace(text))
-				return null;
-			double seconds = double.Parse(text, CultureInfo.InvariantCulture);
-			if (seconds == 0)
-				return null; // HACK - PBW returns zero for nulls
-			return Epoch.AddSeconds(seconds).ToLocalTime();
-		}
+		public string Name { get; set; } = "PBW";
 
-		private static string ToQueryString(this IDictionary<string, string> q)
-		{
-			var array = (from key in q.Keys
-						 select string.Format("{0}={1}", HttpUtility.UrlEncode(key), HttpUtility.UrlEncode(q[key])))
-				.ToArray();
-			return string.Join("&", array);
-		}
-
-		/// <summary>
-		/// Shortcut for string.Format
-		/// </summary>
-		/// <param name="f"></param>
-		/// <param name="data"></param>
-		/// <returns></returns>
-		public static string F(this string f, params object[] data)
-		{
-			return string.Format(f, data);
-		}
-
-		private static CookieContainer cookies;
+		private static CookieContainer? cookies;
 
 		private static string cachedIP = "64.22.124.205";
+
+		private static readonly string userAgent = "AutoPBW/" + Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
 		private static HttpWebRequest RetryRequestWithCachedIP(HttpWebRequest originalRequest)
 		{
@@ -65,47 +38,44 @@ namespace AutoPBW
 			request2.Host = originalRequest.Host;
 
 			request2.CookieContainer = originalRequest.CookieContainer;
-			request2.UserAgent       = originalRequest.UserAgent;
-			request2.Method          = originalRequest.Method;
-			request2.ContentType     = originalRequest.ContentType;
+			request2.UserAgent = originalRequest.UserAgent;
+			request2.Method = originalRequest.Method;
+			request2.ContentType = originalRequest.ContentType;
 			if (originalRequest.ContentLength >= 0) // HttpWebRequest throws an exception if we set ContentLength to -1 ourselves
 				request2.ContentLength = originalRequest.ContentLength;
-			request2.Timeout         = originalRequest.Timeout;
+			request2.Timeout = originalRequest.Timeout;
 			// add as needed
-
 			return request2;
 		}
-		public static bool isLoggedIn { get; private set; } = false;
+		public bool IsLoggedIn { get; private set; } = false;
 
-		/// <summary>
-		/// Logs into PBW.
-		/// </summary>
-		/// <param name="login_address">The full login path.</param>
-		/// <param name="username">The username.</param>
-		/// <param name="password">The password.</param>
-		/// <param name="useHttps">Use HTTPS (default), or just HTTP?</param>
-		/// <remarks>
-		/// Todo: handle errors. better.
-		/// </remarks>
-		public static void Login(string username, string password, bool useHttps = true)
+		public bool Login(string username, string password)
 		{
-			var login_address = $"http{(useHttps ? "s" : "")}://pbw.spaceempires.net/login/process";
-			Log.Write("Attempting to connect to PBW at {0} using username={1} and password={2}.".F(login_address, username, new string('*', password.Length)));
+			var url = $"http://pbw.spaceempires.net/login/process";
+
+			Log.Write($"Attempting to connect to PBW at {url} using username={username} and password={password.Redact()}.");
+
 			var fields = new Dictionary<string, string>
 			{
 				{"username", username},
 				{"password", password},
 			};
-			SubmitForm(login_address, fields, "logging in");
-
-			isLoggedIn = true;
 
 			try
 			{
+				var status = HttpUtility.SubmitForm(url, fields, cookies, "logging in");
+
+				IsLoggedIn = (int)status < 400; // not an error? we should be logged in
+
 				// if we login successfully, cache the IP address of the pbw web service in case we have connection issues later
-				cachedIP = Dns.GetHostEntry(new Uri(login_address).Host).AddressList.First().ToString();
+				cachedIP = Dns.GetHostEntry(new Uri(url).Host).AddressList.First().ToString();
 			}
-			catch { }
+			catch
+			{
+				IsLoggedIn = false;
+			}
+
+			return IsLoggedIn;
 		}
 
 		/// <summary>
@@ -115,47 +85,6 @@ namespace AutoPBW
 		public static void OverrideBadCertificates()
 		{
 			ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
-		}
-
-		public static void SubmitForm(string url, IDictionary<string, string> fields, string action = "submitting form")
-		{
-			HttpWebRequest request;
-			HttpWebResponse response;
-
-			try
-			{
-				request = (HttpWebRequest)WebRequest.Create(url);
-				request.CookieContainer = cookies ?? new CookieContainer();
-				request.Method = "POST";
-				request.ContentType = "application/x-www-form-urlencoded";
-
-				using (StreamWriter writer = new StreamWriter(request.GetRequestStream(), Encoding.ASCII))
-				{
-					writer.Write(fields.ToQueryString());
-				}
-
-				response = (HttpWebResponse)request.GetResponse();
-
-				ConnectionStatus = response.StatusCode;
-
-				Log.Write("Connection status to {0} is {1} {2}: {3}".F(response.ResponseUri, (int)response.StatusCode, response.StatusCode, response.StatusDescription));
-				if (response.Cookies != null)
-					Log.Write("Cookies exist.");
-				else
-					Log.Write("Cookies do not exist.");
-
-				cookies = request.CookieContainer;
-
-				StreamReader responseReader = new StreamReader(response.GetResponseStream());
-				string fullResponse = responseReader.ReadToEnd();
-				response.Close();
-			}
-			catch (WebException ex)
-			{
-				Log.Write("Error while {0}:".F(action));
-				Log.Write(ex.ToString());
-				throw;
-			}
 		}
 
 		/// <summary>
@@ -173,7 +102,7 @@ namespace AutoPBW
 		/// </remarks>
 		private static XDocument GetXMLData(string url)
 		{
-			string returnString = null;
+			string? returnString = null;
 
 			StringBuilder sb = new StringBuilder();
 			byte[] buf = new byte[8192];
@@ -187,7 +116,7 @@ namespace AutoPBW
 				request = (HttpWebRequest)WebRequest.Create(url);
 				request.CookieContainer = cookies;
 
-				request.UserAgent = "AutoPBW/" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+				request.UserAgent = userAgent;
 
 				try
 				{
@@ -211,8 +140,8 @@ namespace AutoPBW
 			}
 			finally
 			{
-				if (resStream != null)
-				{ resStream.Close(); }
+				if (resStream is not null)
+					resStream.Close();
 			}
 			return XDocument.Parse(returnString);
 		}
@@ -221,7 +150,7 @@ namespace AutoPBW
 		/// Gets games that the player is hosting that are in need of processing.
 		/// </summary>
 		/// <returns></returns>
-		public static IEnumerable<HostGame> GetHostGames()
+		public IEnumerable<HostGame> GetHostGames()
 		{
 			var xml = GetXMLData("http://pbw.spaceempires.net/node/host");
 			var hx = xml.Element("host");
@@ -251,7 +180,7 @@ namespace AutoPBW
 		/// Gets games that the player is playing.
 		/// </summary>
 		/// <returns></returns>
-		public static IEnumerable<PlayerGame> GetPlayerGames()
+		public IEnumerable<PlayerGame> GetPlayerGames()
 		{
 			var xml = GetXMLData("http://pbw.spaceempires.net/node/player");
 			var gamesxml = xml.Element("games");
@@ -264,17 +193,16 @@ namespace AutoPBW
 			}
 		}
 
-		#region Game loading helpers
 		private static HostGame LoadHostGame(XElement gx)
 		{
 			var g = new HostGame();
 			g.Code = gx.Element("game_code").Value;
 			g.Password = gx.Element("game_password").Value;
 			g.Mod = Mod.Find(gx.Element("mod_code").Value, gx.Element("game_type").Value);
-			g.TurnMode = Game.ParseTurnMode(gx.Element("turn_mode").Value);
+			g.TurnMode = ParseTurnMode(gx.Element("turn_mode").Value);
 			g.TurnNumber = int.Parse(gx.Element("turn").Value);
 			if (gx.Element("next_turn_date") != null)
-				g.TurnDueDate = UnixTimeToDateTime(gx.Element("next_turn_date").Value);
+				g.TurnDueDate = TimeUtility.UnixTimeToDateTime(gx.Element("next_turn_date").Value);
 			return g;
 		}
 
@@ -284,26 +212,22 @@ namespace AutoPBW
 			g.Code = gx.Element("game_code").Value;
 			g.Password = gx.Element("empire_password").Value;
 			g.Mod = Mod.Find(gx.Element("mod_code").Value, gx.Element("game_type").Value);
-			g.TurnMode = Game.ParseTurnMode(gx.Element("turn_mode").Value);
+			g.TurnMode = ParseTurnMode(gx.Element("turn_mode").Value);
 			g.TurnNumber = int.Parse(gx.Element("turn").Value);
-			g.TurnStartDate = UnixTimeToDateTime(gx.Element("turn_start_date").Value);
-			g.TurnDueDate = UnixTimeToDateTime(gx.Element("next_turn_date").Value);
+			g.TurnStartDate = TimeUtility.UnixTimeToDateTime(gx.Element("turn_start_date").Value);
+			g.TurnDueDate = TimeUtility.UnixTimeToDateTime(gx.Element("next_turn_date").Value);
 			g.Status = PlayerGame.ParseStatus(gx.Element("plr_status").Value);
 			g.PlayerNumber = int.Parse(gx.Element("number").Value);
 			g.ShipsetCode = gx.Element("shipset_code").Value;
 			return g;
 		}
-		#endregion
 
-		/// <summary>
-		/// Downloads a file from PBW.
-		/// </summary>
-		/// <param name="fullurl"></param>
-		/// <param name="downloadfilename"></param>
-		public static void Download(string fullurl, string downloadfilename)
+		public bool Download(string fullurl, string downloadfilename)
 		{
-			Log.Write("Attempting to download from {0} and save as {1}.".F(fullurl, downloadfilename));
+			Log.Write($"Attempting to download from {fullurl} and save as {downloadfilename}.");
 			FileStream fileStream = File.Create(downloadfilename);
+
+			bool result = false;
 
 			try
 			{
@@ -324,7 +248,7 @@ namespace AutoPBW
 
 				Stream responseStream = response.GetResponseStream();
 
-				Log.Write("Connection status to {0} is {1} {2}: {3}".F(response.ResponseUri, (int)response.StatusCode, response.StatusCode, response.StatusDescription));
+				Log.Write($"Connection status to {response.ResponseUri} is {(int)response.StatusCode} {response.StatusCode}: {response.StatusDescription}");
 
 				int buffersize = 1024;
 				byte[] buffer = new byte[buffersize];
@@ -335,8 +259,8 @@ namespace AutoPBW
 				{
 					fileStream.Write(buffer, 0, bytesRead);
 				}
+				result = true;
 			}
-
 			catch (WebException ex)
 			{
 				Log.Write("Error while downloading file:");
@@ -347,23 +271,27 @@ namespace AutoPBW
 			{
 				fileStream.Close();
 			}
+
+			return result;
 		}
 
 
-		public static void Upload(string file, string uploadurl, string uploadFormParam, HttpStatusCode expectedStatus = HttpStatusCode.OK)
+		public bool Upload(string url, string uploadFormParam, string filepath, HttpStatusCode expectedStatus = HttpStatusCode.OK)
 		{
-			//adapted from and many thanks to: http://www.briangrinstead.com/blog/multipart-form-post-in-c
-			Log.Write("Attempting to upload {0} to {1} as form field {2}.".F(file, uploadurl, uploadFormParam));
+			// adapted from and many thanks to: http://www.briangrinstead.com/blog/multipart-form-post-in-c
+			Log.Write($"Attempting to upload {filepath} to {url} as form field {uploadFormParam}.");
 
-			string filename = Path.GetFileName(file);
+			string filename = Path.GetFileName(filepath);
 			string fileformat = uploadFormParam;
 			var maxfilesize = MaxFileSize == 0 ? 64 * 1024 * 1024 : MaxFileSize; // default 64 MB if not already known
 			string content_type = "application/octet-stream";
 
+			bool result = false;
+
 			try
 			{
 				// Read file data
-				FileStream fs = new FileStream(file, FileMode.Open, FileAccess.Read);
+				FileStream fs = new FileStream(filepath, FileMode.Open, FileAccess.Read);
 				byte[] data = new byte[fs.Length];
 				fs.Read(data, 0, data.Length);
 				fs.Close();
@@ -372,14 +300,13 @@ namespace AutoPBW
 				Dictionary<string, object> postParameters = new Dictionary<string, object>();
 				postParameters.Add("MAX_FILE_SIZE", maxfilesize);
 				postParameters.Add("fileformat", fileformat);
-				postParameters.Add(uploadFormParam, new FormUpload.FileParameter(data, filename, content_type));
+				postParameters.Add(uploadFormParam, new FileParameter(data, filename, content_type));
 
 				// Create request and receive response
-				string postURL = uploadurl;
-				string userAgent = "AutoPBW/" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+				string postURL = url;
 				HttpWebResponse response = FormUpload.MultipartFormDataPost(cookies, postURL, userAgent, postParameters);
 
-				Log.Write("Connection status to {0} is {1} {2}: {3}".F(response.ResponseUri, (int)response.StatusCode, response.StatusCode, response.StatusDescription));
+				Log.Write($"Connection status to {response.ResponseUri} is {(int)response.StatusCode} {response.StatusCode}: {response.StatusDescription}");
 
 				// Process response
 				StreamReader responseReader = new StreamReader(response.GetResponseStream());
@@ -395,6 +322,7 @@ namespace AutoPBW
 					}
 				}
 				response.Close();
+				result = true;
 			}
 			catch (Exception ex)
 			{
@@ -402,50 +330,8 @@ namespace AutoPBW
 				Log.Write(ex.ToString());
 				throw;
 			}
-		}
 
-		/// <summary>
-		/// PBW log
-		/// </summary>
-		public static class Log
-		{
-			private static ObservableCollection<string> log = new ObservableCollection<string>();
-			private static int readCount = 0;
-
-			/// <summary>
-			/// Writes to the log.
-			/// </summary>
-			/// <param name="text"></param>
-			/// <param name="newline"></param>
-			public static void Write(string text)
-			{
-				log.Add(text);
-			}
-
-			/// <summary>
-			/// Reads all messages from the log, including ones that have already been read.
-			/// </summary>
-			/// <param name="markRead"></param>
-			/// <returns></returns>
-			public static IEnumerable<string> ReadAll(bool markRead = true)
-			{
-				if (markRead)
-					readCount = log.Count;
-				return log;
-			}
-
-			/// <summary>
-			/// Reads any new messages from the log.
-			/// </summary>
-			/// <param name="markRead"></param>
-			/// <returns></returns>
-			public static IEnumerable<string> ReadNew(bool markRead = true)
-			{
-				var result = log.Skip(readCount).ToArray();
-				if (markRead)
-					readCount = log.Count;
-				return result;
-			}
+			return result;
 		}
 
 		public static HttpStatusCode ConnectionStatus { get; private set; }
@@ -569,20 +455,59 @@ namespace AutoPBW
 
 				return formData;
 			}
+		}
 
-			public class FileParameter
+		public static TurnMode ParseTurnMode(string s)
+		{
+			if (s == "manual")
+				return TurnMode.Manual;
+			else if (s == "alpu")
+				return TurnMode.AfterLastPlayerUpload;
+			else if (s == "timed")
+				return TurnMode.Timed;
+			else if (s == "auto")
+				return TurnMode.FullyAutomatic;
+			else
+				throw new ArgumentException("Invalid turn mode: " + s, nameof(s));
+		}
+
+		public bool PlaceHold(HostGame g, string reason)
+		{
+			try
 			{
-				public byte[] File { get; set; }
-				public string FileName { get; set; }
-				public string ContentType { get; set; }
-				public FileParameter(byte[] file) : this(file, null) { }
-				public FileParameter(byte[] file, string filename) : this(file, filename, null) { }
-				public FileParameter(byte[] file, string filename, string contenttype)
+				var url = $"http://pbw.spaceempires.net/games/{g.Code}/hold-turn";
+				Log.Write($"Attempting to place hold on auto processing for {g}.");
+				var fields = new Dictionary<string, string>
 				{
-					File = file;
-					FileName = filename;
-					ContentType = contenttype;
-				}
+					{"hold_message", reason},
+				};
+				HttpUtility.SubmitForm(url, fields, cookies, "placing hold on " + g);
+				Log.Write($"Placing hold succeeded for {g}.");
+				return true;
+			}
+			catch (Exception ex)
+			{
+				Log.Write($"Placing hold failed for {g}.");
+				return false;
+			}
+		}
+
+		public bool ClearHold(HostGame g, string reason)
+		{
+			// reason parameter is ignored by PBW
+			try
+			{
+				var url = $"http://pbw.spaceempires.net/games/{g.Code}/clear-hold";
+				Log.Write($"Attempting to clear hold on auto processing for {g}.");
+				var fields = new Dictionary<string, string>();
+				HttpUtility.SubmitForm(url, fields, cookies, "clearing hold on " + g);
+				Log.Write($"Placing hold succeeded for {g}.");
+				return true;
+			}
+			catch (Exception ex)
+			{
+				Log.Write($"Placing hold failed for {g}.");
+				return false;
 			}
 		}
 	}

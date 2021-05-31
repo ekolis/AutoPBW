@@ -14,6 +14,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="AutoPBW-Manual.html" />
+    <None Remove="AutoPBW.ico" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="AutoPBW-Manual.html">
@@ -26,5 +27,10 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AutoPBW\AutoPBW.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="AutoPBW.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 </Project>

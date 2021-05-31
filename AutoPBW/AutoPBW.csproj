@@ -11,7 +11,6 @@
     <None Remove="7z.dll" />
     <None Remove="7z64.dll" />
     <None Remove="AutoPBW.config.default.json" />
-    <None Remove="AutoPBW.ico" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="7z.dll">
@@ -27,6 +26,7 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="SevenZipSharp.Net45" Version="1.0.19" />
+    <PackageReference Include="System.Composition" Version="5.0.1" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
@@ -35,5 +35,10 @@
     <Resource Include="AutoPBW.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="AutoPBW.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>
