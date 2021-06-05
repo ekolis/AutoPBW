@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace AutoPBW
 {
 	/// <summary>
-	/// PBW log
+	/// Log of all events captured by AutoPBW.
 	/// </summary>
 	public static class Log
 	{

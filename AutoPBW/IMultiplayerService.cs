@@ -63,6 +63,14 @@ namespace AutoPBW
 		bool Upload(string url, string uploadFormParam, string filepath, HttpStatusCode expectedStatus = HttpStatusCode.OK);
 
 		/// <summary>
+		/// Uploads the next turn from the host so that players can play.
+		/// </summary>
+		/// <param name="game">The game whose turn we are uploading.</param>
+		/// <param name="files">The files to upload.</param>
+		/// <returns>true if successful, otherwise false</returns>
+		bool UploadHostTurn(HostGame game, IEnumerable<string> files);
+
+		/// <summary>
 		/// Places a hold on automatic processing of a game.
 		/// </summary>
 		/// <param name="g">The game.</param>

@@ -11,7 +11,7 @@ namespace AutoPBW
 
 
 	/// <summary>
-	/// A game that is being played on PBW.
+	/// A game that is being played on a multiplayer service.
 	/// </summary>
 	public class PlayerGame : Game
 	{
@@ -77,6 +77,7 @@ namespace AutoPBW
 		/// </summary>
 		public void DownloadTurn()
 		{
+			// TODO: refactor this to not reference PBW in the generic classes
 			var url = $"http://pbw.spaceempires.net/games/{Code}/player-turn/download";
 			var path = GetSavePath();
 			Log.Write($"Downloading turn for {this} to {path}.");
@@ -89,6 +90,7 @@ namespace AutoPBW
 		/// </summary>
 		public void UploadEmpire(string empfile)
 		{
+			// TODO: refactor this to not reference PBW in the generic classes
 			var url = $"http://pbw.spaceempires.net/games/{Code}/player-empire/upload";
 			var path = Path.Combine(Engine.GetPlayerExecutableDirectory(), Mod.EmpirePath);
 			Log.Write($"Uploading empire {path} for {this}.");
@@ -122,7 +124,8 @@ namespace AutoPBW
 			var path = GetSavePath();
 			var files = GetFiles(path, GenerateArgumentsOrFilter(Engine.PlayerTurnUploadFilter));
 
-			// send to PBW
+			// send to service
+			// TODO: refactor this to not reference PBW in the generic classes
 			var url = $"http://pbw.spaceempires.net/games/{Code}/player-turn/upload";
 			if (files.Count() != 1)
 				throw new InvalidOperationException("Can only upload one PLR file at a time. " + files.Count() + " files were submitted.");
@@ -191,8 +194,8 @@ namespace AutoPBW
 	{
 		/// <summary>
 		/// Game is not being played by this user.
-		/// Games that are in this status are not currently returned by PBW.
 		/// </summary>
+		/// <remarks>Games that are in this status are not currently returned by PBW, but may be by other services.</remarks>
 		None,
 
 		/// <summary>

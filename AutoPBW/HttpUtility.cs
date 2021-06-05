@@ -51,5 +51,14 @@ namespace AutoPBW
 				throw;
 			}
 		}
+
+		/// <summary>
+		/// Enables logging in even if a service's SSL certificate is invalid or expired.
+		/// http://stackoverflow.com/questions/2675133/c-sharp-ignore-certificate-errors
+		/// </summary>
+		public static void OverrideBadCertificates()
+		{
+			ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
+		}
 	}
 }

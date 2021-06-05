@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace AutoPBW
 {
 	/// <summary>
-	/// A game that is being hosted on PBW.
+	/// A game that is being hosted on a multiplayer service.
 	/// </summary>
 	public class HostGame : Game
 	{
@@ -24,6 +24,7 @@ namespace AutoPBW
 		/// </summary>
 		public void DownloadEmpires()
 		{
+			// TODO: refactor this to not reference PBW in the generic classes
 			var url = $"http://pbw.spaceempires.net/games/{Code}/host-empire/download";
 			var path = Path.Combine(Path.GetDirectoryName(Engine.HostExecutable.Trim('"')), Mod.EmpirePath);
 			Log.Write($"Downloading empires for {this} and saving to {path}.");
@@ -35,6 +36,7 @@ namespace AutoPBW
 		/// </summary>
 		public void DownloadTurns()
 		{
+			// TODO: refactor this to not reference PBW in the generic classes
 			var url = $"http://pbw.spaceempires.net/games/{Code}/host-turn/download";
 			var path = Path.Combine(Path.GetDirectoryName(Engine.HostExecutable.Trim('"')), Mod.SavePath);
 			Log.Write($"Downloading player turns for {this} and saving to {path}.");
@@ -45,7 +47,7 @@ namespace AutoPBW
 		/// The game that's currently processing/uploading.
 		/// Don't attempt to process any more games if one is already processing, and don't attempt to upload the same game twice in a row!
 		/// </summary>
-		public static HostGame ProcessingGame { get; set; }
+		public static HostGame? ProcessingGame { get; set; }
 
 		/// <summary>
 		/// Prepares to process the turn for this game.
@@ -71,18 +73,14 @@ namespace AutoPBW
 		/// Uploads the next turn for this game.
 		/// Sets the "processing game code" to null.
 		/// </summary>
-		public void UploadTurn()
+		public bool UploadTurn()
 		{
-			// get list of files
 			var path = Path.Combine(Path.GetDirectoryName(Engine.HostExecutable.Trim('"')), Mod.SavePath);
 			var files = GetFiles(path, GenerateArgumentsOrFilter(Engine.HostTurnUploadFilter, true));
-
-			// send to PBW
-			var url = $"http://pbw.spaceempires.net/games/{Code}/host-turn/upload";
 			Log.Write($"Uploading next turn for {this}.");
-			ArchiveUploadAndDeleteArchive(files, url, "turn_file", HttpStatusCode.Redirect); // for some reason PBW gives a 302 on host turn upload
-
+			var result = Service.UploadHostTurn(this, files);
 			ProcessingGame = null;
+			return result;
 		}
 
 		// TODO - replace turn
@@ -123,8 +121,8 @@ namespace AutoPBW
 	{
 		/// <summary>
 		/// Game is not being hosted by this user.
-		/// Games that are in this status are not currently returned by PBW.
 		/// </summary>
+		/// <remarks>Games that are in this status are not currently returned by PBW, but may be by other services.</remarks>
 		None,
 
 		/// <summary>
@@ -139,8 +137,8 @@ namespace AutoPBW
 
 		/// <summary>
 		/// Game is in progress and awaiting player commands.
-		/// Games that are in this status are not currently returned by PBW.
 		/// </summary>
+		/// <remarks>Games that are in this status are not currently returned by PBW, but may be by other services.</remarks>
 		InProgress,
 
 		/// <summary>

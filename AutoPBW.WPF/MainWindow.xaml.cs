@@ -43,15 +43,6 @@ namespace AutoPBW.WPF
 		/// </summary>
 		private Dictionary<string, FileSystemWatcher> TurnUploadWatchers;
 
-		/// <summary>
-		/// Any known multiplayer services.
-		/// </summary>
-		private IList<IMultiplayerService> Services { get; } = new List<IMultiplayerService>()
-		{
-			// TODO: create more multiplayer service types and let the user connect to instances of them
-			new PBW(),
-		};
-
 		public MainWindow()
 		{
 			InitializeComponent();
@@ -157,7 +148,7 @@ namespace AutoPBW.WPF
 			// set cursor
 			Cursor = Cursors.Wait;
 
-			foreach (var service in Services)
+			foreach (var service in Config.Instance.Services)
 			{
 				if (!service.IsLoggedIn)
 				{
@@ -238,7 +229,7 @@ namespace AutoPBW.WPF
 						if (!pbwIsDown)
 							ShowBalloonTip("Unable to refresh", "Unable to refresh games lists: " + ex.Message, null, BalloonIcon.Error);
 						pbwIsDown = true;
-						taskbarIcon.ToolTipText = "Unable to connect to PBW";
+						taskbarIcon.ToolTipText = "Unable to connect to multiplayer services";
 					}
 					try
 					{
@@ -387,7 +378,7 @@ namespace AutoPBW.WPF
 
 		private void Login()
 		{
-			foreach (var service in Services)
+			foreach (var service in Config.Instance.Services)
 			{
 				try
 				{
@@ -405,7 +396,7 @@ namespace AutoPBW.WPF
 						{
 							try
 							{
-								PBW.OverrideBadCertificates();
+								HttpUtility.OverrideBadCertificates();
 								service.Login(Config.Instance.Username, Config.Instance.Password);
 							}
 							catch (Exception ex2)
@@ -839,6 +830,7 @@ namespace AutoPBW.WPF
 
 		private void btnWebsite_Click(object sender, RoutedEventArgs e)
 		{
+			// TODO: refactor this to not reference PBW in the generic classes
 			Process.Start("http://pbw.spaceempires.net/dashboard");
 		}
 
@@ -875,11 +867,12 @@ namespace AutoPBW.WPF
 			RefreshData();
 		}
 
-		// TODO - move pbwIsDown to PBW.IsDown
+		// TODO - move pbwIsDown to IMultiplayerService.IsDown
 		private bool pbwIsDown = false;
 
 		private void btnView_Click(object sender, RoutedEventArgs e)
 		{
+			// TODO: refactor this to not reference PBW in the generic classes
 			var game = (PlayerGame)gridPlayerGames.SelectedItem;
 			if (game != null)
 				Process.Start($"http://pbw.spaceempires.net/games/{game.Code}");
@@ -887,6 +880,7 @@ namespace AutoPBW.WPF
 
 		private void btnViewHost_Click(object sender, RoutedEventArgs e)
 		{
+			// TODO: refactor this to not reference PBW in the generic classes
 			var game = (HostGame)gridHostGames.SelectedItem;
 			if (game != null)
 				Process.Start($"http://pbw.spaceempires.net/games/{game.Code}");

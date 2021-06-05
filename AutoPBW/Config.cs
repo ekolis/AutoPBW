@@ -93,6 +93,8 @@ namespace AutoPBW
 			File.WriteAllText(filename, JsonConvert.SerializeObject(Instance, JsonSettings));
 		}
 
+		// TODO: username and password should be per service
+
 		/// <summary>
 		/// User's PBW username.
 		/// </summary>
@@ -123,15 +125,26 @@ namespace AutoPBW
 		/// </summary>
 		public bool EnableAutoUpload { get; set; }
 
+		// TODO: certificates and polling intervals should be per service
+
 		/// <summary>
-		/// Should we silently ignore bad SSL certificates on the PBW site, or prompt the user about them?
+		/// Should we silently ignore bad SSL certificates on the service, or prompt the user about them?
 		/// </summary>
 		public bool IgnoreBadCertificates { get; set; }
 
 		/// <summary>
-		/// The polling interval to check with PBW, in seconds.
+		/// The polling interval to check with the service, in seconds.
 		/// </summary>
 		public int PollingInterval { get; set; } = 120;
+
+		/// <summary>
+		/// Any known multiplayer services.
+		/// </summary>
+		public IList<IMultiplayerService> Services { get; } = new List<IMultiplayerService>()
+		{
+			// TODO: create more multiplayer service types and let the user connect to instances of them
+			new SEPBW(),
+		};
 
 		/// <summary>
 		/// Known game engines.

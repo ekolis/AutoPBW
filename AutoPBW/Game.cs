@@ -118,7 +118,7 @@ namespace AutoPBW
 			File.Delete(tempfile);
 		}
 
-		protected void ArchiveUploadAndDeleteArchive(IEnumerable<string> files, string url, string uploadFormParam, HttpStatusCode expectedStatus = HttpStatusCode.OK)
+		protected internal void ArchiveUploadAndDeleteArchive(IEnumerable<string> files, string url, string uploadFormParam, HttpStatusCode expectedStatus = HttpStatusCode.OK)
 		{
 			// generate a temp file name
 			var tempfile = MakeTempFile("7z");
