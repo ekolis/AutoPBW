@@ -172,17 +172,17 @@
                     <Label Content="Password" Grid.Row ="1" RenderTransformOrigin="0.5,0.5"/>
                     <PasswordBox x:Name="txtPassword" Grid.Row="1" Grid.Column="1" Height="21" ToolTip="Your PBW password."/>
                     <Label Content="Enable Hosting" Grid.Row ="2" RenderTransformOrigin="0.5,0.5"/>
-                    <CheckBox x:Name="chkEnableHosting" Grid.Row="2" Grid.Column="1" Content="" HorizontalAlignment="Left" Margin="0,4,0,0" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="chkEnableHosting" Grid.Row="2" Grid.Column="1" Content="" HorizontalAlignment="Left" Margin="0,4,0,0" VerticalAlignment="Top" ToolTip="Should AutoPBW process turns for games that you are hosting?"/>
                     <Label Content="Hide Player Zero" Grid.Row ="3" />
-                    <CheckBox x:Name="chkHidePlayerZero" Grid.Row="3" Grid.Column="1" Content="" HorizontalAlignment="Left" Margin="0,4,0,0" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="chkHidePlayerZero" Grid.Row="3" Grid.Column="1" Content="" HorizontalAlignment="Left" Margin="0,4,0,0" VerticalAlignment="Top" ToolTip="Some games, such as THANCS, have a 'fake' player zero which represents the game host. Check this box to hide turns in the Games I Play tab for player zero if you are the host of such a game." />
                     <Label Content="Download Turns Automatically" Grid.Row ="4" />
-                    <CheckBox x:Name="chkAutoDownload" Grid.Row="4" Grid.Column="1" Content="" HorizontalAlignment="Left" Margin="0,4,0,0" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="chkAutoDownload" Grid.Row="4" Grid.Column="1" Content="" HorizontalAlignment="Left" Margin="0,4,0,0" VerticalAlignment="Top" ToolTip="Should AutoPBW automatically download new turns for you to play as they become available?"/>
                     <Label Content="Automatically upload player turns" Grid.Row ="5" />
-                    <CheckBox x:Name="chkEnableAutoUpload" Content="" Grid.Row="5" Grid.Column="1" HorizontalAlignment="Left" Margin="0,4,0,0" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="chkEnableAutoUpload" Content="" Grid.Row="5" Grid.Column="1" HorizontalAlignment="Left" Margin="0,4,0,0" VerticalAlignment="Top" ToolTip="Should AutoPBW automatically upload turns you play after exiting the game?"/>
                     <Label Content="Ignore Bad Certificates" Grid.Row ="6" />
-                    <CheckBox x:Name="chkIgnoreBadCertificates" Grid.Row="6" Grid.Column="1" Content="" HorizontalAlignment="Left" Margin="0,4,0,0" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="chkIgnoreBadCertificates" Grid.Row="6" Grid.Column="1" Content="" HorizontalAlignment="Left" Margin="0,4,0,0" VerticalAlignment="Top" ToolTip="PBW has issues with its SSL certificates; check this box to ignore any such errors."/>
                     <Label Content="Polling Interval" Grid.Row ="7" />
-                    <ComboBox x:Name="ddlPollingInterval" Grid.Row="7" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="120">
+                    <ComboBox x:Name="ddlPollingInterval" Grid.Row="7" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="120" ToolTip="How often should AutoPBW check for new turns?">
                         <ComboBoxItem Content="15s" Tag="15" />
                         <ComboBoxItem Content="30s" Tag="30" />
                         <ComboBoxItem Content="1m"  Tag="60" />
