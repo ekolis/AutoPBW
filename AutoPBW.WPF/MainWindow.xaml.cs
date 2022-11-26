@@ -18,7 +18,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using AutoPBW;
 using AutoPBW.WPF.Properties;
-using Hardcodet.Wpf.TaskbarNotification;
+using H.NotifyIcon;
+using H.NotifyIcon.Core;
 using Microsoft.Win32;
 
 namespace AutoPBW.WPF
@@ -232,7 +233,7 @@ namespace AutoPBW.WPF
 				catch (Exception ex)
 				{
 					if (!pbwIsDown)
-						ShowBalloonTip("Unable to refresh", "Unable to refresh games lists: " + ex.Message, null, BalloonIcon.Error);
+						ShowBalloonTip("Unable to refresh", "Unable to refresh games lists: " + ex.Message, null, NotificationIcon.Error);
 					pbwIsDown = true;
 					taskbarIcon.ToolTipText = "Unable to connect to PBW";
 				}
@@ -251,7 +252,7 @@ namespace AutoPBW.WPF
 				}
 				catch (Exception ex)
 				{
-					ShowBalloonTip("Unable to refresh", "Unable to refresh engines/mods lists: " + ex.Message, null, BalloonIcon.Error);
+					ShowBalloonTip("Unable to refresh", "Unable to refresh engines/mods lists: " + ex.Message, null, NotificationIcon.Error);
 				}
 
 				// load log
@@ -350,7 +351,7 @@ namespace AutoPBW.WPF
 						{
 							var msg = "Unable to upload new turn for hosted game {0}: {1}".F(g, ex.Message);
 							PBW.Log.Write(msg);
-							ShowBalloonTip("Error uploading turn", msg, g, BalloonIcon.Error);
+							ShowBalloonTip("Error uploading turn", msg, g, NotificationIcon.Error);
 							HostGame.ProcessingGame = null; // allow processing a different game
 						}
 						RefreshData();
@@ -360,7 +361,7 @@ namespace AutoPBW.WPF
 					{
 						var msg = "Turn processing for {0} failed with exit code {1}.".F(g, currentTurnExitCode);
 						PBW.Log.Write(msg);
-						ShowBalloonTip("Turn processing failed", msg, g, BalloonIcon.Error);
+						ShowBalloonTip("Turn processing failed", msg, g, NotificationIcon.Error);
 						try
 						{
 							g.PlaceHold("{0} exited with error code {1}".F(System.IO.Path.GetFileName(p.StartInfo.FileName.Trim('"')), currentTurnExitCode));
@@ -369,7 +370,7 @@ namespace AutoPBW.WPF
 						catch (Exception ex)
 						{
 							msg = "Unable to place processing hold on {0}: {1}".F(g, ex.Message);
-							ShowBalloonTip("Error placing hold", msg, g, BalloonIcon.Error);
+							ShowBalloonTip("Error placing hold", msg, g, NotificationIcon.Error);
 							PBW.Log.Write(msg);
 						}
 					}
@@ -403,7 +404,7 @@ namespace AutoPBW.WPF
 						catch (Exception ex2)
 						{
 							if (!pbwIsDown)
-								ShowBalloonTip("Login failed", "Unable to log in to PBW: " + ex2.Message, null, BalloonIcon.Error);
+								ShowBalloonTip("Login failed", "Unable to log in to PBW: " + ex2.Message, null, NotificationIcon.Error);
 							pbwIsDown = true;
 						}
 					}
@@ -416,7 +417,7 @@ namespace AutoPBW.WPF
 				else
 				{
 					if (!pbwIsDown)
-						ShowBalloonTip("Login failed", "Unable to log in to PBW: " + ex.Message, null, BalloonIcon.Error);
+						ShowBalloonTip("Login failed", "Unable to log in to PBW: " + ex.Message, null, NotificationIcon.Error);
 					pbwIsDown = true;
 				}
 			}
@@ -742,7 +743,7 @@ namespace AutoPBW.WPF
 						}
 						catch (Exception ex)
 						{
-							ShowBalloonTip("Upload failed", "Could not upload turn: " + ex.Message, null, BalloonIcon.Error);
+							ShowBalloonTip("Upload failed", "Could not upload turn: " + ex.Message, null, NotificationIcon.Error);
 						}
 					}
 				}
@@ -844,10 +845,14 @@ namespace AutoPBW.WPF
 			Launcher.Launch("AutoPBW-Manual.html");
 		}
 
-		private void ShowBalloonTip(string title, string text, object context = null, BalloonIcon icon = BalloonIcon.None)
+		private void ShowBalloonTip(string title, string text, object context = null, NotificationIcon icon = NotificationIcon.None)
 		{
 			balloonTipContext = context;
-			taskbarIcon.ShowBalloonTip(title, text, icon);
+			if (!taskbarIcon.IsCreated)
+			{
+				taskbarIcon.ForceCreate();
+			}
+			taskbarIcon.ShowNotification(title, text, icon);
 		}
 
 		private void btnReset_Click(object sender, RoutedEventArgs e)
