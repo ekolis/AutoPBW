@@ -16,7 +16,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 6.0.x
+        dotnet-version: 7.0.x
     - name: Install dependencies
       run: dotnet restore
     - name: Build
@@ -30,7 +30,7 @@ jobs:
         mkdir Artifact
         mkdir Artifact/AutoPBW.WPF
         mkdir Artifact/AutoPBW.WPF/AutoPBW
-        mv AutoPBW.WPF/bin/Release/net6.0-windows/* Artifact/AutoPBW.WPF/AutoPBW/
+        mv AutoPBW.WPF/bin/Release/net7.0-windows/* Artifact/AutoPBW.WPF/AutoPBW/
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
       with:
