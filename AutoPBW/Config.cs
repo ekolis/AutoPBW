@@ -4,8 +4,9 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using SevenZip;
 
 namespace AutoPBW
@@ -17,11 +18,13 @@ namespace AutoPBW
 	{
 		static Config()
 		{
-			Instance = new Config();
+			Instance = new();
 
-			JsonSettings = new JsonSerializerSettings();
-			JsonSettings.Formatting = Formatting.Indented;
-			JsonSettings.PreserveReferencesHandling = PreserveReferencesHandling.All;
+			JsonOptions = new()
+			{
+				WriteIndented = true,
+				ReferenceHandler = ReferenceHandler.Preserve,
+			};
 
 			if (IntPtr.Size == 8) // 64-bit
 			{
@@ -36,7 +39,7 @@ namespace AutoPBW
 			}
 		}
 
-		private Config()
+		public Config()
 		{
 			Engines = new ObservableCollection<Engine>();
 			Mods = new ObservableCollection<Mod>();
@@ -55,13 +58,13 @@ namespace AutoPBW
 
 		private const string defaultFilename = "AutoPBW.config.default.json";
 
-		private static JsonSerializerSettings JsonSettings;
+		private static JsonSerializerOptions JsonOptions;
 
 		public static void Load()
 		{
 			try
 			{
-				Default = JsonConvert.DeserializeObject<Config>(File.ReadAllText(defaultFilename), JsonSettings);
+				Default = JsonSerializer.Deserialize<Config>(File.ReadAllText(defaultFilename), JsonOptions)!;
 			}
 			catch (Exception ex)
 			{
@@ -72,7 +75,7 @@ namespace AutoPBW
 
 			try
 			{
-				Instance = JsonConvert.DeserializeObject<Config>(File.ReadAllText(filename), JsonSettings);
+				Instance = JsonSerializer.Deserialize<Config>(File.ReadAllText(filename), JsonOptions)!;
 			}
 			catch (Exception ex)
 			{
@@ -90,7 +93,7 @@ namespace AutoPBW
 
 		public static void Save()
 		{
-			File.WriteAllText(filename, JsonConvert.SerializeObject(Instance, JsonSettings));
+			File.WriteAllText(filename, JsonSerializer.Serialize(Instance, JsonOptions));
 		}
 
 		/// <summary>
