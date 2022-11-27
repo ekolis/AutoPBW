@@ -13,10 +13,17 @@ namespace AutoPBW
 	/// </summary>
 	public class Engine
 	{
+		/// <summary>
+		/// For deserialization.
+		/// </summary>
+		public Engine()
+		{
+			IsUnknown = true;
+		}
+
 		public Engine(string code)
 		{
 			Code = code;
-			IsUnknown = true;
 		}
 
 		/// <summary>

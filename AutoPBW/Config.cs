@@ -136,11 +136,11 @@ namespace AutoPBW
 		/// <summary>
 		/// Known game engines.
 		/// </summary>
-		public ObservableCollection<Engine> Engines { get; private set; }
+		public ObservableCollection<Engine> Engines { get; set; }
 
 		/// <summary>
 		/// Known mods.
 		/// </summary>
-		public ObservableCollection<Mod> Mods { get; private set; }
+		public ObservableCollection<Mod> Mods { get; set; }
 	}
 }

@@ -12,11 +12,19 @@ namespace AutoPBW
 	/// </summary>
 	public class Mod
 	{
+		/// <summary>
+		/// For deserialization.
+		/// </summary>
+		public Mod()
+		{
+			IsUnknown = true;
+		}
+
 		public Mod(string code, string engineCode)
+			: this()
 		{
 			Code = code;
 			Engine = Engine.Find(engineCode);
-			IsUnknown = true;
 		}
 
 		/// <summary>
