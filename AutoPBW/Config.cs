@@ -28,14 +28,11 @@ namespace AutoPBW
 
 			if (IntPtr.Size == 8) // 64-bit
 			{
-				SevenZipCompressor.SetLibraryPath("7z64.dll");
-				SevenZipExtractor.SetLibraryPath("7z64.dll");
-
+				SevenZipBase.SetLibraryPath("7z64.dll");
 			}
 			else
 			{
-				SevenZipCompressor.SetLibraryPath("7z.dll");
-				SevenZipExtractor.SetLibraryPath("7z.dll");
+				SevenZipBase.SetLibraryPath("7z.dll");
 			}
 		}
 
